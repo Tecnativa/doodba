@@ -1,0 +1,9 @@
+#!/bin/sh
+# Shortcut to run Odoo in unit testing mode
+set -e
+addons=$1
+shift
+log INFO Executing Odoo in unittest mode for addons $addons
+# HACK `--workers 0`: https://github.com/odoo/odoo/pull/14809
+set -x
+exec odoo.py --init $addons --update $addons --log-level debug --workers 0 "$@"

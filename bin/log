@@ -1,0 +1,28 @@
+#!/bin/sh
+set -e
+
+type="$1"
+shift
+gray='\e[0;90m'
+bold='\e[1;0m'
+
+case "$type" in
+    ERROR)
+        color='\e[1;41m'
+        ;;
+    WARNING)
+        color='\e[1;43m'
+        ;;
+    DEBUG)
+        color='\e[1;46m'
+        ;;
+    INFO)
+        type=INFO
+        color='\e[1;42m'
+        ;;
+    *)
+        >&2 echo 'Usage: [ERROR|WARNING|DEBUG|INFO] MESSAGE'
+        exit 1
+esac
+
+>&2 echo -e "$color$type$gray $(date +%H:%M:%s)$bold" "$@"

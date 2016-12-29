@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+if [ "$COMPILE" != yes ]; then
+    log WARNING Not compiling Python code
+    exit 0
+fi
+
+log INFO Compiling all Python code in /opt/odoo
+log DEBUG PYTHONOPTIMIZE set to $PYTHONOPTIMIZE
+python -m compileall /opt/odoo

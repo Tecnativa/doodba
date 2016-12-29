@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+if [ "$AGGREGATE" != yes ]; then
+    log WARNING Not aggregating code repositories
+    exit 0
+fi
+
+conf=/opt/odoo/custom/src/repos.yaml
+# Update linked repositories, if the `repos.yaml` file is found
+if [ -f $conf ]; then
+    log INFO Aggregating repositories from $conf
+    cd $(dirname $conf)
+    gitaggregate -c $conf
+else
+    log ERROR Cannot aggregate repositories: $conf not found
+    exit 1
+fi

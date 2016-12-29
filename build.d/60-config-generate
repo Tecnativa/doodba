@@ -1,0 +1,8 @@
+#!/bin/sh
+# Generate Odoo server configuration from templates
+set -e
+src="/opt/odoo/common/conf.d/* /opt/odoo/custom/conf.d/*"
+log INFO Merging $(ls $src | wc -l) configuration files in $ODOO_RC
+conf=$(cat $src | envsubst)
+log DEBUG Resulting configuration: "$conf"
+echo "$conf" > $ODOO_RC

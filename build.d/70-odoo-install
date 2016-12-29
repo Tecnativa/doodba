@@ -1,0 +1,6 @@
+#!/bin/sh
+# Generate Odoo server configuration from templates
+set -e
+src=/opt/odoo/custom/src/odoo
+log INFO Installing Odoo from $src
+pip install --no-cache-dir --editable $src

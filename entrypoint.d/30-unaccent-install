@@ -1,0 +1,9 @@
+#!/bin/sh
+if [ "$UNACCENT" == yes ]; then
+    log INFO Trying to install unaccent in database $PGDATABASE@$PGHOST...
+    if psql -c 'CREATE EXTENSION IF NOT EXISTS unaccent;'; then
+        log INFO Unaccent extension installed
+    else
+        log WARNING Could not install unaccent extension
+    fi
+fi

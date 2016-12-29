@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+# Check if the `addons.txt` file is provided
+list=/opt/odoo/custom/src/addons.txt
+if [ -f $list ]; then
+    # Autocreate the addons directory
+    dir=/opt/odoo/auto/addons
+    log INFO Linking all addons from $list in $dir
+    mkdir -p $dir
+    cd $dir
+    # Link each addon found in `addons.txt`
+    for addon in $(cat $list); do
+        log DEBUG Linking $addon
+        ln -sf /opt/odoo/custom/src/$addon .
+    done
+else
+    log WARNING Linking no addons: $list not found
+fi
