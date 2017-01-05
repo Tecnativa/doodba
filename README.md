@@ -1,4 +1,4 @@
-# Dockerized Odoo Base Image
+# [Dockerized Odoo Base Image](https://hub.docker.com/r/tecnativa/odoo-base)
 
 Highly opinionated image ready to put [Odoo](https://www.odoo.com) inside it,
 but **without Odoo**.
