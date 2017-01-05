@@ -1,0 +1,34 @@
+version: "2"
+services:
+    odoo9:
+        extends:
+            file: common.yaml
+            service: odoo
+        environment:
+            PGDATABASE: test
+        links:
+            - db9:db
+            - wdb
+        volumes:
+            - filestore9:/home/odoo/.local/share/Odoo
+
+    db9:
+        extends:
+            file: common.yaml
+            service: db
+        volumes:
+            - db9:/var/lib/postgresql/data
+
+    https:
+        build: https
+        ports:
+            - "80:80"
+            - "443:443"
+        links:
+            - odoo9:www
+        environment:
+            PORT: 8069
+
+volumes:
+    filestore9:
+    db9:

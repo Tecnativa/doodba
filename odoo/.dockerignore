@@ -1,0 +1,4 @@
+# Ignore all src directories except private and files with a dot
+custom/src/*
+!custom/src/private
+!custom/src/*.*

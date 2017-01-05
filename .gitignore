@@ -1,0 +1,11 @@
+# Ignore all src directories except private and files with a dot
+odoo/custom/src/*
+!odoo/custom/src/private
+!odoo/custom/src/*.*
+
+# Compiled formats, cache, temporary files, git garbage
+**.~
+**.mo
+**.py[co]
+**.egg-info
+**.orig

@@ -1,0 +1,50 @@
+version: "2"
+
+services:
+    odoo9:
+        extends:
+            file: common.yaml
+            service: odoo
+        build:
+            args:
+                # To aggregate in development, use `setup-devel.yaml`
+                AGGREGATE: "no"
+                # No need for this in development
+                CLEAN: "no"
+                COMPILE: "no"
+        ports:
+            # I recommend you to use static ports per project
+            - "8069"
+            - "8072"
+        volumes:
+            - filestore9:/home/odoo/.local/share/Odoo
+            - ./odoo/custom:/opt/odoo/custom:ro,z
+        environment:
+            PGDATABASE: devel
+            # Don't optimize in development
+            PYTHONOPTIMIZE: 0
+            # Use same static port as in `wdb` service below
+            WDB_WEB_PORT: "1984"
+        links:
+            - db9:db
+            - wdb
+        # Uncomment to start in unit test mode, add module names if you wish
+        # command: unittest module1,module2
+        command: odoo.py --dev
+
+    db9:
+        extends:
+            file: common.yaml
+            service: db
+        volumes:
+            - db9:/var/lib/postgresql/data
+
+    wdb:
+        image: docker.io/yajo/wdb-server
+        ports:
+            # I recommend you to use static ports per project
+            - "1984"
+
+volumes:
+    filestore9:
+    db9:

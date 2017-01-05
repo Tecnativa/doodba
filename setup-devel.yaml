@@ -1,0 +1,16 @@
+# Use this environment to download all repositories from `repos.yaml` file:
+#
+#   docker-compose -f setup-devel.yaml up
+#
+# You can clean your git project before if you want to have all really clean:
+#
+#   git clean -ffd
+
+version: "2"
+
+services:
+    gitaggregator:
+        image: tecnativa/git-aggregator
+        volumes:
+            - ./odoo/custom/src/:/repos:rw,z
+        command: -c repos.yaml

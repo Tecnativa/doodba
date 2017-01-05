@@ -1,0 +1,77 @@
+version: "2"
+services:
+    odoo9:
+        extends:
+            file: common.yaml
+            service: odoo
+        restart: always
+        environment:
+            ADMIN_PASSWORD: example secure password
+        links:
+            - db9:db
+        volumes:
+            - filestore9:/home/odoo/.local/share/Odoo
+
+    db9:
+        extends:
+            file: common.yaml
+            service: db
+        restart: always
+        volumes:
+            - db9:/var/lib/postgresql/data
+
+    https:
+        build: https
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        links:
+            - odoo9:www
+        environment:
+            PORT: 8069
+
+    smtp:
+        image: tecnativa/postfix-relay
+        restart: always
+        volumes:
+            - smtp:/var/spool/postfix
+        environment:
+            MAILNAME: example.com
+            MAIL_RELAY_HOST: smtp.example.com
+            MAIL_RELAY_PORT: 587
+            MAIL_RELAY_USER: postmaster@example.com
+            MAIL_RELAY_PASS: example password
+            MAIL_CANONICAL_DOMAINS: example.com
+            MAIL_NON_CANONICAL_DEFAULT: example.com
+
+    backup:
+        image: tecnativa/server-backup
+        environment:
+            ROOT_EMAIL_FROM: backup@example.com
+            ROOT_EMAIL_TO: alerts@example.com
+            MAIL_RELAY_HOST: smtp
+            BACKUP_S3_ACCESS_KEY: example key
+            BACKUP_S3_SECRET_KEY: example secret
+            BACKUP_S3_BUCKET: example-bkp
+            BACKUP_S3_INSTANCE: docker-example
+            BACKUP_SEND_MAIL_ERR: 1
+            BACKUP_SEND_MAIL_LOG: 1
+            BACKUP_EMAIL_SUBJECT: '[EXAMPLE]'
+            BACKUP_EMAIL_FROM: backup@example.com
+            BACKUP_EMAIL_TO: alerts@example.com
+            BACKUP_ENCRYPT: 1
+            BACKUP_ENCRYPT_KEY: example encryption key
+            BACKUP_SOURCES: /home/odoo/.local/share/Odoo,0,1
+            PG_USER: odoo
+            PG_PASS: odoopassword
+        links:
+            - db9:postgresdb
+            - smtp
+        volumes_from:
+            - odoo9data
+
+volumes:
+    filestore9:
+    db9:
+    smtp:

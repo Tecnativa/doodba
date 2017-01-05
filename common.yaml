@@ -1,0 +1,11 @@
+version: "2"
+services:
+    odoo:
+        build: odoo
+        tty: true
+
+    db:
+        image: postgres:9.5-alpine
+        environment:
+            POSTGRES_USER: odoo
+            POSTGRES_PASSWORD: odoopassword
