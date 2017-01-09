@@ -45,14 +45,14 @@ future scaffolding updates merged in your project's `git log`:
 The scaffolding provides you a boilerplate-ready project to start developing
 Odoo in no time.
 
-### Environments
+#### Environments
 
 This scaffolding comes with some environment configurations, ready for you to
 extend them. Each of them is a [Docker Compose
 file](https://docs.docker.com/compose/compose-file/) ready to work out of the
 box, but that will assume that you understand it and will modify it.
 
-### Development
+##### Development
 
 Set it up with:
 
@@ -71,7 +71,7 @@ You will notice `.gitignore` and `.dockerignore` files with these contents:
 This is on purpose. It allows you to track only what Git needs to track and
 provides faster Docker builds.
 
-### Production
+##### Production
 
 This environment is just a template. **It is not production-ready**. You must
 change many things inside it, it's just a guideline.
@@ -82,7 +82,7 @@ Once you fixed everything needed, run it with:
 
     docker-compose -f prod.yaml up --build
 
-### Testing
+##### Testing
 
 A good rule of thumb is test in testing before uploading to production, so this
 environment tries to imitate the production one in everything, but *removing
