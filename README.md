@@ -13,6 +13,89 @@ structure.
 
 BTW, we use [Alpine](https://alpinelinux.org/). I hope you like that.
 
+## Why?
+
+Because developing Odoo is hard. You need lots of customizations, dependencies,
+and if you want to mmove from one version to another, it's a pain.
+
+Also because nobody wants Odoo as it comes from upstream, you most likely will
+need to add custom patches and addons, at least, so we need a way to put all
+together and make it work anywhere quickly.
+
+## Scaffolding
+
+Get up and running quickly with the provided
+[scaffolding](https://github.com/Tecnativa/docker-odoo-base/tree/scaffolding):
+
+### Skip the boring parts
+
+    git clone -b scaffolding https://github.com/Tecnativa/docker-odoo-base.git myproject
+    cd myproject
+    docker-compose -f setup-devel.yaml up
+    docker-compose -f devel.yaml up
+
+And if you don't want to have a chance to do a `git merge` and get possible
+future scaffolding updates merged in your project's `git log`:
+
+    rm -Rf .git
+    git init
+
+### Tell me the boring parts
+
+The scaffolding provides you a boilerplate-ready project to start developing
+Odoo in no time.
+
+### Environments
+
+This scaffolding comes with some environment configurations, ready for you to
+extend them. Each of them is a [Docker Compose
+file](https://docs.docker.com/compose/compose-file/) ready to work out of the
+box, but that will assume that you understand it and will modify it.
+
+### Development
+
+Set it up with:
+
+    docker-compose -f setup-devel.yaml up
+
+Once finished, you can start using Odoo with:
+
+    docker-compose -f devel.yaml up --build
+
+You will notice `.gitignore` and `.dockerignore` files with these contents:
+
+    odoo/custom/src/*
+    !odoo/custom/src/private
+    !odoo/custom/src/*.*
+
+This is on purpose. It allows you to track only what Git needs to track and
+provides faster Docker builds.
+
+### Production
+
+This environment is just a template. **It is not production-ready**. You must
+change many things inside it, it's just a guideline.
+
+It includes pluggable `smtp` and `backup` services.
+
+Once you fixed everything needed, run it with:
+
+    docker-compose -f prod.yaml up --build
+
+### Testing
+
+A good rule of thumb is test in testing before uploading to production, so this
+environment tries to imitate the production one in everything, but *removing
+possible pollution points*:
+
+- It has no `smtp` service.
+
+- It has no `backup` service.
+
+Test it in your machine with:
+
+    docker-compose -f test.yaml up --build
+
 ## Image usage
 
 Basically, every directory you have to worry about is found inside `/opt/odoo`.
