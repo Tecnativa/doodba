@@ -32,22 +32,14 @@ services:
             PORT: 8069
 
     smtp:
-        image: tecnativa/postfix-relay
-        restart: always
-        volumes:
-            - smtp:/var/spool/postfix
-        environment:
-            MAILNAME: example.com
-            MAIL_RELAY_HOST: smtp.example.com
-            MAIL_RELAY_PORT: 587
-            MAIL_RELAY_USER: postmaster@example.com
-            MAIL_RELAY_PASS: example password
-            MAIL_CANONICAL_DOMAINS: example.com
-            MAIL_NON_CANONICAL_DEFAULT: example.com
+        extends:
+            file: common.yaml
+            service: smtpreal
 
     backup:
         image: tecnativa/server-backup
         environment:
+            # XXX Fill all of these according to your settings
             ROOT_EMAIL_FROM: backup@example.com
             ROOT_EMAIL_TO: alerts@example.com
             MAIL_RELAY_HOST: smtp

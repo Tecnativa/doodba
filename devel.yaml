@@ -7,13 +7,13 @@ services:
             service: odoo
         build:
             args:
-                # To aggregate in development, use `setup-devel.yaml`
+                # XXX To aggregate in development, use `setup-devel.yaml`
                 AGGREGATE: "no"
                 # No need for this in development
                 CLEAN: "no"
                 COMPILE: "no"
         ports:
-            # I recommend you to use static ports per project
+            # XXX I recommend you to use static ports per project
             - "8069"
             - "8072"
         volumes:
@@ -23,10 +23,11 @@ services:
             PGDATABASE: devel
             # Don't optimize in development
             PYTHONOPTIMIZE: 0
-            # Use same static port as in `wdb` service below
+            # XXX Use same static port as in `wdb` service below
             WDB_WEB_PORT: "1984"
         links:
             - db9:db
+            - smtp
             - wdb
         # Uncomment to start in unit test mode, add module names if you wish
         # command: unittest module1,module2
@@ -39,10 +40,15 @@ services:
         volumes:
             - db9:/var/lib/postgresql/data
 
+    smtp:
+        extends:
+            file: common.yaml
+            service: smtpfake
+
     wdb:
-        image: docker.io/yajo/wdb-server
+        image: yajo/wdb-server
         ports:
-            # I recommend you to use static ports per project
+            # XXX I recommend you to use static ports per project
             - "1984"
 
 volumes:

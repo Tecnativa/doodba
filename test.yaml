@@ -29,6 +29,11 @@ services:
         environment:
             PORT: 8069
 
+    smtp:
+        extends:
+            file: common.yaml
+            service: smtpfake
+
 volumes:
     filestore9:
     db9:

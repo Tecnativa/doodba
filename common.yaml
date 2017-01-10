@@ -9,3 +9,21 @@ services:
         environment:
             POSTGRES_USER: odoo
             POSTGRES_PASSWORD: odoopassword
+
+    smtpfake:
+        image: michielbdejong/mailtrap
+
+    smtpreal:
+        image: tecnativa/postfix-relay
+        restart: always
+        volumes:
+            - smtp:/var/spool/postfix
+        environment:
+            # XXX Fill all of these according to your settings
+            MAILNAME: example.com
+            MAIL_RELAY_HOST: smtp.example.com
+            MAIL_RELAY_PORT: 587
+            MAIL_RELAY_USER: postmaster@example.com
+            MAIL_RELAY_PASS: example password
+            MAIL_CANONICAL_DOMAINS: example.com
+            MAIL_NON_CANONICAL_DEFAULT: example.com
