@@ -1,0 +1,4 @@
+#!/bin/bash
+DEFAULT_VERSION="9.0"
+# TODO Support 10.0
+OTHER_VERSIONS=""

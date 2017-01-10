@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -ex
 
 if [ "$CLEAN" != yes ]; then
     log WARNING Not cleaning garbage
@@ -13,14 +13,14 @@ list=/opt/odoo/custom/src/addons.txt
 preserve () {
     dir=$(basename $1)
 
-    # To preserve it, it must be a directory
+    # To delete it, it must be a directory
     if [ ! -d $dir ]; then
-        exit 1
+        exit 0
     # Check folder traversal level
     elif [ $(pwd) == /opt/odoo/custom/src ]; then
-        # Reserved directories are never clened: odoo and private
+        # Reserved directories are always preserved: odoo and private
         if [ $dir == "private" -o $dir == "odoo" ]; then
-            exit 1
+            exit 0
         fi
     else
         # The found path should include the repo

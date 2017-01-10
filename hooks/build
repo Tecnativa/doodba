@@ -1,0 +1,22 @@
+#!/bin/bash
+set -ex
+
+build () {
+    # See http://label-schema.org/rc1/#build-time-labels
+    docker build \
+        --build-arg VCS_REF="$GIT_SHA1" \
+        --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
+        "$@" .
+}
+
+# Build requested tag, probably "latest"
+build --tag "$IMAGE_NAME"
+
+if [ "$DOCKER_TAG" == latest ]; then
+    # Build other tags, using cache to get it faster
+    source hooks/variables
+    docker tag "$IMAGE_NAME" "$DOCKER_REPO:$DEFAULT_VERSION"
+    for ver in $OTHER_VERSIONS; do
+        build --build-arg ODOO_VERSION="$ver" --tag "$DOCKER_REPO:$ver"
+    done
+fi

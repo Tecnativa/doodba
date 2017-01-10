@@ -338,6 +338,11 @@ Files must be executable and have no `.` in their name.
 
 Of course. There's no guarantee that we will like it, but please do it. :wink:
 
+### What's this `hooks` folder here?
+
+It runs triggers when doing the automatic build in the Docker Hub.
+[Check this](https://hub.docker.com/r/thibaultdelor/testautobuildhooks/).
+
 ### Can I have my own [scaffolding][]?
 
 You probably **should**, and rebase on our updates. However, if you are

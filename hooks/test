@@ -1,0 +1,4 @@
+#!/bin/bash
+set -ex
+time docker-compose --file scaffolding/test.yaml run odoo9 \
+    unittest all --stop-after-init
