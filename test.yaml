@@ -8,7 +8,6 @@ services:
             PGDATABASE: test
         links:
             - db9:db
-            - wdb
         volumes:
             - filestore9:/home/odoo/.local/share/Odoo
 
@@ -22,8 +21,9 @@ services:
     https:
         build: https
         ports:
-            - "80:80"
-            - "443:443"
+            # XXX Use static ports here if possible
+            - "80"
+            - "443"
         links:
             - odoo9:www
         environment:
