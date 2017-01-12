@@ -1,10 +1,12 @@
 # [Dockerized Odoo Base Image](https://hub.docker.com/r/tecnativa/odoo-base)
 
-[![](https://images.microbadger.com/badges/version/tecnativa/odoo-base.svg)](https://microbadger.com/images/tecnativa/odoo-base "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/tecnativa/odoo-base.svg)](https://microbadger.com/images/tecnativa/odoo-base "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own commit badge on microbadger.com")
 
 [![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:9.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:9.0 "Get your own version badge on microbadger.com")
 [![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:9.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:9.0 "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:9.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:9.0 "Get your own commit badge on microbadger.com")
 
 Highly opinionated image ready to put [Odoo](https://www.odoo.com) inside it,
 but **without Odoo**.
