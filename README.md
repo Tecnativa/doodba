@@ -89,6 +89,7 @@ Here you will put the actual source code for your project.
 When putting code here, you can either:
 
 - Use [`repos.yaml`][], that will fill anything at build time.
+  - This file will be environment variable expanded before use.
 - Directly copy all there.
 
 Recommendation: use [`repos.yaml`][] for everything except for [`private`][],
