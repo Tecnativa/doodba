@@ -7,6 +7,6 @@
         ocb: https://github.com/OCA/OCB.git
         odoo: https://github.com/odoo/odoo.git
     target:
-        ocb 9.0
+        ocb 10.0
     merges:
-        - ocb 9.0
+        - ocb 10.0

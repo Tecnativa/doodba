@@ -1,1 +1,1 @@
-FROM tecnativa/odoo-base:9.0
+FROM tecnativa/odoo-base:10.0

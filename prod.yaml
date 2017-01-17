@@ -1,6 +1,6 @@
 version: "2"
 services:
-    odoo9:
+    odoo10:
         extends:
             file: common.yaml
             service: odoo
@@ -8,17 +8,17 @@ services:
         environment:
             ADMIN_PASSWORD: example secure password
         links:
-            - db9:db
+            - db10:db
         volumes:
-            - filestore9:/home/odoo/.local/share/Odoo
+            - filestore10:/home/odoo/.local/share/Odoo
 
-    db9:
+    db10:
         extends:
             file: common.yaml
             service: db
         restart: always
         volumes:
-            - db9:/var/lib/postgresql/data
+            - db10:/var/lib/postgresql/data
 
     https:
         build: https
@@ -27,7 +27,7 @@ services:
             - "80:80"
             - "443:443"
         links:
-            - odoo9:www
+            - odoo10:www
         environment:
             PORT: 8069
 
@@ -58,12 +58,12 @@ services:
             PG_USER: odoo
             PG_PASS: odoopassword
         links:
-            - db9:postgresdb
+            - db10:postgresdb
             - smtp
         volumes_from:
-            - odoo9data
+            - odoo10data
 
 volumes:
-    filestore9:
-    db9:
+    filestore10:
+    db10:
     smtp:

@@ -1,7 +1,7 @@
 version: "2"
 
 services:
-    odoo9:
+    odoo10:
         extends:
             file: common.yaml
             service: odoo
@@ -17,7 +17,7 @@ services:
             - "8069"
             - "8072"
         volumes:
-            - filestore9:/home/odoo/.local/share/Odoo
+            - filestore10:/home/odoo/.local/share/Odoo
             - ./odoo/custom:/opt/odoo/custom:ro,z
         environment:
             PGDATABASE: devel
@@ -26,19 +26,19 @@ services:
             # XXX Use same static port as in `wdb` service below
             WDB_WEB_PORT: "1984"
         links:
-            - db9:db
+            - db10:db
             - smtp
             - wdb
         # Uncomment to start in unit test mode, add module names if you wish
         # command: unittest module1,module2
         command: odoo.py --dev
 
-    db9:
+    db10:
         extends:
             file: common.yaml
             service: db
         volumes:
-            - db9:/var/lib/postgresql/data
+            - db10:/var/lib/postgresql/data
 
     smtp:
         extends:
@@ -52,5 +52,5 @@ services:
             - "1984"
 
 volumes:
-    filestore9:
-    db9:
+    filestore10:
+    db10:
