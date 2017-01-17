@@ -1,19 +1,21 @@
 #!/bin/bash
 set -e
+cd scaffolding
+
 echo Testing Odoo 10.0
 # Clone and test
-time docker-compose --file scaffolding/setup-devel.yaml up
-time docker-compose --file scaffolding/devel.yaml run odoo10 \
+time docker-compose --file setup-devel.yaml up
+time docker-compose --file devel.yaml run odoo10 \
     unittest all --stop-after-init
 
 echo Testing Odoo 9.0
 # Remove Odoo 10 code
-rm -Rf scaffolding/odoo/custom/src/odoo
+rm -Rf odoo/custom/src/odoo
 # Replace all Odoo 10 references for Odoo 9
-sed -i s/(odoo|db|filestore)10/\\19/g scaffolding/*.yaml
+sed -i s/(odoo|db|filestore)10/\\19/g *.yaml
 sed -i s/10.0/9.0/g \
-    scaffolding/odoo/Dockerfile scaffolding/odoo/custom/src/repos.yaml
+    odoo/Dockerfile odoo/custom/src/repos.yaml
 # Clone and test again
-time docker-compose --file scaffolding/setup-devel.yaml up
-time docker-compose --file scaffolding/devel.yaml run odoo9 \
+time docker-compose --file setup-devel.yaml up
+time docker-compose --file devel.yaml run odoo9 \
     unittest all --stop-after-init
