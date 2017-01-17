@@ -25,17 +25,27 @@ npm cache clean
 rm -Rf /tmp/*
 
 # Build and install Odoo dependencies with pip
-# TODO Remove in psutil>=5.0.2
-# HACK https://github.com/giampaolo/psutil/issues/948
-deps="$deps psutil==2.2.0"
-# HACK https://github.com/erocarrera/pydot/issues/145
-deps="$deps pydot==1.0.2"
-# TODO Remove in psycopg2>=2.6
-# HACK https://github.com/psycopg/psycopg2/commit/37d80f2c0325951d3ee6b07caf7d343d4a97a23d
-deps="$deps psycopg2==2.5.4"
-# TODO Remove in vobject>=0.9.3
-# HACK https://github.com/eventable/vobject/pull/19
-deps="$deps vobject==0.6.6"
+if [ "$ODOO_VERSION" == "9.0" ]; then
+    # TODO Remove in psutil>=5.0.2
+    # HACK https://github.com/giampaolo/psutil/issues/948
+    deps="$deps psutil==2.2.0"
+    # TODO Remove in version that fixes it
+    # HACK https://github.com/erocarrera/pydot/issues/145
+    deps="$deps pydot==1.0.2"
+    # TODO Remove in psycopg2>=2.6
+    # HACK https://github.com/psycopg/psycopg2/commit/37d80f2c0325951d3ee6b07caf7d343d4a97a23d
+    deps="$deps psycopg2==2.5.4"
+    # TODO Remove in vobject>=0.9.3
+    # HACK https://github.com/eventable/vobject/pull/19
+    deps="$deps vobject==0.6.6"
+elif [ "$ODOO_VERSION" == "10.0" ]; then
+    # TODO Remove in psutil>=5.0.2
+    # HACK https://github.com/giampaolo/psutil/issues/948
+    deps="$deps psutil==4.3.1"
+    # TODO Remove in version that fixes it
+    # HACK https://github.com/erocarrera/pydot/issues/145
+    deps="$deps pydot==1.2.3"
+fi
 
 # TODO Remove when all of above deps support PYTHONOPTIMIZE=2
 optimize="$PYTHONOPTIMIZE"
