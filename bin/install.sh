@@ -22,6 +22,7 @@ apk add --no-cache --virtual .sass-deps ruby-dev libffi-dev
 gem install --clear-sources --no-document sass
 npm install --global less
 npm cache clean
+rm -Rf /tmp/*
 
 # Build and install Odoo dependencies with pip
 # TODO Remove in psutil>=5.0.2
