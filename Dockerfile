@@ -29,7 +29,8 @@ ONBUILD ENV PGUSER="$PGUSER" \
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 ONBUILD WORKDIR /opt/odoo
-ONBUILD RUN chown -R odoo:odoo .
+ONBUILD RUN chown -R odoo:odoo . \
+    && chmod -Rc a+rx common/entrypoint.d common/build.d
 ONBUILD RUN ["/opt/odoo/common/build.sh"]
 ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint.sh"]
 ONBUILD CMD ["/usr/local/bin/odoo"]
@@ -81,6 +82,10 @@ RUN ln /opt/odoo/common/entrypoint.sh /opt/odoo/common/build.sh
 COPY build.d /opt/odoo/common/build.d
 COPY conf.d /opt/odoo/common/conf.d
 COPY entrypoint.d /opt/odoo/common/entrypoint.d
+RUN chmod -Rc a+rx \
+    /opt/odoo/common/entrypoint* \
+    /opt/odoo/common/build* \
+    /usr/local/bin
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
