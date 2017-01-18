@@ -1,0 +1,5 @@
+.git*
+*.test.yml
+LICENSE*
+README*
+tests

@@ -1,0 +1,19 @@
+version: "2"
+services:
+    sut:
+        build:
+            context: ./tests/odoo10
+            args:
+                AGGREGATE: "yes"
+                CLEAN: "yes"
+                COMPILE: "no" # PYTHONOPTIMIZE=2 would fail some tests
+                LOCAL_CUSTOM_DIR: .
+        links:
+            - db
+        command: unittest all --stop-after-init
+
+    db:
+        image: postgres:9.5-alpine
+        environment:
+            POSTGRES_USER: odoo
+            POSTGRES_PASSWORD: odoopassword
