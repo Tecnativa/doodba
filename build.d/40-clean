@@ -1,10 +1,10 @@
 #!/bin/sh
-set -ex
-
 if [ "$CLEAN" != yes ]; then
     log WARNING Not cleaning garbage
     exit 0
 fi
+
+set -ex
 
 # Get the list of good folders
 list=/opt/odoo/custom/src/addons.txt
