@@ -28,6 +28,9 @@ services:
             - odoo10:www
         environment:
             PORT: 8069
+            # XXX Change these for your real data
+            EMAIL: admin@example.com
+            DOMAINS: test.example.com
 
     smtp:
         extends:

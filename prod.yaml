@@ -28,8 +28,15 @@ services:
             - "443:443"
         links:
             - odoo10:www
+        volumes:
+            - certs:/etc/letsencrypt
+            - certscron:/var/spool/cron/cronstamps
         environment:
             PORT: 8069
+            # XXX Change these for your real data
+            EMAIL: admin@example.com
+            DOMAINS: example.com
+            STAGING: "false"
 
     smtp:
         extends:
@@ -67,3 +74,5 @@ volumes:
     filestore10:
     db10:
     smtp:
+    certs:
+    certscron:
