@@ -11,6 +11,8 @@ services:
             - db10:db
         volumes:
             - filestore10:/home/odoo/.local/share/Odoo
+        networks:
+            - back
 
     db10:
         extends:
@@ -19,6 +21,8 @@ services:
         restart: always
         volumes:
             - db10:/var/lib/postgresql/data
+        networks:
+            - back
 
     https:
         build: https
@@ -37,11 +41,16 @@ services:
             EMAIL: admin@example.com
             DOMAINS: example.com
             STAGING: "false"
+        networks:
+            - back
+            - front
 
     smtp:
         extends:
             file: common.yaml
             service: smtpreal
+        networks:
+            - back
 
     backup:
         image: tecnativa/server-backup
@@ -69,6 +78,8 @@ services:
             - smtp
         volumes_from:
             - odoo10
+        networks:
+            - back
 
 volumes:
     filestore10:
@@ -76,3 +87,7 @@ volumes:
     smtp:
     certs:
     certscron:
+
+networks:
+    back:
+    front:
