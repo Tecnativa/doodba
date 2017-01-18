@@ -12,6 +12,7 @@ EXPOSE 8069 8072
 ONBUILD ARG AGGREGATE=yes
 ONBUILD ARG CLEAN=yes
 ONBUILD ARG COMPILE=yes
+ONBUILD ARG PIP_INSTALL_ODOO=yes
 ONBUILD ARG ADMIN_PASSWORD=admin
 ONBUILD ARG SMTP_SERVER=smtp
 ONBUILD ARG PROXY_MODE=yes
@@ -37,7 +38,6 @@ ONBUILD USER odoo
 ARG PYTHONOPTIMIZE=2
 ENV ODOO_RC=/opt/odoo/auto/odoo.conf \
     UNACCENT=yes \
-    PYTHONOPTIMIZE="$PYTHONOPTIMIZE" \
     # HACK for Pillow: https://github.com/Tecnativa/odoo/pull/1
     LDFLAGS="-L/lib" \
     # Git and git-aggregator

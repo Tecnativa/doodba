@@ -1,6 +1,13 @@
 #!/bin/sh
-# Generate Odoo server configuration from templates
 set -e
 src=/opt/odoo/custom/src/odoo
 log INFO Installing Odoo from $src
+
+# For development you could want to avoid installing Odoo to speed up build
+if [ "$PIP_INSTALL_ODOO" != yes ]; then
+    log WARNING Blindly symlinking odoo.py executable
+    ln -s $src/odoo.py /usr/local/bin/
+    exit 0
+fi
+
 pip install --no-cache-dir --editable $src
