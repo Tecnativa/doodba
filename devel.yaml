@@ -7,7 +7,7 @@ services:
             service: odoo
         build:
             args:
-                # XXX To aggregate in development, use `setup-devel.yaml`
+                # To aggregate in development, use `setup-devel.yaml`
                 AGGREGATE: "no"
                 # No need for this in development
                 CLEAN: "no"
