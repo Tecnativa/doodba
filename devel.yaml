@@ -31,7 +31,7 @@ services:
             - wdb
         # Uncomment to start in unit test mode, add module names if you wish
         # command: unittest module1,module2
-        command: odoo.py --dev
+        command: odoo --dev
 
     db10:
         extends:
