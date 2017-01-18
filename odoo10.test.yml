@@ -6,8 +6,10 @@ services:
             args:
                 AGGREGATE: "yes"
                 CLEAN: "yes"
-                COMPILE: "no" # PYTHONOPTIMIZE=2 would fail some tests
                 LOCAL_CUSTOM_DIR: .
+                # PYTHONOPTIMIZE=2 would fail some tests
+                COMPILE: "no"
+                PYTHONOPTIMIZE: 0
         links:
             - db
         command: unittest all --stop-after-init
