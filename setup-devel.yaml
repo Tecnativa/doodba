@@ -6,7 +6,7 @@
 #
 #   git clean -ffd
 
-version: "2"
+version: "2.1"
 
 services:
     gitaggregator:
