@@ -11,7 +11,7 @@ services:
             POSTGRES_PASSWORD: odoopassword
 
     smtpfake:
-        image: michielbdejong/mailtrap
+        image: tecnativa/smtp-sink
 
     smtpreal:
         image: tecnativa/postfix-relay
