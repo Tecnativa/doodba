@@ -6,5 +6,5 @@ shift
 log INFO Executing Odoo in unittest mode for addons $addons
 # HACK `--workers 0`: https://github.com/odoo/odoo/pull/14809
 set -x
-exec odoo.py --init "$addons" --update "$addons" --database "$PGDATABASE" \
+exec odoo --init "$addons" --update "$addons" --database "$PGDATABASE" \
     --log-level debug --workers 0 --test-enable "$@"

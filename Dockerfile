@@ -32,7 +32,7 @@ ONBUILD WORKDIR /opt/odoo
 ONBUILD RUN chown -R odoo:odoo .
 ONBUILD RUN ["/opt/odoo/common/build.sh"]
 ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint.sh"]
-ONBUILD CMD ["/usr/local/bin/odoo.py"]
+ONBUILD CMD ["/usr/local/bin/odoo"]
 ONBUILD USER odoo
 
 ARG PYTHONOPTIMIZE=2
