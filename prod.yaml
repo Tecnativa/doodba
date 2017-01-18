@@ -68,7 +68,7 @@ services:
             - db10:postgresdb
             - smtp
         volumes_from:
-            - odoo10data
+            - odoo10
 
 volumes:
     filestore10:
