@@ -11,8 +11,9 @@ conf=/opt/odoo/custom/src/repos.yaml
 if [ -f $conf ]; then
     log INFO Aggregating repositories from $conf
     cd $(dirname $conf)
-    echo "$(cat $conf | envsubst)" > $conf
-    gitaggregate -c $conf
+    envsubst < $conf > /tmp/repos.yaml
+    gitaggregate -c /tmp/repos.yaml
+    rm /tmp/repos.yaml
 else
     log ERROR Cannot aggregate repositories: $conf not found
     exit 1
