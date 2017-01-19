@@ -1,9 +1,11 @@
 #!/bin/sh
 if [ "$UNACCENT" == yes ]; then
-    log INFO Trying to install unaccent in database $PGDATABASE@$PGHOST...
-    if psql -c 'CREATE EXTENSION IF NOT EXISTS unaccent;'; then
+    result="$(psql -qc 'CREATE EXTENSION unaccent' 2>&1)"
+    ok=$?
+    if [ $ok -eq 0 ]; then
         log INFO Unaccent extension installed
-    else
-        log WARNING Could not install unaccent extension
+    elif [ -n "$(echo $result | grep ERROR)" ]; then
+        log WARNING Attempt to install unaccent in \
+            $PGDATABASE@$PGHOST failed with this message: $result
     fi
 fi
