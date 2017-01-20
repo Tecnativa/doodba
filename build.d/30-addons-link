@@ -10,9 +10,12 @@ if [ -f $list ]; then
     mkdir -p $dir
     cd $dir
     # Link each addon found in `addons.txt`
-    for addon in $(cat $list); do
-        log DEBUG Linking $addon
-        ln -sf /opt/odoo/custom/src/$addon .
+    while read -r line; do
+        [[ "$line" =~ ^#.*$ ]] && continue
+        if [ ! -z "$line" ]; then
+            log DEBUG Linking $line
+            ln -sf /opt/odoo/custom/src/$line .
+        fi
     done
 else
     log WARNING Linking no addons: $list not found
