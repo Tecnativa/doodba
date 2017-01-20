@@ -6,6 +6,7 @@ services:
             service: odoo
         restart: unless-stopped
         environment:
+            # XXX Change this!!!
             ADMIN_PASSWORD: example secure password
         links:
             - db10:db
