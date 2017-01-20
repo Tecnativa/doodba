@@ -2,10 +2,10 @@ FROM python:2-alpine
 MAINTAINER Tecnativa <info@tecnativa.com>
 
 # Enable Odoo user and filestore
-RUN adduser -D odoo \
-    && mkdir -p /home/odoo/.local/share/Odoo \
-    && chown -R odoo:odoo /home/odoo
-VOLUME ["/home/odoo/.local/share/Odoo"]
+RUN adduser -DH odoo \
+    && mkdir -p /var/run/odoo \
+    && chown -R odoo:odoo /var/run/odoo
+VOLUME ["/var/run/odoo"]
 EXPOSE 8069 8072
 
 # Subimage triggers
