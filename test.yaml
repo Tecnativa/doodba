@@ -8,6 +8,7 @@ services:
             PGDATABASE: test
         links:
             - db10:db
+            - smtp
         volumes:
             - filestore10:/home/odoo/.local/share/Odoo
 
@@ -19,18 +20,11 @@ services:
             - db10:/var/lib/postgresql/data
 
     https:
-        build: https
-        ports:
-            # XXX Use static ports here if possible
-            - "80"
-            - "443"
+        extends:
+            file: common.yaml
+            service: https
         links:
             - odoo10:www
-        environment:
-            PORT: 8069
-            # XXX Change these for your real data
-            EMAIL: admin@example.com
-            DOMAINS: test.example.com
 
     smtp:
         extends:

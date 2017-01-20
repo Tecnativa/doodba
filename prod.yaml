@@ -4,11 +4,12 @@ services:
         extends:
             file: common.yaml
             service: odoo
-        restart: always
+        restart: unless-stopped
         environment:
             ADMIN_PASSWORD: example secure password
         links:
             - db10:db
+            - smtp
         volumes:
             - filestore10:/home/odoo/.local/share/Odoo
         networks:
@@ -18,28 +19,25 @@ services:
         extends:
             file: common.yaml
             service: db
-        restart: always
+        restart: unless-stopped
         volumes:
             - db10:/var/lib/postgresql/data
         networks:
             - back
 
     https:
-        build: https
-        restart: always
-        ports:
-            - "80:80"
-            - "443:443"
+        extends:
+            file: common.yaml
+            service: https
+        links:
+            - odoo10:www
+        restart: unless-stopped
         links:
             - odoo10:www
         volumes:
             - certs:/etc/letsencrypt
             - certscron:/var/spool/cron/cronstamps
         environment:
-            PORT: 8069
-            # XXX Change these for your real data
-            EMAIL: admin@example.com
-            DOMAINS: example.com
             STAGING: "false"
         networks:
             - back
@@ -49,6 +47,7 @@ services:
         extends:
             file: common.yaml
             service: smtpreal
+        restart: unless-stopped
         networks:
             - back
 

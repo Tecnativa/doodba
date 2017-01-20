@@ -10,12 +10,22 @@ services:
             POSTGRES_USER: odoo
             POSTGRES_PASSWORD: odoopassword
 
+    https:
+        build: https
+        ports:
+            - "80:80"
+            - "443:443"
+        environment:
+            PORT: 8069
+            # XXX Change these for your real data
+            EMAIL: admin@example.com
+            DOMAINS: example.com
+
     smtpfake:
         image: tecnativa/smtp-sink
 
     smtpreal:
         image: tecnativa/postfix-relay
-        restart: always
         volumes:
             - smtp:/var/spool/postfix
         environment:
@@ -27,3 +37,25 @@ services:
             MAIL_RELAY_PASS: example password
             MAIL_CANONICAL_DOMAINS: example.com
             MAIL_NON_CANONICAL_DEFAULT: example.com
+
+    backup:
+        image: tecnativa/server-backup
+        environment:
+            # XXX Fill all of these according to your settings
+            ROOT_EMAIL_FROM: backup@example.com
+            ROOT_EMAIL_TO: alerts@example.com
+            MAIL_RELAY_HOST: smtp
+            BACKUP_S3_ACCESS_KEY: example key
+            BACKUP_S3_SECRET_KEY: example secret
+            BACKUP_S3_BUCKET: example-bkp
+            BACKUP_S3_INSTANCE: docker-example
+            BACKUP_SEND_MAIL_ERR: 1
+            BACKUP_SEND_MAIL_LOG: 1
+            BACKUP_EMAIL_SUBJECT: '[EXAMPLE]'
+            BACKUP_EMAIL_FROM: backup@example.com
+            BACKUP_EMAIL_TO: alerts@example.com
+            BACKUP_ENCRYPT: 1
+            BACKUP_ENCRYPT_KEY: example encryption key
+            BACKUP_SOURCES: /home/odoo/.local/share/Odoo,0,1
+            PG_USER: odoo
+            PG_PASS: odoopassword
