@@ -17,7 +17,6 @@ services:
             - "8069"
             - "8072"
         volumes:
-            - filestore10:/home/odoo/.local/share/Odoo
             - ./odoo/custom:/opt/odoo/custom:ro,z
         environment:
             PGDATABASE: devel
@@ -38,8 +37,6 @@ services:
         extends:
             file: common.yaml
             service: db
-        volumes:
-            - db10:/var/lib/postgresql/data
 
     inbox:
         extends:

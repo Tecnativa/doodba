@@ -10,15 +10,11 @@ services:
             - db10:db
             - inbox
             - smtp
-        volumes:
-            - filestore10:/home/odoo/.local/share/Odoo
 
     db10:
         extends:
             file: common.yaml
             service: db
-        volumes:
-            - db10:/var/lib/postgresql/data
 
     https:
         extends:
@@ -40,3 +36,5 @@ services:
 volumes:
     filestore10:
     db10:
+    certs:
+    certscron:

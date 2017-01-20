@@ -11,8 +11,6 @@ services:
             - db10:db
             - inbox
             - smtp
-        volumes:
-            - filestore10:/home/odoo/.local/share/Odoo
         networks:
             - back
 
@@ -21,8 +19,6 @@ services:
             file: common.yaml
             service: db
         restart: unless-stopped
-        volumes:
-            - db10:/var/lib/postgresql/data
         networks:
             - back
 
@@ -35,9 +31,6 @@ services:
         restart: unless-stopped
         links:
             - odoo10:www
-        volumes:
-            - certs:/etc/letsencrypt
-            - certscron:/var/spool/cron/cronstamps
         environment:
             STAGING: "false"
         networks:
@@ -78,7 +71,7 @@ services:
             BACKUP_EMAIL_TO: alerts@example.com
             BACKUP_ENCRYPT: 1
             BACKUP_ENCRYPT_KEY: example encryption key
-            BACKUP_SOURCES: /home/odoo/.local/share/Odoo,0,1
+            BACKUP_SOURCES: /var/run/odoo,0,1
             PG_USER: odoo
             PG_PASS: odoopassword
         links:

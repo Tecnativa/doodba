@@ -3,18 +3,25 @@ services:
     odoo:
         build: odoo
         tty: true
+        volumes:
+            - filestore10:/var/run/odoo
 
     db:
         image: postgres:9.5-alpine
         environment:
             POSTGRES_USER: odoo
             POSTGRES_PASSWORD: odoopassword
+        volumes:
+            - db10:/var/lib/postgresql/data
 
     https:
         build: https
         ports:
             - "80:80"
             - "443:443"
+        volumes:
+            - certs:/etc/letsencrypt
+            - certscron:/var/spool/cron/cronstamps
         environment:
             PORT: 8069
             # XXX Change these for your real data
@@ -70,6 +77,6 @@ services:
             BACKUP_EMAIL_TO: alerts@example.com
             BACKUP_ENCRYPT: 1
             BACKUP_ENCRYPT_KEY: example encryption key
-            BACKUP_SOURCES: /home/odoo/.local/share/Odoo,0,1
+            BACKUP_SOURCES: /var/run/odoo,0,1
             PG_USER: odoo
             PG_PASS: odoopassword
