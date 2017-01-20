@@ -38,6 +38,20 @@ services:
             MAIL_CANONICAL_DOMAINS: example.com
             MAIL_NON_CANONICAL_DEFAULT: example.com
 
+    inboxfake:
+        image: tecnativa/tcp-proxy
+        environment:
+            LISTEN: ":995"
+            # XXX Put your testing IMAP/POP3 server here
+            TALK: "inbox.example.com:995"
+
+    inboxreal:
+        image: tecnativa/tcp-proxy
+        environment:
+            LISTEN: ":995"
+            # XXX Put your real IMAP/POP3 server here
+            TALK: "inbox.example.com:995"
+
     backup:
         image: tecnativa/server-backup
         environment:

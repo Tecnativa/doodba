@@ -8,6 +8,7 @@ services:
             PGDATABASE: test
         links:
             - db10:db
+            - inbox
             - smtp
         volumes:
             - filestore10:/home/odoo/.local/share/Odoo
@@ -25,6 +26,11 @@ services:
             service: https
         links:
             - odoo10:www
+
+    inbox:
+        extends:
+            file: common.yaml
+            service: inboxfake
 
     smtp:
         extends:

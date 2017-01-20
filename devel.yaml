@@ -27,6 +27,7 @@ services:
             WDB_WEB_PORT: "1984"
         links:
             - db10:db
+            - inbox
             - smtp
             - wdb
         # Uncomment to start in unit test mode, add module names if you wish
@@ -39,6 +40,11 @@ services:
             service: db
         volumes:
             - db10:/var/lib/postgresql/data
+
+    inbox:
+        extends:
+            file: common.yaml
+            service: inboxfake
 
     smtp:
         extends:

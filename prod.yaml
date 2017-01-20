@@ -9,6 +9,7 @@ services:
             ADMIN_PASSWORD: example secure password
         links:
             - db10:db
+            - inbox
             - smtp
         volumes:
             - filestore10:/home/odoo/.local/share/Odoo
@@ -42,6 +43,14 @@ services:
         networks:
             - back
             - front
+
+    inbox:
+        extends:
+            file: common.yaml
+            service: inboxreal
+        restart: unless-stopped
+        networks:
+            - back
 
     smtp:
         extends:
