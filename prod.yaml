@@ -4,6 +4,9 @@ services:
         extends:
             file: common.yaml
             service: odoo
+        bulid:
+            args:
+                PROXY_MODE: "yes"
         restart: unless-stopped
         environment:
             # XXX Change this!!!
