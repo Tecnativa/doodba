@@ -49,7 +49,7 @@ for repo in * .[^.]*; do
     if ! preserve $repo; then
         log DEBUG Removing $repo
         rm -Rf $repo
-    else
+    elif [ -d $repo ]; then
         cd $repo
         # Check each repo addon
         for addon in * .[^.]*; do
