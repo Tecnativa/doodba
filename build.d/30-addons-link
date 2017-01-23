@@ -16,7 +16,7 @@ if [ -f $list ]; then
             log DEBUG Linking $line
             ln -sf /opt/odoo/custom/src/$line .
         fi
-    done
+    done < "$list"
 else
     log WARNING Linking no addons: $list not found
 fi
