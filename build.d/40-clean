@@ -17,6 +17,10 @@ if not CLEAN:
 with open(SRC_DIR + "/addons.yaml") as addons_file:
     config = yaml.load(addons_file)
 
+# Config file could be empty
+if config is None:
+    config = dict()
+
 # Special directories must be preserved
 config.setdefault("private", "all")
 config.setdefault("odoo", "all")

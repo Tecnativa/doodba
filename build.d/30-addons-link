@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+import sys
 
 import yaml
 
@@ -13,6 +14,10 @@ logging.info("Linking all addons from %s in %s", ADDONS_YAML, ADDONS_DIR)
 
 with open(ADDONS_YAML) as addons_file:
     config = yaml.load(addons_file)
+
+# Config file could be empty
+if config is None:
+    sys.exit()
 
 for repo, addons in config.items():
     if addons == "all":
