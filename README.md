@@ -53,7 +53,7 @@ This is its structure:
         src/
             private/
             odoo/
-            addons.txt
+            addons.yaml
             repos.yaml
     common/
         entrypoint.sh
@@ -75,8 +75,6 @@ Here you will put everything related to your project.
 
 Any executables found here will be run when you launch your container, before
 running the command you ask.
-
-
 
 #### `/opt/odoo/custom/build.d`
 
@@ -127,29 +125,44 @@ You can choose your Odoo version, and even merge PRs from many of them using
 
 A [git-aggregator](#git-aggregator) configuration file.
 
-##### `/opt/odoo/custom/src/addons.txt`
+##### `/opt/odoo/custom/src/addons.yaml`
 
-One line per addon you want to activate in your project. Like this:
+One entry per repo and addon you want to activate in your project. Like this:
 
-    server-tools/*
-    website/website_legal_page
+```yaml
+# Using `all` links all addons in a repository (not recommended)
+server-tools: all
+
+# List all addons you want per repository (recommended)
+website:
+    - website_legal_page
+web:
+    - web_responsive
+```
 
 Important notes:
 
-- Do not add lines for the required [`odoo`][] and [`private`][] directories;
+- Do not add repos for the required [`odoo`][] and [`private`][] directories;
   those are automatic.
+
+- Only addons here are symlinked in [`/opt/odoo/auto/addons`][]. Addons from
+  the required directories above are added directly in the [`odoo.conf`][]
+  file.
+
+- This means that if you have an addon with the same name in any of [`odoo`][],
+  [`private`][] or [`/opt/odoo/auto/addons`][] directories, this will be the
+  importance order in which they will be loaded (from most to least important):
+
+  1. Addons in [`private`][].
+  2. Custom addons listed in [`addons.yaml`][].
+  3. Core Odoo addons from [`./odoo/addons`][`odoo`].
+
+  Although it is better to simply have no name conflicts if possible.
 
 - Any other addon not listed here will not be usable in Odoo (and will be
   removed by default, to keep the resulting image thin).
 
-- In case of addon name conflict, this is the importance order in which
-  they will be linked (from most to least important):
-
-  1. Addons in [`private`][].
-  2. Custom addons listed in [`addons.txt`][].
-  3. Core Odoo addons from [`./odoo/addons`][`odoo`].
-
-  Although it is better to simply have no name conflicts if possible.
+- If you list 2 addons with the same name, you'll get a build error.
 
 ### `/opt/odoo/common`: The useful one
 
@@ -159,8 +172,9 @@ the code.
 Only some notes:
 
 - Will compile your code with [`PYTHONOPTIMIZE=2`][] by default.
+
 - Will remove all code not used from the image by default (not listed in
-  `/opt/odoo/custom/src/addons.txt`), to keep it thin.
+  `/opt/odoo/custom/src/addons.yaml`), to keep it thin.
 
 ### `/opt/odoo/auto`: The automatic one
 
@@ -168,7 +182,7 @@ This directory will have things that are automatically generated at build time.
 
 #### `/opt/odoo/auto/addons`
 
-It will be full of symlinks to the addons you selected in [`addons.txt`][].
+It will be full of symlinks to the addons you selected in [`addons.yaml`][].
 
 #### `/opt/odoo/auto/odoo.conf`
 
@@ -373,6 +387,8 @@ open an issue or pull request.
 [`PYTHONOPTIMIZE=2`]: https://docs.python.org/2/using/cmdline.html#envvar-PYTHONOPTIMIZE
 [scaffolding]: #scaffolding
 [`odoo`]: #optodoocustomsrcodoo
+[`odoo.conf`]: #optodooautoodooconf
 [`private`]: #optodoocustomsrcprivate
 [`repos.yaml`]: #optodoocustomsrcreposyaml
-[`addons.txt`]: #optodoocustomsrcaddonstxt
+[`addons.yaml`]: #optodoocustomsrcaddonstxt
+[`/opt/odoo/auto/addons`]: #optodooautoaddons

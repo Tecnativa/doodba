@@ -1,64 +1,43 @@
-#!/bin/sh
-if [ "$CLEAN" != yes ]; then
-    log WARNING Not cleaning garbage
-    exit 0
-fi
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import logging
+import os
+import shutil
+import sys
 
-set -ex
+import yaml
 
-# Get the list of good folders
-list=/opt/odoo/custom/src/addons.txt
+CLEAN = os.environ.get("CLEAN") == "yes"
+SRC_DIR = "/opt/odoo/custom/src"
 
-# Know if a directory should be preserved
-preserve () {
-    dir=$(basename $1)
+if not CLEAN:
+    logging.warning("Not cleaning garbage")
+    sys.exit()
 
-    # To delete it, it must be a directory
-    if [ ! -d $dir ]; then
-        return 0
-    # Check folder traversal level
-    elif [ $(pwd) == /opt/odoo/custom/src ]; then
-        # Reserved directories are always preserved: odoo and private
-        if [ $dir == "private" -o $dir == "odoo" ]; then
-            return 0
-        fi
-    else
-        # The found path should include the repo
-        parent=$(basename $(pwd))
-        # Special case for "repo-name/*": all level 2 folders are preserved
-        if grep -E "^$parent/*" $file; then
-            return 0
-        fi
-        dir=$parent/$dir
-    fi
+with open(SRC_DIR + "/addons.yaml") as addons_file:
+    config = yaml.load(addons_file)
 
-    # If the path is found in list, it is preserved
-    grep -E "^$dir(\/|$)" $file || return 1
-}
+# Special directories must be preserved
+config.setdefault("private", "all")
+config.setdefault("odoo", "all")
 
-if [ -f $list ]; then
-    folders=$(cat $list)
-fi
-cd /opt/odoo/custom/src
-# Remove git stuff, which usually grows a lot
-log INFO Cleaning all Git files
-find -name '.git*' -exec rm -Rf {} +
-# Enter each repo
-for repo in * .[^.]*; do
-    # Delete the repo if it is not used
-    if ! preserve $repo; then
-        log DEBUG Removing $repo
-        rm -Rf $repo
-    elif [ -d $repo ]; then
-        cd $repo
-        # Check each repo addon
-        for addon in * .[^.]*; do
-            # Delete the addon if it is not used
-            if ! preserve $addon; then
-                log DEBUG Removing $repo/$addon
-                rm -Rf $addon
-            fi
-        done
-        cd ..
-    fi
-done
+for directory in os.listdir(SRC_DIR):
+    # Remove directories not listed in addons.yaml
+    full = os.path.join(SRC_DIR, directory)
+    if directory not in config:
+        shutil.rmtree(full)
+        continue
+
+    # Skip addon repositories that need no cleaning
+    if config[directory] == "all":
+        continue
+
+    # Traverse addons
+    for subdirectory in os.listdir(full):
+        subfull = os.path.join(full, subdirectory)
+        # Skip regular files
+        if not os.path.isdir(subfull):
+            continue
+        # Remove addon if not used
+        if subdirectory not in config[directory]:
+            shutil.rmtree(subfull)

@@ -1,22 +1,24 @@
-#!/bin/sh
-set -e
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import logging
+import os
 
-# Check if the `addons.txt` file is provided
-list=/opt/odoo/custom/src/addons.txt
-if [ -f $list ]; then
-    # Autocreate the addons directory
-    dir=/opt/odoo/auto/addons
-    log INFO Linking all addons from $list in $dir
-    mkdir -p $dir
-    cd $dir
-    # Link each addon found in `addons.txt`
-    while read -r line; do
-        [[ "$line" =~ ^#.*$ ]] && continue
-        if [ ! -z "$line" ]; then
-            log DEBUG Linking $line
-            ln -sf /opt/odoo/custom/src/$line .
-        fi
-    done < "$list"
-else
-    log WARNING Linking no addons: $list not found
-fi
+import yaml
+
+SRC_DIR = "/opt/odoo/custom/src"
+ADDONS_YAML = SRC_DIR + "/addons.yaml"
+ADDONS_DIR = "/opt/odoo/auto/addons"
+
+logging.info("Linking all addons from %s in %s", ADDONS_YAML, ADDONS_DIR)
+
+with open(ADDONS_YAML) as addons_file:
+    config = yaml.load(addons_file)
+
+for repo, addons in config.items():
+    if addons == "all":
+        addons = os.listdir(os.path.join(SRC_DIR, repo))
+    for addon in addons:
+        src = os.path.join(SRC_DIR, repo, addon)
+        dst = os.path.join(ADDONS_DIR, addon)
+        logging.debug("Linking %s in %s", src, dst)
+        os.symlink(src, dst)
