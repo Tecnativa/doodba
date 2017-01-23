@@ -5,35 +5,28 @@ import os
 import shutil
 import sys
 
-import yaml
+import odoobaselib
 
-CLEAN = os.environ.get("CLEAN") == "yes"
-SRC_DIR = "/opt/odoo/custom/src"
-
-if not CLEAN:
+if not odoobaselib.CLEAN:
     logging.warning("Not cleaning garbage")
     sys.exit()
 
-with open(SRC_DIR + "/addons.yaml") as addons_file:
-    config = yaml.load(addons_file)
-
-# Config file could be empty
-if config is None:
-    config = dict()
-
-# Special directories must be preserved
-config.setdefault("private", "all")
-config.setdefault("odoo", "all")
-
-for directory in os.listdir(SRC_DIR):
-    # Remove directories not listed in addons.yaml
-    full = os.path.join(SRC_DIR, directory)
-    if directory not in config:
-        shutil.rmtree(full)
+config = odoobaselib.addons_config()
+for directory in os.listdir(odoobaselib.SRC_DIR):
+    # Special directories must be preserved
+    if directory in {"private", "odoo"}:
         continue
 
+    full = os.path.join(odoobaselib.SRC_DIR, directory)
+
     # Skip addon repositories that need no cleaning
-    if config[directory] == "all":
+    try:
+        if config[directory] == "all":
+            continue
+
+    # Remove directories not listed in addons.yaml
+    except KeyError:
+        shutil.rmtree(full)
         continue
 
     # Traverse addons

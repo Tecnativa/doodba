@@ -140,6 +140,26 @@ web:
     - web_responsive
 ```
 
+You can bundle [several YAML documents][] if you want to logically group your
+addons and some repos are repeated among groups, by separating each document
+with `---`:
+
+```yaml
+# Spanish Localization
+l10n-spain:
+    - l10n_es
+server-tools:
+    - date_range
+---
+# SEO tools
+website:
+    - website_blog_excertp_img
+server-tools: # Here we repeat server-tools, but no problem because it's a
+              # different document
+    - html_image_url_extractor
+    - html_text
+```
+
 Important notes:
 
 - Do not add repos for the required [`odoo`][] and [`private`][] directories;
@@ -390,5 +410,6 @@ open an issue or pull request.
 [`odoo.conf`]: #optodooautoodooconf
 [`private`]: #optodoocustomsrcprivate
 [`repos.yaml`]: #optodoocustomsrcreposyaml
+[several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
 [`addons.yaml`]: #optodoocustomsrcaddonstxt
 [`/opt/odoo/auto/addons`]: #optodooautoaddons

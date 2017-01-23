@@ -2,24 +2,15 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
-import sys
 
-import yaml
+import odoobaselib
 
-SRC_DIR = "/opt/odoo/custom/src"
-ADDONS_YAML = SRC_DIR + "/addons.yaml"
-ADDONS_DIR = "/opt/odoo/auto/addons"
+logging.info(
+    "Linking all addons from %s in %s",
+    odoobaselib.ADDONS_YAML,
+    odoobaselib.ADDONS_DIR)
 
-logging.info("Linking all addons from %s in %s", ADDONS_YAML, ADDONS_DIR)
-
-with open(ADDONS_YAML) as addons_file:
-    config = yaml.load(addons_file)
-
-# Config file could be empty
-if config is None:
-    sys.exit()
-
-for repo, addons in config.items():
+for repo, addons in odoobaselib.addons_config().items():
     if addons == "all":
         addons = os.listdir(os.path.join(SRC_DIR, repo))
     for addon in addons:
