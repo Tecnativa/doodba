@@ -17,7 +17,10 @@ for directory in os.listdir(odoobaselib.SRC_DIR):
     if directory in {"private", "odoo"}:
         continue
 
+    # Skip regular files
     full = os.path.join(odoobaselib.SRC_DIR, directory)
+    if not os.path.isdir(full):
+        continue
 
     # Skip addon repositories that need no cleaning
     try:
