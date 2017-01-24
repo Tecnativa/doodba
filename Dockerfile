@@ -70,7 +70,7 @@ RUN ln /usr/local/bin/wkhtmltoimage /usr/local/bin/wkhtmltopdf
 
 # Patched git-aggregator
 RUN apk add --no-cache git
-RUN pip install --no-cache-dir https://github.com/Tecnativa/git-aggregator/archive/master-depth.zip
+RUN pip install --no-cache-dir https://github.com/acsone/git-aggregator/archive/bdfdf05a7e903b06c201f163161053a924330bed.zip
 
 # WDB debugger
 RUN pip install --no-cache-dir wdb

@@ -265,10 +265,9 @@ I told you, this image is opinionated. :wink:
 We found this one to be the most useful tool for downlading code, merging it
 and placing it somewhere.
 
-We use [our own fork](https://github.com/Tecnativa/git-aggregator) because it
-is even better! (Until they merge some PRs and publish a new version).
-
-Actually, because [it allows you to choose a `--depth` when pulling
+We will use
+[a development version](https://github.com/acsone/git-aggregator/tree/bdfdf05a7e903b06c201f163161053a924330bed)
+until the stable one [allows you to choose a `--depth` when pulling
 images](https://github.com/acsone/git-aggregator/pull/7), and [fetches only the
 required remotes](https://github.com/acsone/git-aggregator/pull/6).
 
