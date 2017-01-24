@@ -8,4 +8,4 @@ fi
 
 log INFO Compiling all Python code in /opt/odoo
 log DEBUG PYTHONOPTIMIZE set to $PYTHONOPTIMIZE
-python -m compileall /opt/odoo
+python -m compileall -q /opt/odoo
