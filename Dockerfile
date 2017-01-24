@@ -82,7 +82,6 @@ RUN ln /opt/odoo/common/entrypoint.sh /opt/odoo/common/build.sh
 COPY build.d /opt/odoo/common/build.d
 COPY conf.d /opt/odoo/common/conf.d
 COPY entrypoint.d /opt/odoo/common/entrypoint.d
-COPY lib/*.py /usr/local/lib/python2.7/site-packages
 RUN chmod -Rc a+rx \
     /opt/odoo/common/entrypoint* \
     /opt/odoo/common/build* \
@@ -95,6 +94,7 @@ ARG ODOO_SOURCE=OCA/OCB
 ARG ODOO_VERSION=10.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 RUN install.sh
+COPY lib/*.py /usr/local/lib/python2.7/site-packages
 
 # Metadata
 ARG VCS_REF

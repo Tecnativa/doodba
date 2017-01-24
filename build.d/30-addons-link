@@ -12,9 +12,9 @@ logging.info(
 
 for repo, addons in odoobaselib.addons_config().items():
     if addons == "all":
-        addons = os.listdir(os.path.join(SRC_DIR, repo))
+        addons = os.listdir(os.path.join(odoobaselib.SRC_DIR, repo))
     for addon in addons:
-        src = os.path.join(SRC_DIR, repo, addon)
-        dst = os.path.join(ADDONS_DIR, addon)
+        src = os.path.join(odoobaselib.SRC_DIR, repo, addon)
+        dst = os.path.join(odoobaselib.ADDONS_DIR, addon)
         logging.debug("Linking %s in %s", src, dst)
         os.symlink(src, dst)
