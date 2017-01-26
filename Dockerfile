@@ -3,9 +3,9 @@ MAINTAINER Tecnativa <info@tecnativa.com>
 
 # Enable Odoo user and filestore
 RUN adduser -DH odoo \
-    && mkdir -p /var/run/odoo \
-    && chown -R odoo:odoo /var/run/odoo
-VOLUME ["/var/run/odoo"]
+    && mkdir -p /var/lib/odoo \
+    && chown -R odoo:odoo /var/lib/odoo
+VOLUME ["/var/lib/odoo"]
 EXPOSE 8069 8072
 
 # Subimage triggers

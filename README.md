@@ -363,6 +363,8 @@ Once you fixed everything needed, run it with:
 
     docker-compose -f prod.yaml up --build
 
+Remember that you will want to backup the filestore in `/var/lib/odoo` volume.
+
 ##### Testing
 
 A good rule of thumb is test in testing before uploading to production, so this
