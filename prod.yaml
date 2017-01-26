@@ -6,11 +6,10 @@ services:
             service: odoo
         bulid:
             args:
+                # XXX These are critical for security
+                ADMIN_PASSWORD: example secure password
                 PROXY_MODE: "yes"
         restart: unless-stopped
-        environment:
-            # XXX Change this!!!
-            ADMIN_PASSWORD: example secure password
         links:
             - db10:db
             - inbox
