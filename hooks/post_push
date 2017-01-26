@@ -3,7 +3,7 @@ set -ex
 if [ "$DOCKER_TAG" == latest ]; then
     # Push other tags, that should have been built already
     source hooks/variables
-    for ver in $DEFAULT_VERSION $VERSIONS; do
+    for ver in $DEFAULT_VERSION $OTHER_VERSIONS; do
         docker push "$DOCKER_REPO:$ver"
     done
 fi
