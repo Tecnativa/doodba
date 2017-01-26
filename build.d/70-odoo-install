@@ -5,19 +5,18 @@ dst=/usr/local/bin/odoo
 log INFO Installing Odoo from $src
 
 # For development you could want to avoid installing Odoo to speed up build
-if [ "$PIP_INSTALL_ODOO" != yes ]; then
+if [ "$PIP_INSTALL_ODOO" == yes ]; then
+    pip install --no-cache-dir --editable $src
+
+    # Make version 9.0 have a `odoo` executable
+    if [ "$ODOO_VERSION" == "9.0" ]; then
+        ln -s $dst.py $dst
+    fi
+else
     log WARNING Blindly symlinking odoo executable
     bin=$src/odoo-bin
     if [ "$ODOO_VERSION" == "9.0" ]; then
-        bin=$src/odoo
+        bin=$src/odoo.py
     fi
     ln -s $bin $dst
-    exit 0
-fi
-
-pip install --no-cache-dir --editable $src
-
-# Make version 9.0 have a `odoo` executable
-if [ "$ODOO_VERSION" == "9.0" ]; then
-    ln -s $dst.py $dst
 fi
