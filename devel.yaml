@@ -10,6 +10,8 @@ services:
                 # To aggregate in development, use `setup-devel.yaml`
                 AGGREGATE: "no"
                 # No need for this in development
+                PYTHONOPTIMIZE: 0
+                PIP_INSTALL_ODOO: "no"
                 CLEAN: "no"
                 COMPILE: "no"
                 # You want demo data for development
