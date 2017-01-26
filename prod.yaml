@@ -60,6 +60,7 @@ services:
         extends:
             file: common.yaml
             service: backup
+        restart: unless-stopped
         links:
             - db10:postgresdb
             - smtp
