@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+requirements=/opt/odoo/custom/src/requirements.txt
+
+# Install Python dependencies
+if [ -f $requirements ]; then
+    log INFO Installing Python dependencies from $src
+    pip install --no-cache-dir -r $requirements
+fi

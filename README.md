@@ -55,6 +55,7 @@ This is its structure:
             odoo/
             addons.yaml
             repos.yaml
+            requirements.txt
     common/
         entrypoint.sh
         build.sh
@@ -183,6 +184,11 @@ Important notes:
   removed by default, to keep the resulting image thin).
 
 - If you list 2 addons with the same name, you'll get a build error.
+
+##### `/opt/odoo/custom/src/requirements.txt`
+
+A normal [pip `requirements.txt`][] file, to install dependencies for your
+addons when building the subimage.
 
 ### `/opt/odoo/common`: The useful one
 
@@ -404,6 +410,7 @@ open an issue or pull request.
 [OCA]: https://odoo-community.org/
 [OpenUpgrade]: https://github.com/OCA/OpenUpgrade/
 [`PYTHONOPTIMIZE=2`]: https://docs.python.org/2/using/cmdline.html#envvar-PYTHONOPTIMIZE
+[pip `requirements.txt`]: https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
 [scaffolding]: #scaffolding
 [`odoo`]: #optodoocustomsrcodoo
 [`odoo.conf`]: #optodooautoodooconf
