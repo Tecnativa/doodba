@@ -12,6 +12,8 @@ services:
                 # No need for this in development
                 CLEAN: "no"
                 COMPILE: "no"
+                # You want demo data for development
+                WITHOUT_DEMO: "no"
         ports:
             # XXX I recommend you to use static ports per project
             - "8069"

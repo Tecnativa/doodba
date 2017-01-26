@@ -4,6 +4,10 @@ services:
         extends:
             file: common.yaml
             service: odoo
+        build:
+            args:
+                # You may want demo data for testing
+                WITHOUT_DEMO: "no"
         environment:
             PGDATABASE: test
         links:
