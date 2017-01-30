@@ -1,8 +1,8 @@
-FROM python:2-alpine
+FROM debian:8
 MAINTAINER Tecnativa <info@tecnativa.com>
 
 # Enable Odoo user and filestore
-RUN adduser -DH odoo \
+RUN useradd -M odoo \
     && mkdir -p /var/lib/odoo \
     && chown -R odoo:odoo /var/lib/odoo
 VOLUME ["/var/lib/odoo"]
@@ -42,8 +42,6 @@ ONBUILD USER odoo
 ARG PYTHONOPTIMIZE=2
 ENV ODOO_RC=/opt/odoo/auto/odoo.conf \
     UNACCENT=yes \
-    # HACK for Pillow: https://github.com/Tecnativa/odoo/pull/1
-    LDFLAGS="-L/usr/local/lib -L/usr/lib -L/lib" \
     # Git and git-aggregator
     GIT_AUTHOR_NAME=docker-odoo \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
@@ -57,27 +55,27 @@ ENV ODOO_RC=/opt/odoo/auto/odoo.conf \
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
-RUN apk add --no-cache \
-        ghostscript icu libev nodejs openssl \
-        postgresql-libs poppler-utils ruby
-# Special case for wkhtmltox
-# HACK https://github.com/wkhtmltopdf/wkhtmltopdf/issues/3265
-# Idea from https://hub.docker.com/r/loicmahieu/alpine-wkhtmltopdf/
-# Use prepackaged wkhtmltopdf and wrap it with a dummy X server
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing wkhtmltopdf
-RUN apk add --no-cache xvfb ttf-dejavu ttf-freefont fontconfig dbus
-COPY bin/wkhtmltox.sh /usr/local/bin/wkhtmltoimage
-RUN ln /usr/local/bin/wkhtmltoimage /usr/local/bin/wkhtmltopdf
+RUN apt-get update \
+    && apt-get -y upgrade \
+    && apt-get install -y --no-install-recommends \
+        python-pip postgresql-client ruby-compass node-less git curl \
+
+    # Special case for wkhtmltox
+    && curl -SLo wkhtmltox.deb https://nightly.odoo.com/extra/wkhtmltox-0.12.2.1_linux-jessie-amd64.deb \
+    && echo "4ec2aa2a13d6127cdd6ca07ab18b807a6c5c1f5215c5880b951a89642c1a0ecd  wkhtmltox.deb" | sha256sum -c - \
+    && dpkg --force-depends -i wkhtmltox.deb \
+    && apt-get -y install -f --no-install-recommends \
+    && apt-get -y purge curl \
+    && apt-get -y autoremove \
+    && rm -Rf /var/lib/apt/lists/* wkhtmltox.deb
 
 # Patched git-aggregator
-RUN apk add --no-cache git
-RUN pip install --no-cache-dir https://github.com/acsone/git-aggregator/archive/bdfdf05a7e903b06c201f163161053a924330bed.zip
+RUN pip install --no-cache-dir https://github.com/Tecnativa/git-aggregator/archive/master.zip
 
 # WDB debugger
 RUN pip install --no-cache-dir wdb
 
 # Other facilities
-RUN apk add --no-cache gettext postgresql-client
 RUN pip install --no-cache-dir openupgradelib
 COPY bin/log bin/unittest bin/install.sh /usr/local/bin/
 COPY bin/direxec.sh /opt/odoo/common/entrypoint.sh
