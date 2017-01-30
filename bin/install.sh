@@ -2,7 +2,7 @@
 set -ex
 
 # Requirements to build Odoo dependencies
-apk add --no-cache --virtual .common-deps build-base python-dev
+apk add --no-cache --virtual .common-deps build-base
 # lxml
 apk add --no-cache --virtual .lxml-deps libxml2-dev libxslt-dev
 # Pillow

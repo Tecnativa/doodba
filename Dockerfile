@@ -43,7 +43,7 @@ ARG PYTHONOPTIMIZE=2
 ENV ODOO_RC=/opt/odoo/auto/odoo.conf \
     UNACCENT=yes \
     # HACK for Pillow: https://github.com/Tecnativa/odoo/pull/1
-    LDFLAGS="-L/lib" \
+    LDFLAGS="-L/usr/local/lib -L/usr/lib -L/lib" \
     # Git and git-aggregator
     GIT_AUTHOR_NAME=docker-odoo \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
