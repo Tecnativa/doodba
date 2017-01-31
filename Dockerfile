@@ -71,14 +71,11 @@ RUN apt-get update \
     && apt-get -y autoremove \
     && rm -Rf /var/lib/apt/lists/* wkhtmltox.deb
 
-# Patched git-aggregator
-RUN pip install --no-cache-dir https://github.com/Tecnativa/git-aggregator/archive/master.zip
-
-# WDB debugger
-RUN pip install --no-cache-dir wdb
-
 # Other facilities
-RUN pip install --no-cache-dir openupgradelib
+RUN pip install --no-cache-dir \
+    openupgradelib wdb \
+    # Patched git-aggregator
+    https://github.com/Tecnativa/git-aggregator/archive/master.zip
 COPY bin/log bin/unittest bin/install.sh /usr/local/bin/
 COPY bin/direxec.sh /opt/odoo/common/entrypoint.sh
 RUN ln /opt/odoo/common/entrypoint.sh /opt/odoo/common/build.sh
