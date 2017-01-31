@@ -1,6 +1,6 @@
 version: "2.1"
 services:
-    odoo10:
+    odoo$ODOO_MAJOR:
         extends:
             file: common.yaml
             service: odoo
@@ -11,11 +11,11 @@ services:
         environment:
             PGDATABASE: test
         links:
-            - db10:db
+            - db$ODOO_MAJOR:db
             - inbox
             - smtp
 
-    db10:
+    db$ODOO_MAJOR:
         extends:
             file: common.yaml
             service: db
@@ -25,7 +25,7 @@ services:
             file: common.yaml
             service: https
         links:
-            - odoo10:www
+            - odoo$ODOO_MAJOR:www
 
     inbox:
         extends:
@@ -38,7 +38,7 @@ services:
             service: smtpfake
 
 volumes:
-    filestore10:
-    db10:
+    filestore$ODOO_MAJOR:
+    db$ODOO_MAJOR:
     certs:
     certscron:

@@ -1,7 +1,7 @@
 version: "2.1"
 
 services:
-    odoo10:
+    odoo$ODOO_MAJOR:
         extends:
             file: common.yaml
             service: odoo
@@ -17,19 +17,16 @@ services:
                 # You want demo data for development
                 WITHOUT_DEMO: "no"
         ports:
-            # XXX I recommend you to use static ports per project
-            - "8069"
-            - "8072"
+            - "127.0.0.1:${ODOO_MAJOR}069:8069"
+            - "127.0.0.1:${ODOO_MAJOR}072:8072"
         volumes:
             - ./odoo/custom:/opt/odoo/custom:ro,z
         environment:
             PGDATABASE: devel
             # Don't optimize in development
             PYTHONOPTIMIZE: 0
-            # XXX Use same static port as in `wdb` service below
-            WDB_WEB_PORT: "1984"
         links:
-            - db10:db
+            - db$ODOO_MAJOR:db
             - inbox
             - smtp
             - wdb
@@ -37,7 +34,7 @@ services:
         # command: unittest module1,module2
         command: odoo --dev all
 
-    db10:
+    db$ODOO_MAJOR:
         extends:
             file: common.yaml
             service: db
@@ -55,9 +52,8 @@ services:
     wdb:
         image: yajo/wdb-server
         ports:
-            # XXX I recommend you to use static ports per project
-            - "1984"
+            - "127.0.0.1:1984:1984"
 
 volumes:
-    filestore10:
-    db10:
+    filestore$ODOO_MAJOR:
+    db$ODOO_MAJOR:

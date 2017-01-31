@@ -4,15 +4,15 @@ services:
         build: odoo
         tty: true
         volumes:
-            - filestore10:/var/lib/odoo
+            - filestore$ODOO_MAJOR:/var/lib/odoo
 
     db:
-        image: postgres:9.5-alpine
+        image: postgres:$DB_VERSION-alpine
         environment:
-            POSTGRES_USER: odoo
-            POSTGRES_PASSWORD: odoopassword
+            POSTGRES_USER: "$DB_USER"
+            POSTGRES_PASSWORD: "$DB_PASSWORD"
         volumes:
-            - db10:/var/lib/postgresql/data
+            - db$ODOO_MAJOR:/var/lib/postgresql/data
 
     https:
         build: https
@@ -24,9 +24,8 @@ services:
             - certscron:/var/spool/cron/cronstamps
         environment:
             PORT: 8069
-            # XXX Change these for your real data
-            EMAIL: admin@example.com
-            DOMAINS: example.com
+            EMAIL: "$LETSENCRYPT_EMAIL"
+            DOMAINS: "LETSENCRYPT_DOMAINS"
 
     smtpfake:
         image: tecnativa/smtp-sink
@@ -36,47 +35,43 @@ services:
         volumes:
             - smtp:/var/spool/postfix
         environment:
-            # XXX Fill all of these according to your settings
-            MAILNAME: example.com
-            MAIL_RELAY_HOST: smtp.example.com
-            MAIL_RELAY_PORT: 587
-            MAIL_RELAY_USER: postmaster@example.com
-            MAIL_RELAY_PASS: example password
-            MAIL_CANONICAL_DOMAINS: example.com
-            MAIL_NON_CANONICAL_DEFAULT: example.com
+            MAILNAME: "$SMTP_REAL_MAILNAME"
+            MAIL_RELAY_HOST: "$SMTP_REAL_RELAY_HOST"
+            MAIL_RELAY_PORT: "$SMTP_REAL_RELAY_PORT"
+            MAIL_RELAY_USER: "$SMTP_REAL_RELAY_USER"
+            MAIL_RELAY_PASS: "$SMTP_REAL_RELAY_PASS"
+            MAIL_CANONICAL_DOMAINS: "$SMTP_REAL_CANONICAL_DOMAINS"
+            MAIL_NON_CANONICAL_DEFAULT: "$SMTP_REAL_NON_CANONICAL_DEFAULT"
 
     inboxfake:
         image: tecnativa/tcp-proxy
         environment:
-            LISTEN: ":995"
-            # XXX Put your testing IMAP/POP3 server here
-            TALK: "inbox.example.com:995"
+            LISTEN: "$INBOX_FAKE_LISTEN"
+            TALK: "$INBOX_FAKE_TALK"
 
     inboxreal:
         image: tecnativa/tcp-proxy
         environment:
-            LISTEN: ":995"
-            # XXX Put your real IMAP/POP3 server here
-            TALK: "inbox.example.com:995"
+            LISTEN: "$INBOX_REAL_LISTEN"
+            TALK: "$INBOX_REAL_TALK"
 
     backup:
         image: tecnativa/server-backup
         environment:
-            # XXX Fill all of these according to your settings
-            ROOT_EMAIL_FROM: backup@example.com
-            ROOT_EMAIL_TO: alerts@example.com
-            MAIL_RELAY_HOST: smtp
-            BACKUP_S3_ACCESS_KEY: example key
-            BACKUP_S3_SECRET_KEY: example secret
-            BACKUP_S3_BUCKET: example-bkp
-            BACKUP_S3_INSTANCE: docker-example
-            BACKUP_SEND_MAIL_ERR: 1
-            BACKUP_SEND_MAIL_LOG: 1
-            BACKUP_EMAIL_SUBJECT: '[EXAMPLE]'
-            BACKUP_EMAIL_FROM: backup@example.com
-            BACKUP_EMAIL_TO: alerts@example.com
-            BACKUP_ENCRYPT: 1
-            BACKUP_ENCRYPT_KEY: example encryption key
+            ROOT_EMAIL_FROM: "$BACKUP_ROOT_EMAIL_FROM"
+            ROOT_EMAIL_TO: "$BACKUP_ROOT_EMAIL_TO"
+            MAIL_RELAY_HOST: "$BACKUP_MAIL_RELAY_HOST"
+            BACKUP_S3_ACCESS_KEY: "$BACKUP_S3_ACCESS_KEY"
+            BACKUP_S3_SECRET_KEY: "$BACKUP_S3_SECRET_KEY"
+            BACKUP_S3_BUCKET: "$BACKUP_S3_BUCKET"
+            BACKUP_S3_INSTANCE: "$BACKUP_S3_INSTANCE"
+            BACKUP_SEND_MAIL_ERR: "$BACKUP_SEND_MAIL_ERR"
+            BACKUP_SEND_MAIL_LOG: "$BACKUP_SEND_MAIL_LOG"
+            BACKUP_EMAIL_SUBJECT: "$BACKUP_EMAIL_SUBJECT"
+            BACKUP_EMAIL_FROM: "$BACKUP_EMAIL_FROM"
+            BACKUP_EMAIL_TO: "$BACKUP_EMAIL_TO"
+            BACKUP_ENCRYPT: "$BACKUP_ENCRYPT"
+            BACKUP_ENCRYPT_KEY: "$BACKUP_ENCRYPT_KEY"
             BACKUP_SOURCES: /var/lib/odoo,0,1
-            PG_USER: odoo
-            PG_PASS: odoopassword
+            PG_USER: "$DB_USER"
+            PG_PASS: "$DB_PASSWORD"

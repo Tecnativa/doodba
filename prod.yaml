@@ -1,23 +1,22 @@
 version: "2.1"
 services:
-    odoo10:
+    odoo$ODOO_MAJOR:
         extends:
             file: common.yaml
             service: odoo
         bulid:
             args:
-                # XXX These are critical for security
-                ADMIN_PASSWORD: example secure password
-                PROXY_MODE: "yes"
+                ADMIN_PASSWORD: "$ODOO_ADMIN_PASSWORD"
+                PROXY_MODE: "$ODOO_PROXY_MODE"
         restart: unless-stopped
         links:
-            - db10:db
+            - db$ODOO_MAJOR:db
             - inbox
             - smtp
         networks:
             - back
 
-    db10:
+    db$ODOO_MAJOR:
         extends:
             file: common.yaml
             service: db
@@ -30,10 +29,10 @@ services:
             file: common.yaml
             service: https
         links:
-            - odoo10:www
+            - odoo$ODOO_MAJOR:www
         restart: unless-stopped
         links:
-            - odoo10:www
+            - odoo$ODOO_MAJOR:www
         environment:
             STAGING: "false"
         networks:
@@ -62,16 +61,16 @@ services:
             service: backup
         restart: unless-stopped
         links:
-            - db10:postgresdb
+            - db$ODOO_MAJOR:postgresdb
             - smtp
         volumes_from:
-            - odoo10
+            - odoo$ODOO_MAJOR
         networks:
             - back
 
 volumes:
-    filestore10:
-    db10:
+    filestore$ODOO_MAJOR:
+    db$ODOO_MAJOR:
     smtp:
     certs:
     certscron:
