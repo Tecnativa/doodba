@@ -81,7 +81,7 @@ RUN pip install --no-cache-dir openupgradelib
 COPY bin/log bin/unittest bin/install.sh /usr/local/bin/
 COPY bin/direxec.sh /opt/odoo/common/entrypoint.sh
 RUN ln /opt/odoo/common/entrypoint.sh /opt/odoo/common/build.sh
-COPY lib/*.py /usr/local/lib/python2.7/site-packages
+COPY lib/*.py /usr/local/lib/python2.7/dist-packages
 COPY build.d /opt/odoo/common/build.d
 COPY conf.d /opt/odoo/common/conf.d
 COPY entrypoint.d /opt/odoo/common/entrypoint.d
