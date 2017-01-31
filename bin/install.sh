@@ -1,7 +1,7 @@
 #!/bin/sh
 set -ex
 
-apt_deps="python-dev"
+apt_deps="python-dev build-essentials"
 apt-get update
 
 # lxml
