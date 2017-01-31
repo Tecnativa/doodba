@@ -379,6 +379,41 @@ Test it in your machine with:
 
     docker-compose -f test.yaml up --build
 
+#### Other usage scenarios
+
+In examples below I will skip the `-f <environment>.yaml` part and assume you
+know which environment you want to use.
+
+Also, we recommend to use `run` subcommand to create a new container with same
+settings and volumes. Sometimes you may prefer to use `exec` instead, to
+execute an arbitrary command in a running container.
+
+##### Inspect the database
+
+    docker-compose run --rm odoo psql
+
+##### Run unit tests for some addon
+
+    docker-compose run --rm odoo unittest addon1,addon2 --stop-after-init
+
+##### Install some addon without stopping current running process
+
+    docker-compose run --rm odoo odoo -i addon1,addon2 --stop-after-init
+
+##### Update some addon without stopping current running process
+
+    docker-compose run --rm odoo odoo -u addon1,addon2 --stop-after-init
+
+##### Open an odoo shell
+
+    docker-compose run --rm odoo odoo shell
+
+##### Open another UI instance linked to same filestore and database
+
+    docker-compose run --rm -p 127.0.0.1:$SomeFreePort:8069 odoo
+
+Then open `http://localhost:$SomeFreePort`.
+
 ## FAQ
 
 ### Why my `99-whatever.sh` script in `/opt/odoo/*/*.d/` does not execute?
