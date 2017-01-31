@@ -33,7 +33,7 @@ services:
         environment:
             PORT: 8069
             EMAIL: "$LETSENCRYPT_EMAIL"
-            DOMAINS: "LETSENCRYPT_DOMAINS"
+            DOMAINS: "$LETSENCRYPT_DOMAINS"
 
     smtpfake:
         image: tecnativa/smtp-sink
