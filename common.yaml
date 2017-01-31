@@ -9,6 +9,10 @@ services:
         tty: true
         volumes:
             - filestore$ODOO_MAJOR:/var/lib/odoo
+        networks:
+            default:
+                aliases:
+                    - www
 
     db:
         image: postgres:$DB_VERSION-alpine

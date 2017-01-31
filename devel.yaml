@@ -1,7 +1,7 @@
 version: "2.1"
 
 services:
-    odoo$ODOO_MAJOR:
+    odoo:
         extends:
             file: common.yaml
             service: odoo
@@ -22,16 +22,9 @@ services:
             - "127.0.0.1:${ODOO_MAJOR}072:8072"
         volumes:
             - ./odoo/custom:/opt/odoo/custom:ro,z
-        links:
-            - db$ODOO_MAJOR:db
-            - inbox
-            - smtp
-            - wdb
-        # Uncomment to start in unit test mode, add module names if you wish
-        # command: unittest module1,module2
         command: odoo --dev all
 
-    db$ODOO_MAJOR:
+    db:
         extends:
             file: common.yaml
             service: db
@@ -52,5 +45,5 @@ services:
             - "127.0.0.1:1984:1984"
 
 volumes:
-    filestore$ODOO_MAJOR:
-    db$ODOO_MAJOR:
+    filestore10:
+    db10:

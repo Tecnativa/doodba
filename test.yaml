@@ -1,6 +1,6 @@
 version: "2.1"
 services:
-    odoo$ODOO_MAJOR:
+    odoo:
         extends:
             file: common.yaml
             service: odoo
@@ -9,12 +9,8 @@ services:
                 PGDATABASE: test
                 # You may want demo data for testing
                 WITHOUT_DEMO: "no"
-        links:
-            - db$ODOO_MAJOR:db
-            - inbox
-            - smtp
 
-    db$ODOO_MAJOR:
+    db:
         extends:
             file: common.yaml
             service: db
@@ -23,8 +19,6 @@ services:
         extends:
             file: common.yaml
             service: https
-        links:
-            - odoo$ODOO_MAJOR:www
 
     inbox:
         extends:
@@ -37,7 +31,8 @@ services:
             service: smtpfake
 
 volumes:
-    filestore$ODOO_MAJOR:
-    db$ODOO_MAJOR:
+    # Odoo volume names must match $ODOO_MAJOR to allow easy branch switching
+    filestore10:
+    db10:
     certs:
     certscron:

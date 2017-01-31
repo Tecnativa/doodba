@@ -1,6 +1,6 @@
 version: "2.1"
 services:
-    odoo$ODOO_MAJOR:
+    odoo:
         extends:
             file: common.yaml
             service: odoo
@@ -9,72 +9,45 @@ services:
                 ADMIN_PASSWORD: "$ODOO_ADMIN_PASSWORD"
                 PROXY_MODE: "$ODOO_PROXY_MODE"
         restart: unless-stopped
-        links:
-            - db$ODOO_MAJOR:db
-            - inbox
-            - smtp
-        networks:
-            - back
 
-    db$ODOO_MAJOR:
+    db:
         extends:
             file: common.yaml
             service: db
         restart: unless-stopped
-        networks:
-            - back
 
     https:
         extends:
             file: common.yaml
             service: https
-        links:
-            - odoo$ODOO_MAJOR:www
         restart: unless-stopped
-        links:
-            - odoo$ODOO_MAJOR:www
         environment:
             STAGING: "false"
-        networks:
-            - back
-            - front
 
     inbox:
         extends:
             file: common.yaml
             service: inboxreal
         restart: unless-stopped
-        networks:
-            - back
 
     smtp:
         extends:
             file: common.yaml
             service: smtpreal
         restart: unless-stopped
-        networks:
-            - back
 
     backup:
         extends:
             file: common.yaml
             service: backup
         restart: unless-stopped
-        links:
-            - db$ODOO_MAJOR:postgresdb
-            - smtp
         volumes_from:
-            - odoo$ODOO_MAJOR
-        networks:
-            - back
+            - odoo
 
 volumes:
-    filestore$ODOO_MAJOR:
-    db$ODOO_MAJOR:
+    # Odoo volume names must match $ODOO_MAJOR to allow easy branch switching
+    filestore10:
+    db10:
     smtp:
     certs:
     certscron:
-
-networks:
-    back:
-    front:
