@@ -24,9 +24,9 @@ merges, repositories, etc. With this image, you have a collection of good
 practices and tools to enable your team to have a standard Odoo project
 structure.
 
-BTW, we use [Alpine][]. I hope you like that.
+BTW, we use [Debian][]. I hope you like that.
 
-  [Alpine]: https://alpinelinux.org/
+  [Debian]: https://debian.org/
 
 ## Why?
 
