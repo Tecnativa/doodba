@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Shortcut to run Odoo in unit testing mode
 set -e
 addons=$1

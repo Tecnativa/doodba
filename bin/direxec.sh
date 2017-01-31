@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Thanks Camptocamp for the idea!
 # http://www.camptocamp.com/en/actualite/flexible-docker-entrypoints-scripts/
 set -e

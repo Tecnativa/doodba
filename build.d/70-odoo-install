@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 src=/opt/odoo/custom/src/odoo
 dst=/usr/local/bin/odoo

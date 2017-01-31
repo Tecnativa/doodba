@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Generate Odoo server configuration from templates
 set -e
 src="/opt/odoo/common/conf.d/* /opt/odoo/custom/conf.d/*"

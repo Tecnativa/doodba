@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ "$UNACCENT" == yes ]; then
     result="$(psql -qc 'CREATE EXTENSION IF NOT EXISTS unaccent' 2>&1)"
     ok=$?
