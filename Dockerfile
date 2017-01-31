@@ -58,7 +58,8 @@ ENV ODOO_RC=/opt/odoo/auto/odoo.conf \
 RUN apt-get update \
     && apt-get -y upgrade \
     && apt-get install -y --no-install-recommends \
-        python-pip postgresql-client ruby-compass node-less git curl \
+        python-pip postgresql-client ruby-compass node-less git \
+        curl gettext-base \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
 
     # Special case for wkhtmltox
