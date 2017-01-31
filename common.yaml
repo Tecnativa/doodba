@@ -1,7 +1,11 @@
 version: "2.1"
 services:
     odoo:
-        build: odoo
+        build:
+            context: ./odoo
+            args:
+                PGUSER: "$DB_USER"
+                PGPASSWORD: "$DB_PASSWORD"
         tty: true
         volumes:
             - filestore$ODOO_MAJOR:/var/lib/odoo
