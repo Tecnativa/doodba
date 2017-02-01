@@ -9,6 +9,10 @@ services:
                 ADMIN_PASSWORD: "$ODOO_ADMIN_PASSWORD"
                 PROXY_MODE: "$ODOO_PROXY_MODE"
         restart: unless-stopped
+        depends_on:
+            - db
+            - smtp
+            - inbox
 
     db:
         extends:
@@ -23,6 +27,8 @@ services:
         restart: unless-stopped
         environment:
             STAGING: "false"
+        depends_on:
+            - odoo
 
     inbox:
         extends:
@@ -43,9 +49,13 @@ services:
         restart: unless-stopped
         volumes_from:
             - odoo
+        depends_on:
+            - odoo
+            - db
+            - smtp
 
 volumes:
-    # Odoo volume names must match $ODOO_MAJOR to allow easy branch switching
+    # XXX Odoo volume names must match $ODOO_MAJOR for quick branch switching
     filestore10:
     db10:
     smtp:

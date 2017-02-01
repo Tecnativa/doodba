@@ -9,6 +9,10 @@ services:
                 PGDATABASE: test
                 # You may want demo data for testing
                 WITHOUT_DEMO: "no"
+        depends_on:
+            - db
+            - smtp
+            - inbox
 
     db:
         extends:
@@ -19,6 +23,8 @@ services:
         extends:
             file: common.yaml
             service: https
+        depends_on:
+            - odoo
 
     inbox:
         extends:
@@ -31,7 +37,7 @@ services:
             service: smtpfake
 
 volumes:
-    # Odoo volume names must match $ODOO_MAJOR to allow easy branch switching
+    # XXX Odoo volume names must match $ODOO_MAJOR for quick branch switching
     filestore10:
     db10:
     certs:

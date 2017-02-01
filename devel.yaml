@@ -22,6 +22,11 @@ services:
             - "127.0.0.1:${ODOO_MAJOR}072:8072"
         volumes:
             - ./odoo/custom:/opt/odoo/custom:ro,z
+        depends_on:
+            - db
+            - smtp
+            - inbox
+            - wdb
         command: odoo --dev all
 
     db:
@@ -45,5 +50,6 @@ services:
             - "127.0.0.1:1984:1984"
 
 volumes:
+    # XXX Odoo volume names must match $ODOO_MAJOR for quick branch switching
     filestore10:
     db10:
