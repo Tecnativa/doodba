@@ -10,10 +10,9 @@ version: "2.1"
 
 services:
     odoo:
-        odoo:
-            extends:
-                file: common.yaml
-                service: odoo
+        extends:
+            file: common.yaml
+            service: odoo
         volumes:
             - ./odoo/custom:/opt/odoo/custom:rw,z
         environment:
