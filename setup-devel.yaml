@@ -18,3 +18,7 @@ services:
         environment:
             AGGREGATE: "yes"
         command: /opt/odoo/common/build.d/20-repos-aggregate
+
+volumes:
+    # XXX Odoo volume names must match $ODOO_MAJOR for quick branch switching
+    filestore10:
