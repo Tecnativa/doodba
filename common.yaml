@@ -66,9 +66,9 @@ services:
     backup:
         image: tecnativa/server-backup
         environment:
+            MAIL_RELAY_HOST: smtp
             ROOT_EMAIL_FROM: "$BACKUP_ROOT_EMAIL_FROM"
             ROOT_EMAIL_TO: "$BACKUP_ROOT_EMAIL_TO"
-            MAIL_RELAY_HOST: "$BACKUP_MAIL_RELAY_HOST"
             BACKUP_S3_ACCESS_KEY: "$BACKUP_S3_ACCESS_KEY"
             BACKUP_S3_SECRET_KEY: "$BACKUP_S3_SECRET_KEY"
             BACKUP_S3_BUCKET: "$BACKUP_S3_BUCKET"
