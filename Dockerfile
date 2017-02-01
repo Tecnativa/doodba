@@ -40,7 +40,7 @@ ONBUILD CMD ["/usr/local/bin/odoo"]
 ONBUILD USER odoo
 
 ARG PYTHONOPTIMIZE=2
-ENV ODOO_RC=/opt/odoo/auto/odoo.conf \
+ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     UNACCENT=yes \
     # Git and git-aggregator
     GIT_AUTHOR_NAME=docker-odoo \
