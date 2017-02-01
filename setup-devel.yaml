@@ -9,8 +9,13 @@
 version: "2.1"
 
 services:
-    gitaggregator:
-        image: tecnativa/git-aggregator
+    odoo:
+        odoo:
+            extends:
+                file: common.yaml
+                service: odoo
         volumes:
-            - ./odoo/custom/src/:/repos:rw,z
-        command: -c repos.yaml
+            - ./odoo/custom:/opt/odoo/custom:rw,z
+        environment:
+            AGGREGATE: "yes"
+        command: /opt/odoo/common/build.d/20-repos-aggregate
