@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+conf=/opt/odoo/custom/src/repos.yaml
+# Update linked repositories, if the `repos.yaml` file is found
+if [ -f $conf ]; then
+    log INFO Aggregating repositories from $conf
+    cd $(dirname $conf)
+
+    # Avoid wrong umask in aggregated files
+    if [ -n "$UMASK" ]; then
+        umask "$UMASK"
+    fi
+
+    # Perform aggregation with environment variables expansion
+    gitaggregate --expand-env -c $conf
+
+    # Avoid wrong user/group in aggregated files
+    if [ -n "$GID" -a -n "$UID" ]; then
+        chown -R "$UID:$GID" .
+    fi
+else
+    log ERROR Cannot aggregate repositories: $conf not found
+    exit 1
+fi

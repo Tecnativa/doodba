@@ -271,11 +271,11 @@ I told you, this image is opinionated. :wink:
 We found this one to be the most useful tool for downlading code, merging it
 and placing it somewhere.
 
-We will use
-[a development version](https://github.com/acsone/git-aggregator/tree/bdfdf05a7e903b06c201f163161053a924330bed)
-until the stable one [allows you to choose a `--depth` when pulling
-images](https://github.com/acsone/git-aggregator/pull/7), and [fetches only the
-required remotes](https://github.com/acsone/git-aggregator/pull/6).
+### `autoaggregate`
+
+This little script wraps `git-aggregator` to make it work fine and
+automatically with this image. Used in the [scaffolding][]'s `setup-devel.yaml`
+step.
 
 #### Example [`repos.yaml`][] file
 
