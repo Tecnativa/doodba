@@ -1,5 +1,6 @@
 # Use this environment to download all repositories from `repos.yaml` file:
 #
+#   export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
 #   docker-compose -f setup-devel.yaml up
 #
 # You can clean your git project before if you want to have all really clean:
@@ -14,5 +15,9 @@ services:
         volumes:
             - ./odoo/custom:/opt/odoo/custom:rw,z
         environment:
-            AGGREGATE: "yes"
-        command: /opt/odoo/common/build.d/20-repos-aggregate
+            # XXX Export these variables before running setup to avoid
+            # permissions problems
+            - UID
+            - GID
+            - UMASK
+        command: autoaggregate
