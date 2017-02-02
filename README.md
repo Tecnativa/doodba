@@ -435,12 +435,39 @@ You probably **should**, and rebase on our updates. However, if you are
 planning on a general update to it that you find interesting for the
 general-purpose one, please send us a pull request.
 
+### Can I skip the `-f <environment>.yaml` part for `docker-compose` commands?
+
+Let's suppose you want to use `test.yaml` environment by default, no matter
+where you clone the project:
+
+    ln -s test.yaml docker-compose.yaml
+    git add docker-compose.yaml
+    git commit
+
+Let's suppose you only want to use `devel.yaml` in your local development
+machine by default:
+
+    ln -s devel.yaml docker-compose.yml
+
+Notice the difference in the prefix (`.yaml` vs. `.yml`). Docker Compose will
+use the `.yml` one if both are found, so that's the one we considered you
+should use in your local clones, and that's the one that will be git-ignored by
+default by the scaffolding `.gitignore` file.
+
+Another option is that you use the [`COMPOSE_FILE` environment variable][].
+Returning to the example where you are in your local development machine, you
+might want to add this to your `~/.bashrc` or equivalent:
+
+    export COMPOSE_FILE=docker-compose.yml:docker-compose.yaml:devel.yaml
+
+As a design choice, the scaffolding defaults to being explicit.
+
 ### How can I help?
 
 Just [head to our project](https://github.com/Tecnativa/docker-odoo-base) and
 open an issue or pull request.
 
-
+[`COMPOSE_FILE` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
 [Original Odoo]: https://github.com/odoo/odoo
 [Odoo S.A.]: https://www.odoo.com
 [OCB]: https://github.com/OCA/OCB
