@@ -2,7 +2,7 @@ FROM debian:8
 MAINTAINER Tecnativa <info@tecnativa.com>
 
 # Enable Odoo user and filestore
-RUN useradd -M odoo \
+RUN useradd -md /opt/odoo odoo \
     && mkdir -p /var/lib/odoo \
     && chown -R odoo:odoo /var/lib/odoo
 VOLUME ["/var/lib/odoo"]
