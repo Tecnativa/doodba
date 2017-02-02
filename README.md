@@ -314,6 +314,7 @@ I will assume you know how to use Git, Docker and Docker Compose.
 
     git clone -b scaffolding https://github.com/Tecnativa/docker-odoo-base.git myproject
     cd myproject
+    export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
     docker-compose -f setup-devel.yaml up
     docker-compose -f devel.yaml up
 
@@ -343,6 +344,7 @@ you on making it work.
 
 Set it up with:
 
+    export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
     docker-compose -f setup-devel.yaml up
 
 Once finished, you can start using Odoo with:
@@ -351,6 +353,10 @@ Once finished, you can start using Odoo with:
 
 This is on purpose. It allows you to track only what Git needs to track and
 provides faster Docker builds.
+
+You might consider adding this line to your `~/.bashrc`:
+
+    export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
 
 ##### Production
 
