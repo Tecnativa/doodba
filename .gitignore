@@ -3,6 +3,9 @@ odoo/custom/src/*
 !odoo/custom/src/private
 !odoo/custom/src/*.*
 
+# Ignore docker-compose.yml by default, to allow easy defaults per clone
+docker-compose.yml
+
 # Compiled formats, cache, temporary files, git garbage
 **.~
 **.mo
