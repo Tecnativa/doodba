@@ -22,11 +22,6 @@ services:
             POSTGRES_PASSWORD: "$DB_PASSWORD"
         volumes:
             - db$ODOO_MAJOR:/var/lib/postgresql/data
-        networks:
-            default:
-                aliases:
-                    # For `backup` service
-                    - postgresdb
 
     https:
         build: https
@@ -87,5 +82,6 @@ services:
             BACKUP_ENCRYPT: "$BACKUP_ENCRYPT"
             BACKUP_ENCRYPT_KEY: "$BACKUP_ENCRYPT_KEY"
             BACKUP_SOURCES: /var/lib/odoo,0,1
+            PG_HOST: db
             PG_USER: "$DB_USER"
             PG_PASS: "$DB_PASSWORD"
