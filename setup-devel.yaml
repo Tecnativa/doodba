@@ -1,7 +1,7 @@
 # Use this environment to download all repositories from `repos.yaml` file:
 #
 #   export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
-#   docker-compose -f setup-devel.yaml up
+#   docker-compose -f setup-devel.yaml up --build
 #
 # You can clean your git project before if you want to have all really clean:
 #
@@ -11,13 +11,20 @@ version: "2.1"
 
 services:
     odoo:
-        image: tecnativa/odoo-base:$ODOO_MINOR
+        build:
+            context: ./odoo
+            args:
+                AGGREGATE: "no"
+                PYTHONOPTIMIZE: 0
+                PIP_INSTALL_ODOO: "no"
+                CLEAN: "no"
+                COMPILE: "no"
+                LINK: "no"
         volumes:
             - ./odoo/custom:/opt/odoo/custom:rw,z
         environment:
-            # XXX Export these variables before running setup to avoid
-            # permissions problems
+            # XXX Export these variables before running setup to own the files
             - UID
             - GID
             - UMASK
-        command: autoaggregate
+        entrypoint: autoaggregate
