@@ -350,7 +350,7 @@ you on making it work.
 Set it up with:
 
     export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
-    docker-compose -f setup-devel.yaml up
+    docker-compose -f setup-devel.yaml up --build
 
 Once finished, you can start using Odoo with:
 
