@@ -64,7 +64,7 @@ RUN apt-get update \
         libxml2 libxslt1.1 libjpeg62-turbo zlib1g libfreetype6 liblcms2-2 \
         libopenjpeg5 libtiff5 tk tcl libpq5 libldap-2.4-2 libsasl2-2 \
         # This image's facilities
-        postgresql-client git curl gettext-base \
+        curl gettext-base git nano openssh-client postgresql-client \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
 
     # Special case for wkhtmltox

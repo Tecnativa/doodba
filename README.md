@@ -236,6 +236,11 @@ now keep this in mind:
 
 ## Bundled tools
 
+### [`nano`][]
+
+The CLI text editor we all know, just in case you need to inspect some bug in
+hot deployments.
+
 ### `log`
 
 Just a little shell script that you can use to add logs to your build or
@@ -482,6 +487,7 @@ open an issue or pull request.
 [`PYTHONOPTIMIZE=2`]: https://docs.python.org/2/using/cmdline.html#envvar-PYTHONOPTIMIZE
 [pip `requirements.txt`]: https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
 [scaffolding]: #scaffolding
+[`nano`]: https://www.nano-editor.org/
 [`odoo`]: #optodoocustomsrcodoo
 [`odoo.conf`]: #optodooautoodooconf
 [`private`]: #optodoocustomsrcprivate
