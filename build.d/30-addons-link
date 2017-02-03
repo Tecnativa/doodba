@@ -2,8 +2,13 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+import sys
 
 import odoobaselib
+
+if not odoobaselib.LINK:
+    logging.warning("Not linking addons")
+    sys.exit()
 
 logging.info(
     "Linking all addons from %s in %s",
