@@ -42,12 +42,12 @@ ONBUILD USER odoo
 
 ARG PYTHONOPTIMIZE=2
 ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
-    UNACCENT=yes \
+    UNACCENT=true \
     # Git and git-aggregator
     GIT_AUTHOR_NAME=docker-odoo \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
     # Postgres
-    WAIT_DB=yes \
+    WAIT_DB=true \
     # WDB debugger
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
