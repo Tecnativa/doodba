@@ -5,7 +5,7 @@ dst=/usr/local/bin/odoo
 log INFO Installing Odoo from $src
 
 # For development you could want to avoid installing Odoo to speed up build
-if [ "$PIP_INSTALL_ODOO" == yes ]; then
+if [ "$PIP_INSTALL_ODOO" == true ]; then
     pip install --no-cache-dir --editable $src
 
     # Make version 9.0 have a `odoo` executable

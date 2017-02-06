@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ "$WAIT_DB" != yes ]; then
+if [ "$WAIT_DB" != true ]; then
     log WARNING Not waiting for a postgres server
     exit 0
 fi

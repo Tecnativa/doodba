@@ -8,8 +8,8 @@ import yaml
 SRC_DIR = "/opt/odoo/custom/src"
 ADDONS_YAML = SRC_DIR + "/addons.yaml"
 ADDONS_DIR = "/opt/odoo/auto/addons"
-CLEAN = os.environ.get("CLEAN") == "yes"
-LINK = os.environ.get("LINK") == "yes"
+CLEAN = os.environ.get("CLEAN") == "true"
+LINK = os.environ.get("LINK") == "true"
 
 # Allow to change log level for build
 logging.root.setLevel(int(os.environ.get("LOG_LEVEL", logging.INFO)))

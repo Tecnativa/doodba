@@ -1,5 +1,5 @@
 #!/bin/bash
-if [ "$UNACCENT" == yes ]; then
+if [ "$UNACCENT" == true ]; then
     result="$(psql -qc 'CREATE EXTENSION IF NOT EXISTS unaccent' 2>&1)"
     ok=$?
     if [ $ok -eq 0 -a -z "$result" ]; then
