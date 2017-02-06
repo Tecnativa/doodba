@@ -27,4 +27,5 @@ services:
             - UID
             - GID
             - UMASK
+        user: root
         entrypoint: autoaggregate
