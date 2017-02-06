@@ -14,12 +14,12 @@ services:
         build:
             context: ./odoo
             args:
-                AGGREGATE: "no"
+                AGGREGATE: "false"
                 PYTHONOPTIMIZE: 0
-                PIP_INSTALL_ODOO: "no"
-                CLEAN: "no"
-                COMPILE: "no"
-                LINK: "no"
+                PIP_INSTALL_ODOO: "false"
+                CLEAN: "false"
+                COMPILE: "false"
+                LINK: "false"
         volumes:
             - ./odoo/custom:/opt/odoo/custom:rw,z
         environment:
