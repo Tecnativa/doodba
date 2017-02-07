@@ -16,7 +16,7 @@ services:
                     - www
 
     db:
-        image: postgres:$DB_VERSION-alpine
+        image: postgres:${DB_VERSION}-alpine
         environment:
             POSTGRES_USER: "$DB_USER"
             POSTGRES_PASSWORD: "$DB_PASSWORD"
