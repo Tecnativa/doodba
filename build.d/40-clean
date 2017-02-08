@@ -43,5 +43,5 @@ for directory in os.listdir(odoobaselib.SRC_DIR):
         if not any(key == subdirectory or
                    key.startswith(subdirectory + os.path.sep)
                    for key in config[directory]):
-            logging.info("Removing subdirectory %s", full)
+            logging.info("Removing subdirectory %s", subfull)
             shutil.rmtree(subfull)
