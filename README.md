@@ -286,8 +286,11 @@ To use it, inject this in any Python line:
 
 Then open a telnet connection to it (running in `0.0.0.0:6899` by default).
 
-**DO NOT USE IT IN PRODUCTION ENVIRONMENTS.** At least without restricting the
-IP. (I had to say it).
+It is safe to use in production environments **if you know what you are doing
+and do not expose the debugging port to attackers**. Assuming you use the
+[scaffolding][] production environment, you can achieve that with:
+
+    docker-compose -f prod.yaml exec odoo telnet localhost 6899
 
 ### [`git-aggregator`](https://pypi.python.org/pypi/git-aggregator)
 
