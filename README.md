@@ -282,7 +282,7 @@ can be useful for some cases, or for people that prefer it over wdb.
 
 To use it, inject this in any Python line:
 
-    import pudb.remote; pudb.remote.set_trace()
+    import pudb.remote; pudb.remote.set_trace(term_size=(80, 24))
 
 Then open a telnet connection to it (running in `0.0.0.0:6899` by default).
 
