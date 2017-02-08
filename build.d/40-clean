@@ -40,6 +40,8 @@ for directory in os.listdir(odoobaselib.SRC_DIR):
         if not os.path.isdir(subfull):
             continue
         # Remove addon if not used
-        if subdirectory not in config[directory]:
+        if not any(key == subdirectory or
+                   key.startswith(subdirectory + os.path.sep)
+                   for key in config[directory]):
             logging.info("Removing subdirectory %s", full)
             shutil.rmtree(subfull)
