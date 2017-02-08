@@ -139,8 +139,6 @@ website:
     - website_legal_page
 web:
     - web_responsive
-other/repo/with/long/paths/to/addons/dir:
-    - my_custom_addon
 ```
 
 You can bundle [several YAML documents][] if you want to logically group your
