@@ -269,7 +269,25 @@ Docker-based development, so here you have it preinstalled.
 
 I told you, this image is opinionated. :wink:
 
+To use it, inject this in any Python line:
+
+    import wdb; wdb.set_trace()
+
 **DO NOT USE IT IN PRODUCTION ENVIRONMENTS.** (I had to say it).
+
+### [`pudb`](https://github.com/inducer/pudb)
+
+This is another great debugger that includes remote debugging via telnet, which
+can be useful for some cases, or for people that prefer it over wdb.
+
+To use it, inject this in any Python line:
+
+    import pudb.remote; pudb.remote.set_trace()
+
+Then open a telnet connection to it (running in `0.0.0.0:6899` by default).
+
+**DO NOT USE IT IN PRODUCTION ENVIRONMENTS.** At least without restricting the
+IP. (I had to say it).
 
 ### [`git-aggregator`](https://pypi.python.org/pypi/git-aggregator)
 

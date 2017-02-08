@@ -48,6 +48,9 @@ ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
     # Postgres
     WAIT_DB=true \
+    # PuDB debugger
+    PUDB_RDB_HOST=0.0.0.0 \
+    PUDB_RDB_PORT=6899 \
     # WDB debugger
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
@@ -79,7 +82,7 @@ RUN apt-get update \
 
 # Other facilities
 RUN pip install --no-cache-dir \
-    git-aggregator openupgradelib wdb
+    git-aggregator openupgradelib pudb wdb
 COPY bin/autoaggregate bin/log bin/unittest bin/install.sh /usr/local/bin/
 COPY bin/direxec.sh /opt/odoo/common/entrypoint.sh
 RUN ln /opt/odoo/common/entrypoint.sh /opt/odoo/common/build.sh
