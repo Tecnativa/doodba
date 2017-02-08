@@ -29,6 +29,7 @@ for directory in os.listdir(odoobaselib.SRC_DIR):
 
     # Remove directories not listed in addons.yaml
     except KeyError:
+        logging.info("Removing directory %s", full)
         shutil.rmtree(full)
         continue
 
@@ -40,4 +41,5 @@ for directory in os.listdir(odoobaselib.SRC_DIR):
             continue
         # Remove addon if not used
         if subdirectory not in config[directory]:
+            logging.info("Removing subdirectory %s", full)
             shutil.rmtree(subfull)
