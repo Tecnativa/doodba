@@ -48,7 +48,6 @@ services:
             service: backup
         restart: unless-stopped
         depends_on:
-            - odoo
             - db
             - smtp
 
