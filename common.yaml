@@ -85,3 +85,5 @@ services:
             PG_HOST: db
             PG_USER: "$DB_USER"
             PG_PASS: "$DB_PASSWORD"
+        volumes:
+            - filestore$ODOO_MAJOR:/var/lib/odoo
