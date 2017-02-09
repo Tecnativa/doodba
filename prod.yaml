@@ -47,8 +47,6 @@ services:
             file: common.yaml
             service: backup
         restart: unless-stopped
-        volumes_from:
-            - odoo
         depends_on:
             - odoo
             - db
