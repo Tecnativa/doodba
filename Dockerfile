@@ -55,7 +55,9 @@ ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
-    WDB_WEB_SERVER=localhost
+    WDB_WEB_SERVER=localhost \
+    # Other
+    LC_ALL=C.UTF-8
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
