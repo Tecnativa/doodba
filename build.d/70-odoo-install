@@ -17,6 +17,7 @@ else
     bin=$src/odoo-bin
     if [ "$ODOO_VERSION" == "9.0" ]; then
         bin=$src/odoo.py
+        ln -s /opt/odoo/custom/src/openerp-{gevent,server} /usr/local/bin/
     fi
     ln -s $bin $dst
 fi
