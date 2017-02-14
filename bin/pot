@@ -1,0 +1,10 @@
+#!/bin/bash
+# Shortcut to run Odoo in unit testing mode
+set -e
+addons=$1
+shift
+log INFO Executing Odoo in i18n export mode for addons $addons
+ln -sf /tmp/stdout.pot /dev/stdout
+set -x
+exec odoo --stop-after-init -d "$PGDATABASE" --i18n-export /tmp/stdout.pot \
+    --modules "$addons" --update "$addons" --workers 0 "$@"

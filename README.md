@@ -248,6 +248,13 @@ entrypoint scripts:
 
     log INFO I'm informing
 
+### `pot`
+
+Little shell shortcut for exporting a translation template from any addon(s).
+Usage:
+
+    pot my_addon,my_other_addon
+
 ### `unittest`
 
 Another little shell script, useful for debugging. Just run it like this and
@@ -435,6 +442,12 @@ execute an arbitrary command in a running container.
 ##### Update some addon without stopping current running process
 
     docker-compose run --rm odoo odoo -u addon1,addon2 --stop-after-init
+
+##### Export some addon's translations to stdout
+
+    docker-compose run --rm odoo pot addon1[,addon2]
+
+Now copy the relevant parts to your `addon1.pot` file.
 
 ##### Open an odoo shell
 
