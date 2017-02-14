@@ -65,13 +65,18 @@ RUN apt-get update \
     && apt-get -y upgrade \
     && apt-get install -y --no-install-recommends \
         # Odoo direct dependencies
-        python ruby-compass node-less \
+        python ruby-compass node-less npm \
         # Odoo indirect dependencies
         libxml2 libxslt1.1 libjpeg62-turbo zlib1g libfreetype6 liblcms2-2 \
         libopenjpeg5 libtiff5 tk tcl libpq5 libldap-2.4-2 libsasl2-2 \
         # This image's facilities
         curl gettext-base git nano openssh-client postgresql-client telnet \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
+
+    # Special case for PhantomJS
+    && ln -s /usr/bin/nodejs /usr/local/bin/node \
+    && npm install -g phantomjs-prebuilt \
+    && rm -Rf ~/.npm \
 
     # Special case for wkhtmltox
     && curl -SLo wkhtmltox.deb https://nightly.odoo.com/extra/wkhtmltox-0.12.2.1_linux-jessie-amd64.deb \
