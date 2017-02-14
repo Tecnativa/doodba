@@ -262,6 +262,11 @@ Odoo will execute unit tests in its default database:
 
     unittest my_addon,my_other_addon
 
+Note that the addon must be installed for it to work. Otherwise, you should run
+it as:
+
+    unittest my_addon,my_other_addon -i my_addon,my_other_addon
+
 ### [`psql`](https://www.postgresql.org/docs/9.5/static/app-psql.html)
 
 Environment variables are there so that if you need to connect with the
@@ -433,6 +438,7 @@ execute an arbitrary command in a running container.
 
 ##### Run unit tests for some addon
 
+    docker-compose run --rm odoo odoo --stop-after-init --init addon1,addon2
     docker-compose run --rm odoo unittest addon1,addon2 --stop-after-init
 
 ##### Install some addon without stopping current running process

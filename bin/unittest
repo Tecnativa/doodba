@@ -6,4 +6,4 @@ shift
 log INFO Executing Odoo in unittest mode for addons $addons
 # HACK `--workers 0`: https://github.com/odoo/odoo/pull/14809
 set -x
-exec odoo --init "$addons" --update "$addons" --workers 0 --test-enable "$@"
+exec odoo --workers 0 --test-enable --update "$addons" "$@"
