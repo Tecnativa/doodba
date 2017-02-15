@@ -28,7 +28,7 @@ services:
             - smtp
             - inbox
             - wdb
-        command: odoo --dev all
+        command: odoo --workers 0 --dev all
 
     db:
         extends:
