@@ -91,7 +91,7 @@ RUN apt-get update \
 # Other facilities
 RUN pip install --no-cache-dir \
     git-aggregator openupgradelib pudb wdb
-COPY bin/autoaggregate bin/log bin/unittest bin/install.sh /usr/local/bin/
+COPY bin/autoaggregate bin/log bin/pot bin/unittest bin/install.sh /usr/local/bin/
 COPY bin/direxec.sh /opt/odoo/common/entrypoint.sh
 RUN ln /opt/odoo/common/entrypoint.sh /opt/odoo/common/build.sh
 COPY lib/*.py /usr/local/lib/python2.7/dist-packages
