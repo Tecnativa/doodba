@@ -70,9 +70,14 @@ RUN apt-get update \
         libxml2 libxslt1.1 libjpeg62-turbo zlib1g libfreetype6 liblcms2-2 \
         libopenjpeg5 libtiff5 tk tcl libpq5 libldap-2.4-2 libsasl2-2 \
         # This image's facilities
-        bzip2 curl gettext-base git nano npm openssh-client \
-        postgresql-client telnet \
+        bzip2 curl gettext-base git nano npm openssh-client telnet \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
+
+    # Special case to get latest PostgreSQL client
+    && echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
+    && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client \
 
     # Special case for PhantomJS
     && ln -s /usr/bin/nodejs /usr/local/bin/node \
