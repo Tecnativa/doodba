@@ -90,7 +90,7 @@ RUN apt-get update \
 
 # Other facilities
 RUN pip install --no-cache-dir \
-    git-aggregator openupgradelib pudb wdb
+    astor git-aggregator openupgradelib pudb wdb
 COPY bin/autoaggregate bin/log bin/pot bin/unittest bin/install.sh /usr/local/bin/
 COPY bin/direxec.sh /opt/odoo/common/entrypoint.sh
 RUN ln /opt/odoo/common/entrypoint.sh /opt/odoo/common/build.sh
