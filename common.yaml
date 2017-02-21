@@ -33,6 +33,7 @@ services:
             - certscron:/var/spool/cron/cronstamps
         environment:
             PORT: 8069
+            MODE: "$PROXY_MODE"
             EMAIL: "$LETSENCRYPT_EMAIL"
             DOMAINS: "$LETSENCRYPT_DOMAINS"
 
