@@ -8,6 +8,7 @@ Content-Type: text/html
     <head>
         <meta charset="utf-8"/>
         <meta name="viewport" content="initial-scale=1">
+        <!-- XXX Customize this file to get user-friendly 503 errors -->
         <title>My Project failed!</title>
         <link
             href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
