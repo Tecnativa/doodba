@@ -4,7 +4,8 @@ set -e
 addons=$1
 shift
 log INFO Executing Odoo in i18n export mode for addons $addons
-ln -sf /tmp/stdout.pot /dev/stdout
+# HACK Odoo needs a *.pot file to guess the output format
+ln -sf /dev/stdout /tmp/stdout.pot
 set -x
 exec odoo --stop-after-init -d "$PGDATABASE" --i18n-export /tmp/stdout.pot \
     --modules "$addons" --update "$addons" --workers 0 "$@"
