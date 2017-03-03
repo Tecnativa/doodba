@@ -321,15 +321,16 @@ This example merges [several sources][`odoo`]:
 
     ./odoo:
         defaults:
-            # Shallow repositores are faster & thinner
-            depth: 1000
+            # Shallow repositores are faster & thinner. You better use
+            # $DEPTH_DEFAULT here when you need no merges.
+            depth: $DEPTH_MERGE
         remotes:
             ocb: https://github.com/OCA/OCB.git
             odoo: https://github.com/odoo/odoo.git
         target:
-            ocb 9.0
+            ocb $ODOO_VERSION
         merges:
-            - ocb 9.0
+            - ocb $ODOO_VERSION
             - odoo refs/pull/13635/head
 
 ### [`odoo`](https://www.odoo.com/documentation/10.0/reference/cmdline.html)

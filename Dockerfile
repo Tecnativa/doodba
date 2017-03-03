@@ -10,6 +10,8 @@ EXPOSE 8069 8072
 
 # Subimage triggers
 ONBUILD ARG AGGREGATE=true
+ONBUILD ARG DEPTH_DEFAULT=1
+ONBUILD ARG DEPTH_MERGE=100
 ONBUILD ARG CLEAN=true
 ONBUILD ARG COMPILE=true
 ONBUILD ARG LINK=true
@@ -46,6 +48,8 @@ ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     # Git and git-aggregator
     GIT_AUTHOR_NAME=docker-odoo \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
+    DEPTH_DEFAULT=1 \
+    DEPTH_MERGE=100 \
     # Postgres
     WAIT_DB=true \
     # PuDB debugger
