@@ -1,7 +1,7 @@
 # Odoo is always required
 ./odoo:
     defaults:
-        # Shallow repositores are faster & thinner
+        # Shallow repositories are faster & thinner
         depth: $DEPTH_DEFAULT
     remotes:
         ocb: https://github.com/OCA/OCB.git
