@@ -7,7 +7,7 @@ apt-get update
 # lxml
 apt_deps="$apt_deps libxml2-dev libxslt1-dev"
 # Pillow
-apt_deps="$apt_deps libjpeg-dev zlib1g-dev libfreetype6-dev
+apt_deps="$apt_deps libjpeg-dev libfreetype6-dev
     liblcms2-dev libopenjpeg-dev libtiff5-dev tk-dev tcl-dev"
 # psutil
 apt_deps="$apt_deps linux-headers-amd64"
