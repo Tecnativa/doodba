@@ -453,6 +453,16 @@ In production:
     docker-compose run --rm odoo odoo --stop-after-init --init addon1,addon2
     docker-compose run --rm odoo unittest addon1,addon2 --stop-after-init
 
+##### Reading the logs
+
+For all services in the environment:
+
+    docker-compose logs -f --tail 10
+
+Only Odoo's:
+
+    docker-compose logs -f --tail 10 odoo
+
 ##### Install some addon without stopping current running process
 
     docker-compose run --rm odoo odoo -i addon1,addon2 --stop-after-init
