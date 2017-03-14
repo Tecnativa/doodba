@@ -1,7 +1,8 @@
 # Odoo is always required
 ./odoo:
     defaults:
-        # Shallow repositories are faster & thinner
+        # Shallow repositories ($DEPTH_DEFAULT=1) are faster & thinner
+        # You may need a bigger depth when merging PRs
         depth: $DEPTH_DEFAULT
     remotes:
         ocb: https://github.com/OCA/OCB.git
@@ -10,3 +11,5 @@
         ocb $ODOO_VERSION
     merges:
         - ocb $ODOO_VERSION
+        # Example of a merge of the PR with the number $PR
+        # - oca refs/pull/$PR/head 
