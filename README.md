@@ -438,6 +438,16 @@ execute an arbitrary command in a running container.
 
     docker-compose run --rm odoo psql
 
+##### Restart Odoo
+
+You will need to restart it whenever any Python code changes, so to do that:
+
+    docker-compose restart -t0 odoo
+
+In production:
+
+    docker-compose restart odoo https
+
 ##### Run unit tests for some addon
 
     docker-compose run --rm odoo odoo --stop-after-init --init addon1,addon2
