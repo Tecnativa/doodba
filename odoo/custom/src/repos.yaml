@@ -12,4 +12,4 @@
     merges:
         - ocb $ODOO_VERSION
         # Example of a merge of the PR with the number <PR>
-        # - oca refs/pull/<PR>/head 
+        # - oca refs/pull/<PR>/head
