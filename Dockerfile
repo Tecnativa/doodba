@@ -74,7 +74,8 @@ RUN apt-get update \
         libxml2 libxslt1.1 libjpeg62-turbo zlib1g libfreetype6 liblcms2-2 \
         libopenjpeg5 libtiff5 tk tcl libpq5 libldap-2.4-2 libsasl2-2 \
         # This image's facilities
-        bzip2 curl gettext-base git nano npm openssh-client telnet \
+        ca-certificates curl gettext-base git nano npm \
+        openssh-client telnet xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
 
     # Special case to get latest PostgreSQL client
@@ -89,13 +90,14 @@ RUN apt-get update \
     && rm -Rf ~/.npm \
 
     # Special case for wkhtmltox
-    && curl -SLo wkhtmltox.deb https://nightly.odoo.com/extra/wkhtmltox-0.12.2.1_linux-jessie-amd64.deb \
-    && echo "4ec2aa2a13d6127cdd6ca07ab18b807a6c5c1f5215c5880b951a89642c1a0ecd  wkhtmltox.deb" | sha256sum -c - \
-    && dpkg --force-depends -i wkhtmltox.deb \
-    && apt-get -y install -f --no-install-recommends \
-    && apt-get -y purge curl \
-    && apt-get -y autoremove \
-    && rm -Rf /var/lib/apt/lists/* wkhtmltox.deb
+    && curl -SLo wkhtmltox.tar.xz https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz \
+    && echo "0ef646d802cd0375524034d11af76444c7c8e796e11d553ab39bd4a7bf703ac631f4a3300902bec54589b3d5400b5762d9995839f6faaae2f9159efdf225cc78  wkhtmltox.tar.xz" | sha512sum -c - \
+    && tar --strip-components 1 -C /usr/local/ -xf wkhtmltox.tar.xz \
+    && rm wkhtmltox.tar.xz \
+    && apt-get -y purge curl xz-utils \
+    && apt-get -y install --no-install-recommends \
+        zlibc fontconfig libfreetype6 libx11-6 libxext6 libxrender1 \
+    && wkhtmltopdf --version
 
 # Other facilities
 RUN pip install --no-cache-dir \
