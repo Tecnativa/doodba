@@ -77,25 +77,24 @@ RUN apt-get update \
         # This image's facilities
         bzip2 ca-certificates curl gettext-base git nano npm \
         openssh-client telnet xz-utils \
-    && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
+    && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir
 
     # Special case to get latest PostgreSQL client
-    && echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
+RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
-    && apt-get install -y --no-install-recommends postgresql-client \
+    && apt-get install -y --no-install-recommends postgresql-client
 
     # Special case for PhantomJS
-    && ln -s /usr/bin/nodejs /usr/local/bin/node \
+RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
     && npm install -g phantomjs-prebuilt \
-    && rm -Rf ~/.npm \
+    && rm -Rf ~/.npm
 
     # Special case for wkhtmltox
-    && curl -SLo wkhtmltox.tar.xz https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz \
+RUN curl -SLo wkhtmltox.tar.xz https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz \
     && echo "0ef646d802cd0375524034d11af76444c7c8e796e11d553ab39bd4a7bf703ac631f4a3300902bec54589b3d5400b5762d9995839f6faaae2f9159efdf225cc78  wkhtmltox.tar.xz" | sha512sum -c - \
     && tar --strip-components 1 -C /usr/local/ -xf wkhtmltox.tar.xz \
     && rm wkhtmltox.tar.xz \
-    && apt-get -y purge curl xz-utils \
     && wkhtmltopdf --version
 
 # Other facilities
