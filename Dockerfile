@@ -71,10 +71,11 @@ RUN apt-get update \
         # Odoo direct dependencies
         python ruby-compass node-less \
         # Odoo indirect dependencies
-        libxml2 libxslt1.1 libjpeg62-turbo zlib1g libfreetype6 liblcms2-2 \
-        libopenjpeg5 libtiff5 tk tcl libpq5 libldap-2.4-2 libsasl2-2 \
+        fontconfig libfreetype6 libxml2 libxslt1.1 libjpeg62-turbo zlib1g \
+        libfreetype6 liblcms2-2 libopenjpeg5 libtiff5 tk tcl libpq5 \
+        libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 zlibc \
         # This image's facilities
-        ca-certificates curl gettext-base git nano npm \
+        bzip2 ca-certificates curl gettext-base git nano npm \
         openssh-client telnet xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
 
@@ -95,8 +96,6 @@ RUN apt-get update \
     && tar --strip-components 1 -C /usr/local/ -xf wkhtmltox.tar.xz \
     && rm wkhtmltox.tar.xz \
     && apt-get -y purge curl xz-utils \
-    && apt-get -y install --no-install-recommends \
-        zlibc fontconfig libfreetype6 libx11-6 libxext6 libxrender1 \
     && wkhtmltopdf --version
 
 # Other facilities
