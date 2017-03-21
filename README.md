@@ -5,6 +5,10 @@
 [![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own commit badge on microbadger.com")
 [![](https://images.microbadger.com/badges/license/tecnativa/odoo-base.svg)](https://microbadger.com/images/tecnativa/odoo-base "Get your own license badge on microbadger.com")
 
+[![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:8.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:8.0 "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:8.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:8.0 "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:8.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:8.0 "Get your own commit badge on microbadger.com")
+
 [![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:9.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:9.0 "Get your own version badge on microbadger.com")
 [![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:9.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:9.0 "Get your own image badge on microbadger.com")
 [![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:9.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:9.0 "Get your own commit badge on microbadger.com")
@@ -385,14 +389,14 @@ you on making it work.
 Set it up with:
 
     export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
-    docker-compose -f setup-devel.yaml up --build
+    docker-compose -f setup-devel.yaml up
 
 Once finished, you can start using Odoo with:
 
     docker-compose -f devel.yaml up --build
 
-This is on purpose. It allows you to track only what Git needs to track and
-provides faster Docker builds.
+This allows you to track only what Git needs to track and provides faster
+Docker builds.
 
 You might consider adding this line to your `~/.bashrc`:
 
@@ -488,6 +492,16 @@ Now copy the relevant parts to your `addon1.pot` file.
 Then open `http://localhost:$SomeFreePort`.
 
 ## FAQ
+
+### When I boot `devel.yaml` for the first time, Odoo crashes
+
+Most likely you are using versions `8.0` or `9.0` of the image. If so:
+
+1. Edit `devel.yaml`.
+2. Search for the line that starts with `command:` in the `odoo` service.
+3. Change it for a command that actually works with your version:
+   - `odoo --workers 0` for Odoo 8.0.
+   - `odoo --workers 0 --dev` for Odoo 9.0.
 
 ### Why my `99-whatever.sh` script in `/opt/odoo/*/*.d/` does not execute?
 

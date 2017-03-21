@@ -6,16 +6,21 @@ log INFO Installing Odoo from $src
 
 # For development you could want to avoid installing Odoo to speed up build
 if [ "$PIP_INSTALL_ODOO" == true ]; then
-    pip install --no-cache-dir --editable $src
+    args="--no-cache-dir"
+    # Odoo v8 dependencies could crash at install, so we don't use them
+    if [ "$ODOO_VERSION" == "8.0" ]; then
+        args="$args --no-deps"
+    fi
+    pip install $args --editable $src
 
-    # Make version 9.0 have a `odoo` executable
-    if [ "$ODOO_VERSION" == "9.0" ]; then
+    # Make version 8.0 and 9.0 have an `odoo` executable
+    if [ "$ODOO_VERSION" == "8.0" -o "$ODOO_VERSION" == "9.0" ]; then
         ln -s $dst.py $dst
     fi
 else
     log WARNING Blindly symlinking odoo executable
     bin=$src/odoo-bin
-    if [ "$ODOO_VERSION" == "9.0" ]; then
+    if [ "$ODOO_VERSION" == "8.0" -o "$ODOO_VERSION" == "9.0" ]; then
         bin=$src/odoo.py
         ln -s /opt/odoo/custom/src/odoo/openerp-{gevent,server} /usr/local/bin/
     fi

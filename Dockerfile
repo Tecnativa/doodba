@@ -88,7 +88,7 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc
     # Special case for PhantomJS
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
     && npm install -g phantomjs-prebuilt \
-    && rm -Rf ~/.npm
+    && rm -Rf ~/.npm /tmp/*
 
     # Special case for wkhtmltox
 RUN curl -SLo wkhtmltox.tar.xz https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz \
