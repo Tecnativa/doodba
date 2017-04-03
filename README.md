@@ -359,7 +359,7 @@ I will assume you know how to use Git, Docker and Docker Compose.
     cd myproject
     export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
     docker-compose -f devel.yaml build --pull
-    docker-compose -f setup-devel.yaml up
+    docker-compose -f setup-devel.yaml run --rm odoo
     docker-compose -f devel.yaml up
 
 And if you don't want to have a chance to do a `git merge` and get possible
@@ -389,7 +389,7 @@ you on making it work.
 Set it up with:
 
     export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
-    docker-compose -f setup-devel.yaml up
+    docker-compose -f setup-devel.yaml run --rm odoo
 
 Once finished, you can start using Odoo with:
 
