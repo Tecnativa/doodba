@@ -415,6 +415,94 @@ Once you fixed everything needed, run it with:
 
 Remember that you will want to backup the filestore in `/var/lib/odoo` volume.
 
+###### Global inverse proxy
+
+For production template to work fine, you need to have a working [Traefik][]
+inverse proxy in each node.
+
+To have it, use this `inverseproxy.yaml` file:
+
+```yaml
+version: "2.1"
+
+services:
+    proxy:
+        image: traefik:1.2-alpine
+        networks:
+            shared:
+            private:
+        volumes:
+            - acme:/etc/traefik/acme:rw,Z
+        ports:
+            - "80:80"
+            - "443:443"
+        depends_on:
+            - dockersocket
+        restart: unless-stopped
+        privileged: true
+        tty: true
+        command:
+            - --ACME.ACMELogging
+            - --ACME.Email=you@example.com
+            - --ACME.EntryPoint=https
+            - --ACME.OnHostRule
+            - --ACME.Storage=/etc/traefik/acme/acme.json
+            - --DefaultEntryPoints=http,https
+            - --EntryPoints=Name:http Address::80 Redirect.EntryPoint:https
+            - --EntryPoints=Name:https Address::443 TLS
+            - --LogLevel=INFO
+            - --Docker
+            - --Docker.EndPoint=http://dockersocket:2375
+            - --Docker.ExposedByDefault=false
+            - --Docker.Watch
+
+    dockersocket:
+        image: tecnativa/docker-socket-proxy
+        privileged: true
+        networks:
+            private:
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        environment:
+            CONTAINERS: 1
+            NETWORKS: 1
+            SERVICES: 1
+            SWARM: 1
+            TASKS: 1
+        restart: unless-stopped
+
+networks:
+    shared:
+        driver_opts:
+            encrypted: 1
+
+    private:
+        driver_opts:
+            encrypted: 1
+
+volumes:
+    acme:
+```    
+
+Then boot it up with:
+
+    docker-compose -p inverseproxy -f inverseproxy.yaml up -d
+
+This will intercept all requests coming from port 80 (`http`) and redirect them
+to port 443 (`https`), it will download and install required SSL certificates
+from [Let's Encrypt][] whenever you boot a new production instance, add the
+required proxy headers to the request, and then redirect all traffic to/from
+odoo automatically.
+
+It includes [a security-enhaced proxy][docker-socket-proxy] to reduce attack
+surface when listening to the Docker socket.
+
+This allows you to:
+
+* Have multiple domains for each Odoo instance.
+* Have multiple Odoo instances in each node.
+* Add an SSL layer automatically and for free.
+
 ##### Testing
 
 A good rule of thumb is test in testing before uploading to production, so this
@@ -555,6 +643,8 @@ Just [head to our project](https://github.com/Tecnativa/docker-odoo-base) and
 open an issue or pull request.
 
 [`COMPOSE_FILE` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
+[docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
+[Let's Encrypt]: https://letsencrypt.org/
 [Original Odoo]: https://github.com/odoo/odoo
 [Odoo S.A.]: https://www.odoo.com
 [OCB]: https://github.com/OCA/OCB
@@ -569,5 +659,6 @@ open an issue or pull request.
 [`private`]: #optodoocustomsrcprivate
 [`repos.yaml`]: #optodoocustomsrcreposyaml
 [several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
+[Traefik]: https://traefik.io/
 [`addons.yaml`]: #optodoocustomsrcaddonstxt
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
