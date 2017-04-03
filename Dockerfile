@@ -69,7 +69,7 @@ RUN apt-get update \
     && apt-get -y upgrade \
     && apt-get install -y --no-install-recommends \
         # Odoo direct dependencies
-        python ruby-compass node-less \
+        python ruby-compass \
         # Odoo indirect dependencies
         fontconfig libfreetype6 libxml2 libxslt1.1 libjpeg62-turbo zlib1g \
         libfreetype6 liblcms2-2 libopenjpeg5 libtiff5 tk tcl libpq5 \
@@ -80,19 +80,23 @@ RUN apt-get update \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
     && rm -Rf /var/lib/apt/lists/*
 
-    # Special case to get latest PostgreSQL client
+# Special case to get latest PostgreSQL client
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
     && apt-get install -y --no-install-recommends postgresql-client \
-    && rm -Rf /var/lib/apt/lists/*
+    && rm -Rf /var/lib/apt/lists/* /tmp/*
 
-    # Special case for PhantomJS
+# Special case to get latest Less
+RUN npm install -g less \
+    && rm -Rf ~/.npm /tmp/*
+
+# Special case for PhantomJS
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
     && npm install -g phantomjs-prebuilt \
     && rm -Rf ~/.npm /tmp/*
 
-    # Special case for wkhtmltox
+# Special case for wkhtmltox
 RUN curl -SLo wkhtmltox.tar.xz https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz \
     && echo "0ef646d802cd0375524034d11af76444c7c8e796e11d553ab39bd4a7bf703ac631f4a3300902bec54589b3d5400b5762d9995839f6faaae2f9159efdf225cc78  wkhtmltox.tar.xz" | sha512sum -c - \
     && tar --strip-components 1 -C /usr/local/ -xf wkhtmltox.tar.xz \
