@@ -19,12 +19,13 @@ services:
             file: common.yaml
             service: db
 
-    https:
+    proxy:
         extends:
             file: common.yaml
-            service: https
-        depends_on:
-            - odoo
+            service: proxy
+        labels:
+            # XXX Put testing domain here
+            traefik.frontend.rule: "Host:test.example.com"
 
     inbox:
         extends:

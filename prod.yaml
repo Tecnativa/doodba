@@ -20,15 +20,15 @@ services:
             service: db
         restart: unless-stopped
 
-    https:
+
+    proxy:
         extends:
             file: common.yaml
-            service: https
+            service: proxy
         restart: unless-stopped
-        environment:
-            STAGING: "false"
-        depends_on:
-            - odoo
+        labels:
+            # XXX Put production domain here
+            traefik.frontend.rule: "Host:prod.example.com"
 
     inbox:
         extends:

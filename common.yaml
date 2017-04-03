@@ -23,19 +23,15 @@ services:
         volumes:
             - db$ODOO_MAJOR:/var/lib/postgresql/data
 
-    https:
-        build: https
-        ports:
-            - "80:80"
-            - "443:443"
-        volumes:
-            - certs:/etc/letsencrypt
-            - certscron:/var/spool/cron/cronstamps
-        environment:
-            PORT: 8069
-            MODE: "$PROXY_MODE"
-            EMAIL: "$LETSENCRYPT_EMAIL"
-            DOMAINS: "$LETSENCRYPT_DOMAINS"
+    # TODO Remove this when Traefik 1.3 is released
+    # SEE https://github.com/containous/traefik/pull/1257
+    proxy:
+        image: tecnativa/odoo-proxy
+        labels:
+            traefik.docker.network: "inverseproxy_shared"
+            traefik.enable: "true"
+            traefik.frontend.passHostHeader: "true"
+            traefik.port: "80"
 
     smtpfake:
         image: tecnativa/smtp-sink
