@@ -26,6 +26,9 @@ services:
             file: common.yaml
             service: proxy
         restart: unless-stopped
+        networks:
+            default:
+            inverseproxy_shared:
         labels:
             # XXX Put production domain here
             traefik.frontend.rule: "Host:prod.example.com"
@@ -50,6 +53,14 @@ services:
         depends_on:
             - db
             - smtp
+
+networks:
+    default:
+        driver_opts:
+            encrypted: 1
+
+    inverseproxy_shared:
+        external: true
 
 volumes:
     # XXX Odoo volume names must match $ODOO_MAJOR for quick branch switching

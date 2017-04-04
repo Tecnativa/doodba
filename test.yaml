@@ -23,6 +23,9 @@ services:
         extends:
             file: common.yaml
             service: proxy
+        networks:
+            default:
+            inverseproxy_shared:
         labels:
             # XXX Put testing domain here
             traefik.frontend.rule: "Host:test.example.com"
@@ -36,6 +39,14 @@ services:
         extends:
             file: common.yaml
             service: smtpfake
+
+networks:
+    default:
+        driver_opts:
+            encrypted: 1
+
+    inverseproxy_shared:
+        external: true
 
 volumes:
     # XXX Odoo volume names must match $ODOO_MAJOR for quick branch switching
