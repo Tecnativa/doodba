@@ -91,6 +91,10 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc
 RUN npm install -g less \
     && rm -Rf ~/.npm /tmp/*
 
+# Special case to get bootstrap-sass, required by Odoo for Sass assets
+RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<4' \
+    && rm -Rf ~/.gem /var/lib/gems/*/cache/
+
 # Special case for PhantomJS
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
     && npm install -g phantomjs-prebuilt \
