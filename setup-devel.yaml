@@ -1,7 +1,7 @@
 # Use this environment to download all repositories from `repos.yaml` file:
 #
 #   export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
-#   docker-compose -f setup-devel.yaml up --build
+#   docker-compose -f setup-devel.yaml run --rm odoo
 #
 # You can clean your git project before if you want to have all really clean:
 #
