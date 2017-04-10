@@ -28,6 +28,8 @@ if [ "$ODOO_VERSION" == "8.0" ]; then
     curl -SL $reqs | sed -r 's/pyparsing|six/#\0/' > /tmp/requirements.txt
     reqs=/tmp/requirements.txt
     pip_deps="psutil==2.1.1 pydot==1.0.2 psycopg2==2.5.3 vobject==0.6.6"
+    # Extra dependencies for Odoo at runtime
+    apt-get install -y --no-install-recommends file
 elif [ "$ODOO_VERSION" == "9.0" ]; then
     pip_deps="psutil==2.2.0 pydot==1.0.2 psycopg2==2.5.4 vobject==0.6.6"
 else
