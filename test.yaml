@@ -26,9 +26,10 @@ services:
         networks:
             default:
             inverseproxy_shared:
+        environment:
+            FORCEHOST: $DOMAIN_TEST
         labels:
-            # XXX Put testing domain here
-            traefik.frontend.rule: "Host:test.example.com"
+            traefik.frontend.rule: "Host:${DOMAIN_TEST}"
 
     inbox:
         extends:

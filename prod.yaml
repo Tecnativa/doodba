@@ -20,7 +20,6 @@ services:
             service: db
         restart: unless-stopped
 
-
     proxy:
         extends:
             file: common.yaml
@@ -29,9 +28,10 @@ services:
         networks:
             default:
             inverseproxy_shared:
+        environment:
+            FORCEHOST: $DOMAIN_PROD
         labels:
-            # XXX Put production domain here
-            traefik.frontend.rule: "Host:prod.example.com"
+            traefik.frontend.rule: "Host:${DOMAIN_PROD}"
 
     inbox:
         extends:

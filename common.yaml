@@ -27,6 +27,8 @@ services:
     # SEE https://github.com/containous/traefik/pull/1257
     proxy:
         image: tecnativa/odoo-proxy
+        environment:
+            FORWARDFOR: 0
         labels:
             traefik.docker.network: "inverseproxy_shared"
             traefik.enable: "true"
