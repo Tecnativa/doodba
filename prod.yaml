@@ -67,5 +67,3 @@ volumes:
     filestore10:
     db10:
     smtp:
-    certs:
-    certscron:
