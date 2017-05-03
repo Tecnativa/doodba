@@ -12,12 +12,17 @@ if [ -f $conf ]; then
     fi
 
     # Perform aggregation with environment variables expansion
+    set +e
     gitaggregate --expand-env -c $conf
+    code=$?
+    set -e
 
     # Avoid wrong user/group in aggregated files
     if [ -n "$GID" -a -n "$UID" ]; then
         chown -R "$UID:$GID" .
     fi
+
+    [ $code -eq 0 ] || exit $code
 else
     log ERROR Cannot aggregate repositories: $conf not found
     exit 1
