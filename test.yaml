@@ -16,7 +16,7 @@ services:
         command:
             - odoo
             - --workers=1
-            - --max_cron_threads=1
+            - --max-cron-threads=1
 
     db:
         extends:
