@@ -135,11 +135,8 @@ A [git-aggregator](#git-aggregator) configuration file.
 One entry per repo and addon you want to activate in your project. Like this:
 
 ```yaml
-# Using `all` links all addons in a repository (not recommended)
-server-tools: all
-
-# List all addons you want per repository (recommended)
 website:
+    - website_cookie_notice
     - website_legal_page
 web:
     - web_responsive

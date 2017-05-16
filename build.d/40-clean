@@ -22,13 +22,8 @@ for directory in os.listdir(odoobaselib.SRC_DIR):
     if not os.path.isdir(full):
         continue
 
-    # Skip addon repositories that need no cleaning
-    try:
-        if config[directory] == "all":
-            continue
-
     # Remove directories not listed in addons.yaml
-    except KeyError:
+    if directory not in config:
         logging.info("Removing directory %s", full)
         shutil.rmtree(full)
         continue
