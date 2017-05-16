@@ -28,8 +28,11 @@ services:
             - smtp
             - inbox
             - wdb
-        # XXX Odoo v8 has no `--dev` mode; Odoo v9 has no `all` parameter
-        command: odoo --workers 0 --dev all
+        command:
+            - odoo
+            - --workers=0
+            # XXX Odoo v8 has no `--dev` mode; Odoo v9 has no `all` parameter
+            - --dev=all
 
     db:
         extends:
