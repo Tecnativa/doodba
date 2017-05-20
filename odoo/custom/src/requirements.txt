@@ -1,0 +1,4 @@
+unicodecsv
+unidecode
+requests
+xlsxwriter
