@@ -15,7 +15,7 @@ services:
             - inbox
         command:
             - odoo
-            - --workers=1
+            - --workers=2
             - --max-cron-threads=1
 
     db:
