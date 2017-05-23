@@ -73,7 +73,8 @@ RUN apt-get update \
         # Odoo indirect dependencies
         fontconfig libfreetype6 libxml2 libxslt1.1 libjpeg62-turbo zlib1g \
         libfreetype6 liblcms2-2 libopenjpeg5 libtiff5 tk tcl libpq5 \
-        libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 zlibc \
+        libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 \
+        locales-all zlibc \
         # This image's facilities
         bzip2 ca-certificates curl gettext-base git nano npm \
         openssh-client telnet xz-utils \
