@@ -354,10 +354,11 @@ I will assume you know how to use Git, Docker and Docker Compose.
 
     git clone -b scaffolding https://github.com/Tecnativa/docker-odoo-base.git myproject
     cd myproject
+    ln -s devel.yaml docker-compose.yml
     export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
-    docker-compose -f devel.yaml build --pull
+    docker-compose build --pull
     docker-compose -f setup-devel.yaml run --rm odoo
-    docker-compose -f devel.yaml up
+    docker-compose up
 
 And if you don't want to have a chance to do a `git merge` and get possible
 future scaffolding updates merged in your project's `git log`:
