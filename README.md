@@ -541,7 +541,7 @@ In production:
 ##### Run unit tests for some addon
 
     docker-compose run --rm odoo odoo --stop-after-init --init addon1,addon2
-    docker-compose run --rm odoo unittest addon1,addon2 --stop-after-init
+    docker-compose run --rm odoo unittest addon1,addon2
 
 ##### Reading the logs
 
