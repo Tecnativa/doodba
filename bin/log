@@ -2,11 +2,18 @@
 from __future__ import unicode_literals
 import argparse
 import logging
+import os
 
 parser = argparse.ArgumentParser(description="Easy logging for scripts")
 parser.add_argument("level", choices=("DEBUG", "INFO", "WARNING", "ERROR"))
 parser.add_argument("message")
 arguments = parser.parse_args()
 
-logging.root.setLevel(logging.DEBUG)
+try:
+    logging.root.setLevel(int(os.environ["LOG_LEVEL"]))
+except KeyError:
+    pass
+except ValueError:
+    logging.warning("Expected an int in $LOG_LEVEL")
+
 logging.log(getattr(logging, arguments.level), arguments.message)
