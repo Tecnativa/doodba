@@ -6,7 +6,7 @@ import os
 
 parser = argparse.ArgumentParser(description="Easy logging for scripts")
 parser.add_argument("level", choices=("DEBUG", "INFO", "WARNING", "ERROR"))
-parser.add_argument("message")
+parser.add_argument("message", nargs="+")
 arguments = parser.parse_args()
 
 try:
@@ -16,4 +16,4 @@ except KeyError:
 except ValueError:
     logging.warning("Expected an int in $LOG_LEVEL")
 
-logging.log(getattr(logging, arguments.level), arguments.message)
+logging.log(getattr(logging, arguments.level), " ".join(arguments.message))

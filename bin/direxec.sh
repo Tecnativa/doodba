@@ -8,7 +8,7 @@ mode=$(basename $0 .sh)
 for dir in custom common; do
     dir=/opt/odoo/$dir/$mode.d
     if [ -d $dir ]; then
-        log INFO Executing contents of $dir > /dev/stderr
+        log INFO Executing contents of $dir
         run-parts --exit-on-error $dir
     else
         log WARNING Skipping execution of $dir: not found
