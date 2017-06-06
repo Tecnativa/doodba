@@ -409,14 +409,14 @@ It includes pluggable `smtp` and `backup` services.
 
 Once you fixed everything needed, run it with:
 
-    docker-compose -f prod.yaml up --build
+    docker-compose -f prod.yaml up --build --remove-orphans
 
 Remember that you will want to backup the filestore in `/var/lib/odoo` volume.
 
 ###### Global inverse proxy
 
-For production template to work fine, you need to have a working [Traefik][]
-inverse proxy in each node.
+For production and test templates to work fine, you need to have a working
+[Traefik][] inverse proxy in each node.
 
 To have it, use this `inverseproxy.yaml` file:
 
@@ -425,7 +425,7 @@ version: "2.1"
 
 services:
     proxy:
-        image: traefik:1.2-alpine
+        image: traefik:1.3-alpine
         networks:
             shared:
             private:
@@ -579,6 +579,48 @@ Then open `http://localhost:$SomeFreePort`.
 
 ## FAQ
 
+### I need to force addition or removal of `www.` prefix in production
+
+[We hope that some day Traefik supports that feature][www-force], but in the
+mean time, you must add an intermediate proxy to do that.
+
+1.  Edit `common.yaml` and remove `labels` and `networks` from `odoo` service.
+
+2.  Add this service to `common.yaml`:
+
+    ```yaml
+    proxy:
+        image: tecnativa/odoo-proxy
+        environment:
+            FORWARDFOR: 0
+        labels:
+            traefik.docker.network: "inverseproxy_shared"
+            traefik.enable: "true"
+            traefik.frontend.passHostHeader: "true"
+            traefik.port: "80"
+    ```
+
+3.  Add this service to `prod.yaml`:
+
+    ```yaml
+
+    proxy:
+        extends:
+            file: common.yaml
+            service: proxy
+        restart: unless-stopped
+        networks:
+            default:
+            inverseproxy_shared:
+        environment:
+            FORCEHOST: $DOMAIN_PROD
+        labels:
+            traefik.frontend.rule: "Host:${DOMAIN_PROD}"
+    ```
+
+4.  Add the same service from step 3 to `test.yaml`, replacing `DOMAIN_PROD` by
+    `DOMAIN_TEST`.
+
 ### When I boot `devel.yaml` for the first time, Odoo crashes
 
 Most likely you are using versions `8.0` or `9.0` of the image. If so:
@@ -658,5 +700,6 @@ open an issue or pull request.
 [`repos.yaml`]: #optodoocustomsrcreposyaml
 [several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
 [Traefik]: https://traefik.io/
+[www-force]: https://github.com/containous/traefik/issues/1380
 [`addons.yaml`]: #optodoocustomsrcaddonstxt
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
