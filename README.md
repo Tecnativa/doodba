@@ -682,24 +682,24 @@ As a design choice, the scaffolding defaults to being explicit.
 Just [head to our project](https://github.com/Tecnativa/docker-odoo-base) and
 open an issue or pull request.
 
+[`/opt/odoo/auto/addons`]: #optodooautoaddons
+[`addons.yaml`]: #optodoocustomsrcaddonstxt
 [`COMPOSE_FILE` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
+[`nano`]: https://www.nano-editor.org/
+[`odoo.conf`]: #optodooautoodooconf
+[`odoo`]: #optodoocustomsrcodoo
+[`private`]: #optodoocustomsrcprivate
+[`PYTHONOPTIMIZE=2`]: https://docs.python.org/2/using/cmdline.html#envvar-PYTHONOPTIMIZE
+[`repos.yaml`]: #optodoocustomsrcreposyaml
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
 [Let's Encrypt]: https://letsencrypt.org/
-[Original Odoo]: https://github.com/odoo/odoo
-[Odoo S.A.]: https://www.odoo.com
-[OCB]: https://github.com/OCA/OCB
 [OCA]: https://odoo-community.org/
+[OCB]: https://github.com/OCA/OCB
+[Odoo S.A.]: https://www.odoo.com
 [OpenUpgrade]: https://github.com/OCA/OpenUpgrade/
-[`PYTHONOPTIMIZE=2`]: https://docs.python.org/2/using/cmdline.html#envvar-PYTHONOPTIMIZE
+[Original Odoo]: https://github.com/odoo/odoo
 [pip `requirements.txt`]: https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
 [scaffolding]: #scaffolding
-[`nano`]: https://www.nano-editor.org/
-[`odoo`]: #optodoocustomsrcodoo
-[`odoo.conf`]: #optodooautoodooconf
-[`private`]: #optodoocustomsrcprivate
-[`repos.yaml`]: #optodoocustomsrcreposyaml
 [several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
 [Traefik]: https://traefik.io/
 [www-force]: https://github.com/containous/traefik/issues/1380
-[`addons.yaml`]: #optodoocustomsrcaddonstxt
-[`/opt/odoo/auto/addons`]: #optodooautoaddons
