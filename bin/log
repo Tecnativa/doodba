@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser(description="Easy logging for scripts")
 parser.add_argument("level", choices=("DEBUG", "INFO", "WARNING", "ERROR"))
 parser.add_argument("message", nargs="+")
 arguments = parser.parse_args()
+logging.root.name = "docker-odoo-base"
 
 try:
     logging.root.setLevel(int(os.environ["LOG_LEVEL"]))
