@@ -9,11 +9,12 @@ services:
         tty: true
         volumes:
             - filestore$ODOO_MAJOR:/var/lib/odoo
-        networks:
-            default:
-                aliases:
-                    # For `https` service
-                    - www
+        labels:
+            traefik.docker.network: "inverseproxy_shared"
+            traefik.enable: "true"
+            traefik.frontend.passHostHeader: "true"
+            traefik.longpolling.port: "8072"
+            traefik.www.port: "8069"
 
     db:
         image: postgres:${DB_VERSION}-alpine
@@ -22,18 +23,6 @@ services:
             POSTGRES_PASSWORD: "$DB_PASSWORD"
         volumes:
             - db$ODOO_MAJOR:/var/lib/postgresql/data
-
-    # TODO Remove this when Traefik 1.3 is released
-    # SEE https://github.com/containous/traefik/pull/1257
-    proxy:
-        image: tecnativa/odoo-proxy
-        environment:
-            FORWARDFOR: 0
-        labels:
-            traefik.docker.network: "inverseproxy_shared"
-            traefik.enable: "true"
-            traefik.frontend.passHostHeader: "true"
-            traefik.port: "80"
 
     smtpfake:
         image: tecnativa/smtp-sink

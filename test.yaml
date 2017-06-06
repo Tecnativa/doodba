@@ -13,6 +13,13 @@ services:
             - db
             - smtp
             - inbox
+        networks:
+            default:
+            inverseproxy_shared:
+        labels:
+            traefik.longpolling.frontend.rule:
+                "Host:${DOMAIN_TEST};PathPrefix:/longpolling/"
+            traefik.www.frontend.rule: "Host:${DOMAIN_TEST}"
         command:
             - odoo
             - --workers=2
@@ -22,18 +29,6 @@ services:
         extends:
             file: common.yaml
             service: db
-
-    proxy:
-        extends:
-            file: common.yaml
-            service: proxy
-        networks:
-            default:
-            inverseproxy_shared:
-        environment:
-            FORCEHOST: $DOMAIN_TEST
-        labels:
-            traefik.frontend.rule: "Host:${DOMAIN_TEST}"
 
     inbox:
         extends:

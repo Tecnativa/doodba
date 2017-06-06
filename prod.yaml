@@ -13,25 +13,19 @@ services:
             - db
             - smtp
             - inbox
+        networks:
+            default:
+            inverseproxy_shared:
+        labels:
+            traefik.longpolling.frontend.rule:
+                "Host:${DOMAIN_PROD};PathPrefix:/longpolling/"
+            traefik.www.frontend.rule: "Host:${DOMAIN_PROD}"
 
     db:
         extends:
             file: common.yaml
             service: db
         restart: unless-stopped
-
-    proxy:
-        extends:
-            file: common.yaml
-            service: proxy
-        restart: unless-stopped
-        networks:
-            default:
-            inverseproxy_shared:
-        environment:
-            FORCEHOST: $DOMAIN_PROD
-        labels:
-            traefik.frontend.rule: "Host:${DOMAIN_PROD}"
 
     inbox:
         extends:
