@@ -587,7 +587,7 @@ mean time, you must add an additional proxy to do that.
 To **remove** the `www.` prefix, add this service to `prod.yaml`:
 
 ```yaml
-proxy:
+www_remove:
     image: tecnativa/odoo-proxy
     environment:
         FORCEHOST: $DOMAIN_PROD
