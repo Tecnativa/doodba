@@ -582,44 +582,28 @@ Then open `http://localhost:$SomeFreePort`.
 ### I need to force addition or removal of `www.` prefix in production
 
 [We hope that some day Traefik supports that feature][www-force], but in the
-mean time, you must add an intermediate proxy to do that.
+mean time, you must add an additional proxy to do that.
 
-1.  Edit `common.yaml` and remove `labels` and `networks` from `odoo` service.
+To **remove** the `www.` prefix, add this service to `prod.yaml`:
 
-2.  Add this service to `common.yaml`:
+```yaml
+proxy:
+    image: tecnativa/odoo-proxy
+    environment:
+        FORCEHOST: $DOMAIN_PROD
+    networks:
+        default:
+        inverseproxy_shared:
+    labels:
+        traefik.docker.network: "inverseproxy_shared"
+        traefik.enable: "true"
+        traefik.frontend.passHostHeader: "true"
+        traefik.port: "80"
+        traefik.frontend.rule: "Host:www.${DOMAIN_PROD}"
+```
 
-    ```yaml
-    proxy:
-        image: tecnativa/odoo-proxy
-        environment:
-            FORWARDFOR: 0
-        labels:
-            traefik.docker.network: "inverseproxy_shared"
-            traefik.enable: "true"
-            traefik.frontend.passHostHeader: "true"
-            traefik.port: "80"
-    ```
-
-3.  Add this service to `prod.yaml`:
-
-    ```yaml
-
-    proxy:
-        extends:
-            file: common.yaml
-            service: proxy
-        restart: unless-stopped
-        networks:
-            default:
-            inverseproxy_shared:
-        environment:
-            FORCEHOST: $DOMAIN_PROD
-        labels:
-            traefik.frontend.rule: "Host:${DOMAIN_PROD}"
-    ```
-
-4.  Add the same service from step 3 to `test.yaml`, replacing `DOMAIN_PROD` by
-    `DOMAIN_TEST`.
+To **add** the `www.` prefix, it is almost the same; use your imagination
+:wink:.
 
 ### When I boot `devel.yaml` for the first time, Odoo crashes
 
