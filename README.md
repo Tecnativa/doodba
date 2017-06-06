@@ -605,6 +605,10 @@ www_remove:
 To **add** the `www.` prefix, it is almost the same; use your imagination
 :wink:.
 
+### How to allow access from several host names?
+
+In `.env`, set `DOMAIN_PROD` to `host1.com,host2.com,www.host1.com`, etc.
+
 ### When I boot `devel.yaml` for the first time, Odoo crashes
 
 Most likely you are using versions `8.0` or `9.0` of the image. If so:
