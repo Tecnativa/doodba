@@ -256,6 +256,28 @@ Usage:
 
     pot my_addon,my_other_addon
 
+### `python-odoo-shell`
+
+Little shortcut to make your `odoo shell` scripts executable.
+
+For example, create this file in your scaffolding-based project:
+`odoo/custom/shell-scripts/whoami.py`. Fill it with:
+
+```python
+#!/usr/local/bin/python-odoo-shell
+from __future__ import print_function
+print(env.user.name)
+print(env.context)
+```
+
+Now run it:
+
+```bash
+$ chmod a+x odoo/custom/shell-scripts/whoami.py  # Make it executable
+$ docker-compose build --pull  # Rebuild the image, unless in devel
+$ docker-compose run --rm odoo custom/shell-scripts/whoami.py
+```
+
 ### `unittest`
 
 Another little shell script, useful for debugging. Just run it like this and
@@ -480,7 +502,7 @@ networks:
 
 volumes:
     acme:
-```    
+```
 
 Then boot it up with:
 
