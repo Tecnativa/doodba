@@ -14,7 +14,7 @@ LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 
 # Customize logging for build
 logging.root.name = "docker-odoo-base"
-_log_level = os.environ.get("LOG_LEVEL")
+_log_level = os.environ.get("LOG_LEVEL", "")
 if _log_level.isdigit():
     _log_level = int(_log_level)
 elif _log_level in LOG_LEVELS:
