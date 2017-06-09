@@ -10,9 +10,19 @@ ADDONS_YAML = SRC_DIR + "/addons.yaml"
 ADDONS_DIR = "/opt/odoo/auto/addons"
 CLEAN = os.environ.get("CLEAN") == "true"
 LINK = os.environ.get("LINK") == "true"
+LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 
-# Allow to change log level for build
-logging.root.setLevel(int(os.environ.get("LOG_LEVEL", logging.INFO)))
+# Customize logging for build
+logging.root.name = "docker-odoo-base"
+_log_level = os.environ.get("LOG_LEVEL")
+if _log_level.isdigit():
+    _log_level = int(_log_level)
+elif _log_level in LOG_LEVELS:
+    _log_level = getattr(logging, _log_level)
+else:
+    _log_level = logging.INFO
+    logging.warning("Wrong value in $LOG_LEVEL, falling back to INFO")
+logging.root.setLevel(_log_level)
 
 
 def addons_config():

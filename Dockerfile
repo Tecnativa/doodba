@@ -36,7 +36,7 @@ ONBUILD WORKDIR /opt/odoo
 ONBUILD RUN chown -R odoo:odoo . \
     && chmod -Rc a+rx common/entrypoint.d common/build.d
 # https://docs.python.org/2.7/library/logging.html#levels
-ONBUILD ARG LOG_LEVEL=20
+ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN ["/opt/odoo/common/build.sh"]
 ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint.sh"]
 ONBUILD CMD ["/usr/local/bin/odoo"]
