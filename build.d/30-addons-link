@@ -16,7 +16,18 @@ logging.info(
     odoobaselib.ADDONS_DIR)
 
 for repo, addons in odoobaselib.addons_config().items():
-    for addon in addons:
+    while addons:
+        addon = addons.pop()
+        if addon == '*':
+            addon_dir = os.path.join(odoobaselib.SRC_DIR, repo)
+            try:
+                modules = next(os.walk(addon_dir))[1]
+            except StopIteration:
+                continue
+            for module in modules:
+                if not module.startswith('.') and module != 'setup':
+                    addons.append(module)
+            continue
         src = os.path.join(odoobaselib.SRC_DIR, repo, addon)
         dst = os.path.join(odoobaselib.ADDONS_DIR, addon)
         logging.debug("Linking %s in %s", src, dst)
