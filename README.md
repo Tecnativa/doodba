@@ -162,6 +162,13 @@ server-tools: # Here we repeat server-tools, but no problem because it's a
     - html_text
 ```
 
+You can add all modules in a repo by using a `*`:
+
+```yaml
+website:
+    - "*"
+```
+
 Important notes:
 
 - Do not add repos for the required [`odoo`][] and [`private`][] directories;
@@ -185,6 +192,8 @@ Important notes:
   removed by default, to keep the resulting image thin).
 
 - If you list 2 addons with the same name, you'll get a build error.
+
+- If you use the wildcard (`*`), it must be encapsulated in quotes.
 
 ##### `/opt/odoo/custom/src/requirements.txt`
 
