@@ -15,6 +15,7 @@ else:
     ADDONS_YAML = '%s.yml' % ADDONS_YAML
 ADDONS_DIR = "/opt/odoo/auto/addons"
 CLEAN = os.environ.get("CLEAN") == "true"
+AUTO_REQUIREMENTS = os.environ.get("AUTO_REQUIREMENTS") == "true"
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 FILE_APT_BUILD = os.path.join(
     CUSTOM_DIR, 'dependencies', 'apt_build.txt',

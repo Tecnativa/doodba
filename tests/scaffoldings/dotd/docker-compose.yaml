@@ -5,6 +5,7 @@ services:
       context: ./
       dockerfile: ${ODOO_MINOR}.Dockerfile
       args:
+        AUTO_REQUIREMENTS: "true"
         CONFIG_BUILD: 'false'
         LOG_LEVEL: DEBUG
     tty: true
