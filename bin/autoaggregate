@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
-conf=/opt/odoo/custom/src/repos.yaml
+
+conf=/opt/odoo/custom/src/repos
+
+if [ -f "${conf}.yaml" ]; then
+    conf="${conf}.yaml"
+elif [ -f "${conf}.yml" ]; then
+    conf="${conf}.yml"
+fi
+
 # Update linked repositories, if the `repos.yaml` file is found
 if [ -f $conf ]; then
     log INFO Aggregating repositories from $conf
