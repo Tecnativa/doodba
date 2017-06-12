@@ -28,6 +28,10 @@ for directory in os.listdir(odoobaselib.SRC_DIR):
         shutil.rmtree(full)
         continue
 
+    # Skip wildcards
+    if '*' in config[directory]:
+        continue
+
     # Traverse addons
     for subdirectory in os.listdir(full):
         subfull = os.path.join(full, subdirectory)
