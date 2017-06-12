@@ -25,8 +25,9 @@ if _log_level.isdigit():
 elif _log_level in LOG_LEVELS:
     _log_level = getattr(logging, _log_level)
 else:
+    if _log_level:
+        logging.warning("Wrong value in $LOG_LEVEL, falling back to INFO")
     _log_level = logging.INFO
-    logging.warning("Wrong value in $LOG_LEVEL, falling back to INFO")
 logging.root.setLevel(_log_level)
 
 
