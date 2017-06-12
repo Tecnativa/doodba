@@ -38,6 +38,8 @@ logging.root.setLevel(_log_level)
 def addons_config():
     """Load configurations from ``ADDONS_YAML`` into a dict."""
     config = dict()
+    if not os.path.isfile(ADDONS_YAML):
+        return config
     with open(ADDONS_YAML) as addons_file:
         for doc in yaml.load_all(addons_file):
             for repo, addons in doc.items():
