@@ -12,3 +12,6 @@ docker-compose.yml
 **.py[co]
 **.egg-info
 **.orig
+
+# Editor garbage folders
+.vscode
