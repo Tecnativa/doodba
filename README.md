@@ -304,20 +304,64 @@ Docker-based development, so here you have it preinstalled.
 
 I told you, this image is opinionated. :wink:
 
-To use it, inject this in any Python line:
+To use it, write this in any Python script:
 
-    import wdb; wdb.set_trace()
+```python
+import wdb
+wdb.set_trace()
+```
 
 **DO NOT USE IT IN PRODUCTION ENVIRONMENTS.** (I had to say it).
+
+### [`ptvsd`](https://github.com/DonJayamanne/pythonVSCode)
+
+[VSCode][] debugger. If you use this editor with its python module, you will
+find it useful.
+
+To debug, add this Python code somewhere:
+
+```python
+import ptvsd
+ptvsd.enable_attach("my_secret", address=("0.0.0.0", 6899))
+print("ptvsd waiting...")
+ptvsd.wait_for_attach()
+```
+
+Of course, you need to have properly configured your [VSCode][]. To do so, make
+sure in your project there is a `.vscode/launch.json` file with these minimal
+contents:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to debug in devel.yaml",
+            "type": "python",
+            "request": "attach",
+            "localRoot": "${workspaceRoot}/odoo",
+            "remoteRoot": "/opt/odoo",
+            "port": 6899,
+            "secret": "my_secret",
+            "host": "localhost"
+        }
+    ]
+}
+```
+
+Then, execute that configuration as usual.
 
 ### [`pudb`](https://github.com/inducer/pudb)
 
 This is another great debugger that includes remote debugging via telnet, which
 can be useful for some cases, or for people that prefer it over wdb.
 
-To use it, inject this in any Python line:
+To use it, inject this in any Python script:
 
-    import pudb.remote; pudb.remote.set_trace(term_size=(80, 24))
+```python
+import pudb.remote
+pudb.remote.set_trace(term_size=(80, 24))
+```
 
 Then open a telnet connection to it (running in `0.0.0.0:6899` by default).
 
@@ -712,4 +756,5 @@ open an issue or pull request.
 [scaffolding]: #scaffolding
 [several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
 [Traefik]: https://traefik.io/
+[VSCode]: https://code.visualstudio.com/
 [www-force]: https://github.com/containous/traefik/issues/1380
