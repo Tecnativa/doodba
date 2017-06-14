@@ -16,7 +16,6 @@ ONBUILD ARG DEPTH_DEFAULT=1
 ONBUILD ARG DEPTH_MERGE=100
 ONBUILD ARG CLEAN=true
 ONBUILD ARG COMPILE=true
-ONBUILD ARG LINK=true
 ONBUILD ARG PIP_INSTALL_ODOO=true
 ONBUILD ARG ADMIN_PASSWORD=admin
 ONBUILD ARG SMTP_SERVER=smtp
@@ -134,7 +133,8 @@ RUN install.sh
 # Metadata
 ARG VCS_REF
 ARG BUILD_DATE
-LABEL org.label-schema.schema-version="1.0" \
+ARG VERSION
+LABEL org.label-schema.schema-version="$VERSION" \
       org.label-schema.vendor=Tecnativa \
       org.label-schema.license=Apache-2.0 \
       org.label-schema.build-date="$BUILD_DATE" \

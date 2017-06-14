@@ -9,7 +9,6 @@ SRC_DIR = "/opt/odoo/custom/src"
 ADDONS_YAML = '%s/addons' % SRC_DIR
 ADDONS_DIR = "/opt/odoo/auto/addons"
 CLEAN = os.environ.get("CLEAN") == "true"
-LINK = os.environ.get("LINK") == "true"
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 
 if os.path.isfile('%s.yaml' % ADDONS_YAML):
