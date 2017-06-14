@@ -9,7 +9,6 @@ SRC_DIR = "/opt/odoo/custom/src"
 ADDONS_YAML = SRC_DIR + "/addons.yaml"
 ADDONS_DIR = "/opt/odoo/auto/addons"
 CLEAN = os.environ.get("CLEAN") == "true"
-LINK = os.environ.get("LINK") == "true"
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 
 # Customize logging for build
