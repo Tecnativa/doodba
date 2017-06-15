@@ -34,8 +34,7 @@ ONBUILD ENV PGUSER="$PGUSER" \
             PGDATABASE="$PGDATABASE"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
-ONBUILD RUN chown -R odoo:odoo . \
-    && chmod -Rc a+rx common/entrypoint.d common/build.d
+ONBUILD RUN chown -R odoo:odoo .
 # https://docs.python.org/2.7/library/logging.html#levels
 ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN ["/opt/odoo/common/build.sh"]
