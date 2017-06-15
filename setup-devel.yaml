@@ -20,7 +20,6 @@ services:
                 PIP_INSTALL_ODOO: "false"
                 CLEAN: "false"
                 COMPILE: "false"
-                LINK: "false"
         volumes:
             - ./odoo/custom:/opt/odoo/custom:rw,z
         environment:
