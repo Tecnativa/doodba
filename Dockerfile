@@ -9,6 +9,8 @@ VOLUME ["/var/lib/odoo"]
 EXPOSE 8069 8072
 
 # Subimage triggers
+ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint.sh"]
+ONBUILD CMD ["/usr/local/bin/odoo"]
 ONBUILD ARG AGGREGATE=true
 ONBUILD ARG DEPTH_DEFAULT=1
 ONBUILD ARG DEPTH_MERGE=100
@@ -32,14 +34,11 @@ ONBUILD ENV PGUSER="$PGUSER" \
             PGDATABASE="$PGDATABASE"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
-ONBUILD WORKDIR /opt/odoo
 ONBUILD RUN chown -R odoo:odoo . \
     && chmod -Rc a+rx common/entrypoint.d common/build.d
 # https://docs.python.org/2.7/library/logging.html#levels
 ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN ["/opt/odoo/common/build.sh"]
-ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint.sh"]
-ONBUILD CMD ["/usr/local/bin/odoo"]
 ONBUILD USER odoo
 
 ARG PYTHONOPTIMIZE=2
@@ -109,19 +108,20 @@ RUN curl -SLo wkhtmltox.tar.xz https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkh
     && wkhtmltopdf --version
 
 # Other facilities
+WORKDIR /opt/odoo
 RUN pip install --no-cache-dir \
     astor git-aggregator openupgradelib ptvsd==3.0.0 pudb wdb
 COPY bin/autoaggregate bin/install.sh bin/log bin/pot bin/python-odoo-shell bin/unittest /usr/local/bin/
-COPY bin/direxec.sh /opt/odoo/common/entrypoint.sh
-RUN ln /opt/odoo/common/entrypoint.sh /opt/odoo/common/build.sh
+COPY bin/direxec.sh common/entrypoint.sh
+RUN ln common/entrypoint.sh common/build.sh
 COPY lib/*.py /usr/local/lib/python2.7/dist-packages
-COPY build.d /opt/odoo/common/build.d
-COPY conf.d /opt/odoo/common/conf.d
-COPY entrypoint.d /opt/odoo/common/entrypoint.d
-RUN mkdir -p /opt/odoo/auto/addons
+COPY build.d common/build.d
+COPY conf.d common/conf.d
+COPY entrypoint.d common/entrypoint.d
+RUN mkdir -p auto/addons
 RUN chmod -Rc a+rx \
-    /opt/odoo/common/entrypoint* \
-    /opt/odoo/common/build* \
+    common/entrypoint* \
+    common/build* \
     /usr/local/bin
 
 # Execute installation script by Odoo version
