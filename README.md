@@ -55,12 +55,17 @@ This is its structure:
         build.d/
         conf.d/
         ssh/
+        dependencies/
+            apt_build.txt
+            apt.txt
+            gem.txt
+            npm.txt
+            pip.txt
         src/
             private/
             odoo/
             addons.yaml
             repos.yaml
-            requirements.txt
     common/
         entrypoint.sh
         build.sh
@@ -229,7 +234,7 @@ Important notes:
 
 - If you use the wildcard (`*`), it must be encapsulated in quotes.
 
-##### `/opt/odoo/custom/src/requirements.txt`
+##### `/opt/odoo/custom/dependencies/pip.txt`
 
 A normal [pip `requirements.txt`][] file, to install dependencies for your
 addons when building the subimage.
@@ -808,6 +813,11 @@ Dockerfile similar to this one:
 # Hash-pinned version of tecnativa/odoo-base:10.0
 FROM tecnativa/odoo-base@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c98d5d3817699e1
 ```
+
+### What is `/opt/odoo/custom/src/requirements.txt`?
+
+This is the deprecated file path for the PIP requirements. Use
+`/opt/odoo/custom/dependencies/pip.txt` instead.
 
 ### How can I help?
 
