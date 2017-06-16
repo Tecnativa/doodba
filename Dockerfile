@@ -2,7 +2,7 @@ FROM debian:8
 MAINTAINER Tecnativa <info@tecnativa.com>
 
 # Enable Odoo user and filestore
-RUN useradd -md /opt/odoo odoo \
+RUN useradd -md /home/odoo odoo \
     && mkdir -p /var/lib/odoo \
     && chown -R odoo:odoo /var/lib/odoo
 VOLUME ["/var/lib/odoo"]
@@ -33,10 +33,10 @@ ONBUILD ENV PGUSER="$PGUSER" \
             PGDATABASE="$PGDATABASE"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
-ONBUILD RUN chown -R odoo:odoo .
 # https://docs.python.org/2.7/library/logging.html#levels
 ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN ["/opt/odoo/common/build.sh"]
+ONBUILD RUN chown -R root:odoo . && chmod -R u+rwX,g+rX-w,o= .
 ONBUILD USER odoo
 
 ARG PYTHONOPTIMIZE=2
