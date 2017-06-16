@@ -6,8 +6,9 @@ import subprocess
 import yaml
 
 # Constants needed in scripts
-SRC_DIR = "/opt/odoo/custom/src"
-ADDONS_YAML = '%s/addons' % SRC_DIR
+CUSTOM_DIR = "/opt/odoo/custom"
+SRC_DIR = os.path.join(CUSTOM_DIR, 'src')
+ADDONS_YAML = os.path.join(SRC_DIR, 'addons')
 ADDONS_DIR = "/opt/odoo/auto/addons"
 CLEAN = os.environ.get("CLEAN") == "true"
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")

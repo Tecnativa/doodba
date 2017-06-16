@@ -1,9 +1,0 @@
-#!/bin/bash
-set -e
-req=/opt/odoo/custom/src/requirements.txt
-
-# Install Python dependencies
-if [ -f $req ]; then
-    log INFO Installing Python dependencies from $req
-    pip install --no-cache-dir -r $req
-fi

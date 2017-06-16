@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+# Copyright 2017 LasLabs Inc.
+
+import os
+
+import odoobaselib
+from installer import Installer
+
+
+FILE_APT_BUILD = os.path.join(
+    odoobaselib.CUSTOM_DIR, 'dependencies', 'apt_build.txt',
+)
+
+
+if os.path.isfile(FILE_APT_BUILD):
+    Installer('apt', FILE_APT_BUILD).remove()
