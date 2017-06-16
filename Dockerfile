@@ -58,7 +58,9 @@ ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost \
     # Other
-    LC_ALL=C.UTF-8
+    LC_ALL=C.UTF-8 \
+    WKHTMLTOPDF_VERSION=0.12.4 \
+    WKHTMLTOPDF_CHECKSUM='049b2cdec9a8254f0ef8ac273afaf54f7e25459a273e27189591edc7d7cf29db'
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
@@ -99,8 +101,8 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
     && rm -Rf ~/.npm /tmp/*
 
 # Special case for wkhtmltox
-RUN curl -SLo wkhtmltox.tar.xz https://downloads.wkhtmltopdf.org/0.12/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz \
-    && echo "0ef646d802cd0375524034d11af76444c7c8e796e11d553ab39bd4a7bf703ac631f4a3300902bec54589b3d5400b5762d9995839f6faaae2f9159efdf225cc78  wkhtmltox.tar.xz" | sha512sum -c - \
+RUN curl -SLo wkhtmltox.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox-${WKHTMLTOPDF_VERSION}_linux-generic-amd64.tar.xz \
+    && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.tar.xz" | sha256sum -c - \
     && tar --strip-components 1 -C /usr/local/ -xf wkhtmltox.tar.xz \
     && rm wkhtmltox.tar.xz \
     && wkhtmltopdf --version
