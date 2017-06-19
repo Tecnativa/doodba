@@ -120,7 +120,8 @@ RUN mkdir -p auto/addons
 RUN chmod -Rc a+rx \
     common/entrypoint* \
     common/build* \
-    /usr/local/bin
+    /usr/local/bin \
+    /usr/local/lib/python2.7/dist-packages/*.py*
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
