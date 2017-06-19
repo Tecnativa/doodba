@@ -37,7 +37,9 @@ ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN ["/opt/odoo/common/build.sh"]
 ONBUILD RUN ln -s /opt/odoo/custom/ssh ~root/.ssh
-ONBUILD RUN chown -R root:odoo . && chmod -R u+rwX,g+rX-w,o= .
+ONBUILD RUN chown -R root:odoo . \
+    && chmod -R u+rwX,g+rX-w,o= . \
+    && chmod -R g+w auto/addons
 ONBUILD USER odoo
 
 ARG PYTHONOPTIMIZE=2
