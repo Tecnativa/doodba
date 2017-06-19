@@ -22,11 +22,14 @@ apt-get install -y --no-install-recommends $apt_deps
 # Install all dependencies that do not support PYTHONOPTIMIZE=2
 # TODO Remove when these get fixed:
 # https://github.com/Tecnativa/docker-odoo-base/issues/18
+
+# Download requirements file to be able to patch it
+curl -SLo /tmp/requirements.txt $reqs
+reqs=/tmp/requirements.txt
 # https://github.com/Tecnativa/docker-odoo-base/issues/21
 if [ "$ODOO_VERSION" == "8.0" ]; then
     # Packages already installed that conflict with others
-    curl -SL $reqs | sed -r 's/pyparsing|six/#\0/' > /tmp/requirements.txt
-    reqs=/tmp/requirements.txt
+    sed -ir 's/pyparsing|six/#\0/' $reqs
     pip_deps="psutil==2.1.1 pydot==1.0.2 vobject==0.6.6"
     # Extra dependencies for Odoo at runtime
     apt-get install -y --no-install-recommends file
@@ -35,6 +38,10 @@ elif [ "$ODOO_VERSION" == "9.0" ]; then
 else
     pip_deps="psutil==4.3.1 pydot==1.2.3"
 fi
+
+# psycopg2 will be installed later
+sed -ir 's/psycopg2/#\0/' $reqs
+
 optimize="$PYTHONOPTIMIZE"
 if [ $PYTHONOPTIMIZE -gt 1 ]; then
     export PYTHONOPTIMIZE=1
