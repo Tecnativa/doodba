@@ -36,6 +36,7 @@ ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 # https://docs.python.org/2.7/library/logging.html#levels
 ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN ["/opt/odoo/common/build.sh"]
+ONBUILD RUN ln -s /opt/odoo/custom/ssh ~root/.ssh
 ONBUILD RUN chown -R root:odoo . && chmod -R u+rwX,g+rX-w,o= .
 ONBUILD USER odoo
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+import subprocess
 
 import yaml
 
@@ -40,3 +41,8 @@ def addons_config():
                 config[repo] += addons
 
     return config
+
+
+def do_command(command_list):
+    proc = subprocess.Popen(command_list)
+    proc.communicate()
