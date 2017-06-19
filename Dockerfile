@@ -117,7 +117,7 @@ RUN pip install --no-cache-dir \
 COPY bin/autoaggregate bin/install.sh bin/log bin/pot bin/python-odoo-shell bin/unittest /usr/local/bin/
 COPY bin/direxec.sh common/entrypoint.sh
 RUN ln common/entrypoint.sh common/build.sh
-COPY lib/*.py /usr/local/lib/python2.7/dist-packages
+COPY lib/*.py /usr/local/lib/python2.7/dist-packages/
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
