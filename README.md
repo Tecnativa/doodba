@@ -774,6 +774,41 @@ might want to add this to your `~/.bashrc` or equivalent:
 
 As a design choice, the scaffolding defaults to being explicit.
 
+### How can I pin an image version?
+
+Version-pinning is a good idea to keep your code from differing among image
+updates. It's the best way to ensure no updates got in between the last time
+you checked the image and the time you deploy it to production.
+
+You can do it through **its sha256 code**.
+
+Get any image's code through inspect, running from a computer where the correct
+image version is downloaded:
+
+    docker image inspect --format='{{.RepoDigests}}' tecnativa/odoo-base:10.0
+
+Alternatively, you can browse [this image's builds][builds], click on the one
+you know it works fine for you, and search for the `digest` word using your
+browser's *search in page* system (Ctrl+F usually).
+
+You will find lines similar to:
+
+    [...]
+    10.0: digest: sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c98d5d3817699e1 size: 4508
+    [...]
+    8.0: digest: sha256:27a3dd3a32ce6c4c259b4a184d8db0c6d94415696bec6c2668caafe755c6445e size: 4508
+    [...]
+    9.0: digest: sha256:33a540eca6441b950d633d3edc77d2cc46586717410f03d51c054ce348b2e977 size: 4508
+    [...]
+
+Once you find them, you can use that pinned version in your builds, using a
+Dockerfile similar to this one:
+
+```Dockerfile
+# Hash-pinned version of tecnativa/odoo-base:10.0
+FROM tecnativa/odoo-base@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c98d5d3817699e1
+```
+
 ### How can I help?
 
 Just [head to our project](https://github.com/Tecnativa/docker-odoo-base) and
@@ -788,6 +823,7 @@ open an issue or pull request.
 [`private`]: #optodoocustomsrcprivate
 [`PYTHONOPTIMIZE=2`]: https://docs.python.org/2/using/cmdline.html#envvar-PYTHONOPTIMIZE
 [`repos.yaml`]: #optodoocustomsrcreposyaml
+[builds]: https://hub.docker.com/r/tecnativa/odoo-base/builds/
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
 [Let's Encrypt]: https://letsencrypt.org/
 [OCA]: https://odoo-community.org/
