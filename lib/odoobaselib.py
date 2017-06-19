@@ -44,6 +44,16 @@ def addons_config():
     return config
 
 
-def do_command(command_list):
-    proc = subprocess.Popen(command_list)
+def do_command(command, split=True, shell=False):
+    if split:
+        command = command.split()
+    logging.debug('Running Command: %s', command)
+    if shell:
+        proc = subprocess.Popen(
+            ' '.join(command),
+            env=os.environ,
+            shell=True,
+        )
+    else:
+        proc = subprocess.Popen(command, env=os.environ)
     proc.communicate()

@@ -10,7 +10,18 @@ from installer import Installer
 FILE_APT_BUILD = os.path.join(
     odoobaselib.CUSTOM_DIR, 'dependencies', 'apt_build.txt',
 )
+CLEANUP = ['apt', 'gem', 'npm']
 
 
 if os.path.isfile(FILE_APT_BUILD):
-    Installer('apt', FILE_APT_BUILD).remove()
+    installer = Installer('apt', FILE_APT_BUILD)
+    installer.remove()
+    installer.cleanup()
+
+
+for name in CLEANUP:
+    req_file = os.path.join(
+        odoobaselib.CUSTOM_DIR, 'dependencies', '%s.txt' % name,
+    )
+    if os.path.isfile(req_file):
+        Installer(name, req_file).cleanup()
