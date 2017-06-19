@@ -27,13 +27,13 @@ if [ "$ODOO_VERSION" == "8.0" ]; then
     # Packages already installed that conflict with others
     curl -SL $reqs | sed -r 's/pyparsing|six/#\0/' > /tmp/requirements.txt
     reqs=/tmp/requirements.txt
-    pip_deps="psutil==2.1.1 psycopg2==2.6.3 pydot==1.0.2 vobject==0.6.6"
+    pip_deps="psutil==2.1.1 pydot==1.0.2 vobject==0.6.6"
     # Extra dependencies for Odoo at runtime
     apt-get install -y --no-install-recommends file
 elif [ "$ODOO_VERSION" == "9.0" ]; then
-    pip_deps="psutil==2.2.0 psycopg2==2.6.3 pydot==1.0.2 vobject==0.6.6"
+    pip_deps="psutil==2.2.0 pydot==1.0.2 vobject==0.6.6"
 else
-    pip_deps="psutil==4.3.1 psycopg2==2.6.3 pydot==1.2.3"
+    pip_deps="psutil==4.3.1 pydot==1.2.3"
 fi
 optimize="$PYTHONOPTIMIZE"
 if [ $PYTHONOPTIMIZE -gt 1 ]; then
@@ -41,6 +41,9 @@ if [ $PYTHONOPTIMIZE -gt 1 ]; then
 fi
 pip install --no-cache-dir $pip_deps
 export PYTHONOPTIMIZE="$optimize"
+
+# Security upgrades
+pip install --no-cache-dir "psycopg2>=2.7" # ODOO-SA-2017-06-15-1
 
 # Build and install Odoo dependencies with pip
 pip install --no-cache-dir --requirement $reqs
