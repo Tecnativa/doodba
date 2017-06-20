@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "${CONFIG_BUILD}" = true ]; then
+    log WARNING Skipping Odoo config generation - performed at build time.
+    exit 0
+fi
+
+config-generate
