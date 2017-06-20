@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import os
-import subprocess
 
 from odoobaselib import do_command
 
+INSTALLERS = ('apt', 'gem', 'npm', 'pip')
+CLEANERS = ('apt', 'gem', 'npm')
+
 
 class Installer(object):
-    """ Install all sorts of things. """
-
-    _HAS_RUN = {}
+    """Install all sorts of things."""
+    _has_run = {}
 
     def __init__(self, handler_name, file_path):
         self.handler_name = handler_name
@@ -18,9 +18,9 @@ class Installer(object):
         self.requirements = self._parse_requirements()
 
     def has_run(self, install_type, update=True):
-        has_run = self._HAS_RUN.get(install_type, False)
+        has_run = self._has_run.get(install_type, False)
         if update:
-            self._HAS_RUN[install_type] = True
+            self._has_run[install_type] = True
         return has_run
 
     def install(self):
@@ -100,6 +100,7 @@ class Installer(object):
             )
 
     def _run_command(self, command, split=True, shell=False):
+        logging.info("Executing: %s", command)
         return do_command(command, split, shell)
 
     def _parse_requirements(self):

@@ -12,6 +12,9 @@ ADDONS_YAML = os.path.join(SRC_DIR, 'addons')
 ADDONS_DIR = "/opt/odoo/auto/addons"
 CLEAN = os.environ.get("CLEAN") == "true"
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
+FILE_APT_BUILD = os.path.join(
+    CUSTOM_DIR, 'dependencies', 'apt_build.txt',
+)
 
 if os.path.isfile('%s.yaml' % ADDONS_YAML):
     ADDONS_YAML = '%s.yaml' % ADDONS_YAML

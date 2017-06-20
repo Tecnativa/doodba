@@ -55,6 +55,10 @@ This is its structure:
         build.d/
         conf.d/
         ssh/
+            config
+            known_hosts
+            id_rsa
+            id_rsa.pub
         dependencies/
             apt_build.txt
             apt.txt
@@ -98,13 +102,17 @@ Files here will be environment-variable-expanded and concatenated in
 
 #### `/opt/odoo/custom/ssh`
 
-Files here will be used to create the `root` and `odoo` users' SSH directories.
+It must follow the same structure as a standard `~/.ssh` directory, including
+`config` and `known_hosts` files. In fact, it is completely equivalent to
+`~root/.ssh`.
 
-It should follow the same structure as a standard `~/.ssh` directory, including
-`config` and `known_hosts` files.
+The `config` file can contain `IdentityFile` keys to represent the private
+key that should be used for that host. Unless specified otherwise, this
+defaults to `identity[.pub]`, `id_rsa[.pub]` or `id_dsa[.pub]` files found in
+this same directory.
 
-The `config` file should contain `IdentityFile` keys to represent the private
-key that should be used for that host. The key will be located in  `~/.ssh/`.
+This is very useful **to use deployment keys** that grant git access to your
+private repositories.
 
 Example - a private key file in the `ssh` folder named `my_private_key` for
 the host `repo.example.com` would have a `config` entry similar to the below:
@@ -114,6 +122,9 @@ Host repo.example.com
   IdentityFile ~/.ssh/my_private_key
 ```
 
+Or you could just drop the key in `id_rsa` and `id_rsa.pub` files and it should
+work by default without the need of adding a `config` file.
+
 Host key checking is enabled by default, which means that you also need to
 provide a `known_hosts` file for any repos that you wish to access via SSH.
 
@@ -122,12 +133,11 @@ like this:
 
 ```
 Host repo.example.com
-  IdentityFile ~/.ssh/my_private_key
   StrictHostKeyChecking no
 ```
 
 For additional information regarding this directory, take a look at this
-[Digital Ocean Article](https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client).
+[Digital Ocean Article][ssh-conf].
 
 #### `/opt/odoo/custom/src`
 
@@ -234,10 +244,27 @@ Important notes:
 
 - If you use the wildcard (`*`), it must be encapsulated in quotes.
 
-##### `/opt/odoo/custom/dependencies/pip.txt`
+##### `/opt/odoo/custom/dependencies/*.txt`
 
-A normal [pip `requirements.txt`][] file, to install dependencies for your
-addons when building the subimage.
+Files to indicate dependencies of your subimage, one for each of the supported
+package managers:
+
+- `apt_build.txt`: build-time dependencies, installed before any others and
+  removed after all the others too. Usually these would include Debian packages
+  such as `build-essential` or `python-dev`.
+- `apt.txt`: run-time dependencies installed by apt.
+- `gem.txt`: run-time dependencies installed by gem.
+- `npm.txt`: run-time dependencies installed by npm.
+- `pip.txt`: a normal [pip `requirements.txt`][] file, for run-time
+  dependencies too.
+
+All of these files will install separately each line. See this example
+`apt_build.txt` to get the point.
+
+    # First it will install this
+    build-essential
+    # Then it will install these two at the same time
+    python-dev ruby-dev
 
 ### `/opt/odoo/common`: The useful one
 
@@ -844,6 +871,7 @@ open an issue or pull request.
 [pip `requirements.txt`]: https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
 [scaffolding]: #scaffolding
 [several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
+[ssh-conf]: https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client
 [Traefik]: https://traefik.io/
 [VSCode]: https://code.visualstudio.com/
 [www-force]: https://github.com/containous/traefik/issues/1380

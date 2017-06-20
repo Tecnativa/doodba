@@ -1,26 +1,20 @@
 #!/usr/bin/env python
 # Copyright 2017 LasLabs Inc.
 
+import logging
 import os
 
-import odoobaselib
-from installer import Installer
-
-
-DIR_CUSTOM = odoobaselib.CUSTOM_DIR
-FILE_APT_BUILD = os.path.join(
-    DIR_CUSTOM, 'dependencies', 'apt_build.txt',
-)
-INSTALL = ['apt', 'gem', 'npm', 'pip']
+from odoobaselib import CUSTOM_DIR, FILE_APT_BUILD, SRC_DIR
+from odoobaselib.installer import Installer, INSTALLERS
 
 
 if os.path.isfile(FILE_APT_BUILD):
     Installer('apt', FILE_APT_BUILD).install()
 
 
-for name in INSTALL:
+for name in INSTALLERS:
     req_file = os.path.join(
-        DIR_CUSTOM, 'dependencies', '%s.txt' % name,
+        CUSTOM_DIR, 'dependencies', '%s.txt' % name,
     )
     if os.path.isfile(req_file):
         Installer(name, req_file).install()
@@ -28,11 +22,11 @@ for name in INSTALL:
 
 # Deprecated
 req_file = os.path.join(
-    DIR_CUSTOM, 'requirements.txt',
+    SRC_DIR, 'requirements.txt',
 )
 if os.path.isfile(req_file):
     new_file = os.path.join(
-        DIR_CUSTOM, 'dependencies', 'pip.txt',
+        CUSTOM_DIR, 'dependencies', 'pip.txt',
     )
     logging.warning(
         'The "%s" path is deprecated. Please use "%s" instead.',
