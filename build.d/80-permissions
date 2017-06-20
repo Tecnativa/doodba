@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+chown -Rc root:odoo /opt/odoo
+chmod -Rc u+rwX,g+rX-w,o= /opt/odoo
+chmod -Rc g+w /opt/odoo/auto/addons
