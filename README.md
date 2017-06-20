@@ -315,6 +315,44 @@ now keep this in mind:
 The CLI text editor we all know, just in case you need to inspect some bug in
 hot deployments.
 
+### `install-addons`
+
+This script will iterate the `addons.yml` file to gather support addons, and
+subsequently install to the Odoo instance. It will then exit.
+
+This script is great to use during buildout in order to prepare an instance.
+Below is a minimalistic `docker-compose` file illustrating a use case:
+
+```yaml
+version: '2'
+
+services:
+
+  install:
+    context: ./odoo
+    command: 'install-addons'
+    tty: true
+    depends_on:
+      - db
+
+  web:
+    context: ./odoo
+    restart: unless-stopped
+    tty: true
+    depends_on:
+      - db
+      - install
+    ports:
+      - 8069
+      - 8071
+    environment:
+      WAIT_NOHOST: 'install'
+
+  db:
+    image: postgres:9.6-alpine
+    restart: unless-stopped
+```
+
 ### `log`
 
 Just a little shell script that you can use to add logs to your build or
