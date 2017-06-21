@@ -120,7 +120,7 @@ COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
 RUN mkdir -p auto/addons
 RUN chmod -Rc a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -Rc a+rX /usr/local/lib/python2.7/dist-packages/odoobaselib
+    && chmod -Rc a+rX /usr/local/lib/python2.7/dist-packages/
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
