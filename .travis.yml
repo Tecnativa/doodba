@@ -19,7 +19,7 @@ env:
 
 before_install:
   - docker build -t "tecnativa/odoo-base:${ODOO_VERSION}" --build-arg "ODOO_VERSION=${ODOO_VERSION}" ./
-  - docker pull kiasaki/alpine-postgres
+  - docker pull postgres:9.6-alpine
   - docker run -d -it -e POSTGRES_USER="odoo" -e POSTGRES_PASSWORD="odoopassword" --name="db" postgres:9.6-alpine
 
 install:
