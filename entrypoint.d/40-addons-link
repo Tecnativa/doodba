@@ -25,6 +25,10 @@ for repo, addons in odoobaselib.addons_config().items():
             continue
         src = os.path.join(odoobaselib.SRC_DIR, repo, addon)
         dst = os.path.join(odoobaselib.ADDONS_DIR, addon)
-        if not os.path.exists(dst):
-            logging.debug("Linking %s in %s", src, dst)
+        try:
             os.symlink(src, dst)
+            logging.debug("Linked %s in %s", src, dst)
+        except OSError:
+            logging.debug(
+                "Error linking %s in %s; skipping...",
+                src, dst, exc_info=True)
