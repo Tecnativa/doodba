@@ -1,0 +1,15 @@
+version: "2.1"
+services:
+    odoo:
+        build:
+            context: ./basic/
+            dockerfile: ${ODOO_MINOR}.Dockerfile
+        tty: true
+        depends_on:
+            - db
+
+    db:
+        image: postgres:${DB_VERSION}-alpine
+        environment:
+            POSTGRES_USER: odoo
+            POSTGRES_PASSWORD: odoopassword

@@ -2,11 +2,11 @@
 ./odoo:
     defaults:
         # Shallow repositores are faster & thinner
-        depth: 1
+        depth: $DEPTH_DEFAULT
     remotes:
         ocb: https://github.com/OCA/OCB.git
         odoo: https://github.com/odoo/odoo.git
     target:
-        ocb 10.0
+        ocb $ODOO_VERSION
     merges:
-        - ocb 10.0
+        - ocb $ODOO_VERSION
