@@ -21,7 +21,7 @@ services:
                 CLEAN: "false"
                 COMPILE: "false"
         volumes:
-            - ./odoo/custom:/opt/odoo/custom:rw,z
+            - ./odoo/custom/src:/opt/odoo/custom/src:rw,z
         environment:
             DEPTH_DEFAULT: 100
             # XXX Export these variables before running setup to own the files
