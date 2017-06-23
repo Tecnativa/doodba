@@ -2,5 +2,7 @@
 set -e
 chown -Rc root:odoo /opt/odoo
 chmod -Rc u+rwX,g+rX-w,o= /opt/odoo
-chmod -Rc g+w /opt/odoo/auto/addons
-chmod -Rc u=rwX,go= /opt/odoo/custom/ssh
+chmod -Rc g+w /opt/odoo/auto
+if [ -d /opt/odoo/custom/ssh ]; then
+    chmod -Rc u=rwX,go= /opt/odoo/custom/ssh
+fi
