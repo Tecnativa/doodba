@@ -3,9 +3,9 @@ services:
     odoo:
         build:
             context: ./odoo
-            args:
-                PGUSER: "$DB_USER"
-                PGPASSWORD: "$DB_PASSWORD"
+        environment:
+            PGUSER: "$DB_USER"
+            PGPASSWORD: "$DB_PASSWORD"
         tty: true
         volumes:
             - filestore$ODOO_MAJOR:/var/lib/odoo
