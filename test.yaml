@@ -4,10 +4,11 @@ services:
         extends:
             file: common.yaml
             service: odoo
-        environment:
-            PGDATABASE: test
-            # You may want demo data for testing
-            WITHOUT_DEMO: "false"
+        build:
+            args:
+                PGDATABASE: test
+                # You may want demo data for testing
+                WITHOUT_DEMO: "false"
         depends_on:
             - db
             - smtp
