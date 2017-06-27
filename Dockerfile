@@ -17,20 +17,8 @@ ONBUILD ARG DEPTH_MERGE=100
 ONBUILD ARG CLEAN=true
 ONBUILD ARG COMPILE=true
 ONBUILD ARG PIP_INSTALL_ODOO=true
-ONBUILD ARG ADMIN_PASSWORD=admin
-ONBUILD ARG SMTP_SERVER=smtp
-ONBUILD ARG PROXY_MODE=false
-ONBUILD ARG WITHOUT_DEMO=all
 ONBUILD ARG PYTHONOPTIMIZE=1
 ONBUILD ENV PYTHONOPTIMIZE="$PYTHONOPTIMIZE"
-ONBUILD ARG PGUSER=odoo
-ONBUILD ARG PGPASSWORD=odoopassword
-ONBUILD ARG PGHOST=db
-ONBUILD ARG PGDATABASE=prod
-ONBUILD ENV PGUSER="$PGUSER" \
-            PGPASSWORD="$PGPASSWORD" \
-            PGHOST="$PGHOST" \
-            PGDATABASE="$PGDATABASE"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 # https://docs.python.org/2.7/library/logging.html#levels
@@ -45,6 +33,10 @@ ARG WKHTMLTOPDF_VERSION=0.12.4
 ARG WKHTMLTOPDF_CHECKSUM='049b2cdec9a8254f0ef8ac273afaf54f7e25459a273e27189591edc7d7cf29db'
 ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     UNACCENT=true \
+    ADMIN_PASSWORD=admin \
+    SMTP_SERVER=smtp \
+    PROXY_MODE=false \
+    WITHOUT_DEMO=all \
     # Git and git-aggregator
     GIT_AUTHOR_NAME=docker-odoo \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
@@ -52,6 +44,10 @@ ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     DEPTH_MERGE=100 \
     # Postgres
     WAIT_DB=true \
+    PGUSER=odoo \
+    PGPASSWORD=odoopassword \
+    PGHOST=db \
+    PGDATABASE=prod \
     # PuDB debugger
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
