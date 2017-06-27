@@ -4,10 +4,9 @@ services:
         extends:
             file: common.yaml
             service: odoo
-        build:
-            args:
-                ADMIN_PASSWORD: "$ODOO_ADMIN_PASSWORD"
-                PROXY_MODE: "$ODOO_PROXY_MODE"
+        environment:
+            ADMIN_PASSWORD: "$ODOO_ADMIN_PASSWORD"
+            PROXY_MODE: "$ODOO_PROXY_MODE"
         restart: unless-stopped
         depends_on:
             - db

@@ -14,8 +14,8 @@ services:
         build:
             context: ./odoo
             args:
+                # Same as in devel.yaml
                 AGGREGATE: "false"
-                DEPTH_DEFAULT: 100
                 PYTHONOPTIMIZE: 0
                 PIP_INSTALL_ODOO: "false"
                 CLEAN: "false"
