@@ -107,7 +107,8 @@ class Installer(object):
         requirements = []
         with open(self.file_path, 'r') as fh:
             for line in fh.read().splitlines():
-                if line.strip().startswith('#'):
+                line = line.strip()
+                if not line or line.startswith('#'):
                     continue
                 requirements += [
                     req.strip() for req in line.split() if req.strip()
