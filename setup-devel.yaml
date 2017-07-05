@@ -25,7 +25,7 @@ services:
         environment:
             DEPTH_DEFAULT: 100
             # XXX Export these variables before running setup to own the files
-            UID: "$UID"
+            UID: "$DEV_UID"
             GID: "$GID"
             UMASK: "$UMASK"
         user: root
