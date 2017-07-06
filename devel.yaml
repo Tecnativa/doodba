@@ -23,6 +23,7 @@ services:
             - "127.0.0.1:6899:6899"
         volumes:
             - ./odoo/custom:/opt/odoo/custom:ro,z
+            - ./odoo/auto/addons:/opt/odoo/auto/addons:rw,z
         depends_on:
             - db
             - smtp
