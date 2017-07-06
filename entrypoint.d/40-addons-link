@@ -23,9 +23,10 @@ for repo, addons in odoobaselib.addons_config().items():
                 if not module.startswith('.') and module != 'setup':
                     addons.append(module)
             continue
-        src = os.path.join(odoobaselib.SRC_DIR, repo, addon)
+        src = os.path.relpath(
+            os.path.join(odoobaselib.SRC_DIR, repo, addon),
+            odoobaselib.ADDONS_DIR)
         dst = os.path.join(odoobaselib.ADDONS_DIR, addon)
-        src = os.path.relpath(src, dst)
         try:
             os.symlink(src, dst)
             logging.debug("Linked %s in %s", src, dst)
