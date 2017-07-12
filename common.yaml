@@ -14,7 +14,7 @@ services:
             traefik.enable: "true"
             traefik.frontend.passHostHeader: "true"
             traefik.longpolling.port: "8072"
-            traefik.www.port: "8069"
+            traefik.port: "8069"
 
     db:
         image: postgres:${DB_VERSION}-alpine
