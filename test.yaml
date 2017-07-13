@@ -6,7 +6,9 @@ services:
             service: odoo
         build:
             args:
+                ADMIN_PASSWORD: "$ODOO_ADMIN_PASSWORD"
                 PGDATABASE: test
+                PROXY_MODE: "$ODOO_PROXY_MODE"
                 # You may want demo data for testing
                 WITHOUT_DEMO: "false"
         depends_on:
@@ -17,8 +19,16 @@ services:
             default:
             inverseproxy_shared:
         labels:
+            traefik.dbmanager.frontend.auth.basic:
+                "${DB_USER}:${ODOO_ADMIN_PASSWORD_BCRYPT}"
+            traefik.dbmanager.frontend.rule:
+                "Host:${DOMAIN_TEST};PathPrefix:/web/database/"
             traefik.longpolling.frontend.rule:
                 "Host:${DOMAIN_TEST};PathPrefix:/longpolling/"
+            traefik.websiteinfo.frontend.auth.basic:
+                "${DB_USER}:${ODOO_ADMIN_PASSWORD_BCRYPT}"
+            traefik.websiteinfo.frontend.rule:
+                "Host:${DOMAIN_TEST};Path:/website/info"
             traefik.www.frontend.rule: "Host:${DOMAIN_TEST}"
         command:
             - odoo
