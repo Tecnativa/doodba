@@ -155,8 +155,8 @@ class ScaffoldingLookupCase(unittest.TestCase):
             setup_env = {
                 "COMPOSE_FILE": "setup-devel.yaml",
                 # Avoid unlink permission errors
-                "UID": pwdata.pw_uid,
-                "GID": pwdata.pw_gid,
+                "UID": str(pwdata.pw_uid),
+                "GID": str(pwdata.pw_gid),
             }
             # TODO Test all supported versions
             for sub_env in matrix(odoo={"10.0"}):
