@@ -11,7 +11,7 @@ from itertools import product, starmap
 from os import environ
 from os.path import basename, dirname, join
 from pwd import getpwnam
-from subprocess import Popen
+from subprocess import PIPE, Popen
 
 # Common test utilities
 DIR = dirname(__file__)
@@ -47,6 +47,10 @@ def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
 
 
 class ScaffoldingLookupCase(unittest.TestCase):
+    def popen(self, *args, **kwargs):
+        """Shortcut to open a subprocess and ensure it works."""
+        self.assertFalse(Popen(*args, **kwargs).wait())
+
     def compose_test(self, workdir, sub_env, *commands):
         """Execute commands in a docker-compose environment.
 
@@ -67,49 +71,50 @@ class ScaffoldingLookupCase(unittest.TestCase):
         full_env = dict(environ, **sub_env)
         with self.subTest(PWD=workdir, **sub_env):
             try:
-                build = Popen(
+                self.popen(
                     ("docker-compose", "build"),
                     cwd=workdir,
                     env=full_env,
                 )
-                self.assertFalse(build.wait())
                 for command in commands:
                     with self.subTest(command=command):
-                        run = Popen(
+                        self.popen(
                             ("docker-compose", "run", "--rm", "odoo") +
                             command,
                             cwd=workdir,
                             env=full_env,
                         )
-                        self.assertFalse(run.wait())
             finally:
-                down = Popen(
+                self.popen(
                     ("docker-compose", "down", "-v"),
                     cwd=workdir,
                     env=full_env,
                 )
-                self.assertFalse(down.wait())
 
     def test_smallest(self):
         """Tests for the smallest possible environment."""
-        common_commands = (
+        commands = (
             # Must generate a configuration file
             ("test", "-f", "/opt/odoo/auto/odoo.conf"),
             # Must be able to install base addons
             ODOO_PREFIX + ("--init", "base"),
-            # Must be able to test successfully base addons
-            ("unittest", "base"),
         )
-        for sub_env in matrix():
-            if sub_env["ODOO_MINOR"] == "8.0":
-                commads = (
-                    # Odoo 8.0 does not autocreate the database
-                    ("psql", "-d", "postgres", "-c", "create database prod"),
-                ) + common_commands
-            else:
-                commads = common_commands
+        smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
+        # TODO Unit testing ``base`` should work in 8.0 too
+        for sub_env in matrix(odoo_skip={"8.0"}):
             self.compose_test(
-                join(SCAFFOLDINGS_DIR, "smallest"), sub_env, **commads)
+                smallest_dir, sub_env,
+                *commands,
+                # Must be able to test successfully base addons
+                ("unittest", "base"),
+            )
+        for sub_env in matrix(odoo={"8.0"}):
+            self.compose_test(
+                smallest_dir, sub_env,
+                # Odoo 8.0 does not autocreate the database
+                ("psql", "-d", "postgres", "-c", "create database prod"),
+                *commands
+            )
 
     def test_dotd(self):
         """Test environment with common ``*.d`` directories."""
@@ -121,11 +126,12 @@ class ScaffoldingLookupCase(unittest.TestCase):
                 # ``custom/entrypoint.d`` was properly executed
                 ("test", "-f", "/home/odoo/created-at-entrypoint"),
                 # ``custom/conf.d`` was properly concatenated
-                ("grep", "test-conf", "/opt/odoo/auto/odoo.conf"),
+                ("grep", "test-conf", "auto/odoo.conf"),
                 # ``dummy_addon`` and ``private_addon`` exist
-                ("test", "-d", "/opt/odoo/auto/addons/dummy_addon"),
-                ("test", "!", "-d", "/opt/odoo/auto/addons/private_addon"),
-                ("test", "-d", "/opt/odoo/common/src/private/dummy_addon"),
+                ("test", "-d", "auto/addons/dummy_addon"),
+                ("test", "!", "-d", "custom/src/private/dummy_addon"),
+                ("test", "-d", "custom/src/private/private_addon"),
+                ("test", "!", "-d", "auto/addons/private_addon"),
                 # ``odoo`` command works
                 ("odoo", "--help"),
             )
@@ -134,29 +140,28 @@ class ScaffoldingLookupCase(unittest.TestCase):
         """Test the official scaffolding."""
         with tempfile.TemporaryDirectory() as tmpdirname:
             # Clone main scaffolding
-            clone = Popen(
+            self.popen(
                 ("git", "clone", "-b", "scaffolding", "--depth", "1",
                  "https://github.com/Tecnativa/docker-odoo-base.git"),
                 cwd=tmpdirname,
             )
-            self.assertFalse(clone.wait())
             # Create inverseproxy_shared network
-            net = Popen(
+            self.popen(
                 ("docker", "network", "create", "inverseproxy_shared")
             )
-            self.assertFalse(net.wait())
             tmpdirname = join(tmpdirname, "docker-odoo-base")
             # Special env keys for setup-devel
             pwdata = getpwnam(environ["USER"])
             setup_env = {
                 "COMPOSE_FILE": "setup-devel.yaml",
+                # Avoid unlink permission errors
                 "UID": pwdata.pw_uid,
                 "GID": pwdata.pw_gid,
             }
             # TODO Test all supported versions
             for sub_env in matrix(odoo={"10.0"}):
                 # Setup the devel environment
-                self.compose_test(tmpdirname, sub_env + setup_env, ())
+                self.compose_test(tmpdirname, dict(sub_env, **setup_env), ())
                 # Test all 3 official environments
                 for dcfile in ("devel", "test", "prod"):
                     sub_env["COMPOSE_FILE"] = f"{dcfile}.yaml"
