@@ -10,6 +10,7 @@ from glob import iglob
 from itertools import product, starmap
 from os import environ
 from os.path import basename, dirname, join
+from pwd import getpwnam
 from subprocess import Popen
 
 # Common test utilities
@@ -100,7 +101,7 @@ class ScaffoldingLookupCase(unittest.TestCase):
             ("unittest", "base"),
         )
         for sub_env in matrix():
-            if sub_env["ODOO_VERSION"] == "8.0":
+            if sub_env["ODOO_MINOR"] == "8.0":
                 commads = (
                     # Odoo 8.0 does not autocreate the database
                     ("psql", "-d", "postgres", "-c", "create database prod"),
@@ -145,17 +146,17 @@ class ScaffoldingLookupCase(unittest.TestCase):
             )
             self.assertFalse(net.wait())
             tmpdirname = join(tmpdirname, "docker-odoo-base")
-            setup = Popen(
-                ("docker-compose", "-f", "setup-devel.yaml",
-                 "run", "--rm", "odoo"),
-                cwd=tmpdirname,
-            )
-            self.assertFalse(setup.wait())
+            # Special env keys for setup-devel
+            pwdata = getpwnam(environ["USER"])
+            setup_env = {
+                "COMPOSE_FILE": "setup-devel.yaml",
+                "UID": pwdata.pw_uid,
+                "GID": pwdata.pw_gid,
+            }
             # TODO Test all supported versions
             for sub_env in matrix(odoo={"10.0"}):
                 # Setup the devel environment
-                sub_env["COMPOSE_FILE"] = "setup-devel.yaml"
-                self.compose_test(tmpdirname, sub_env, ())
+                self.compose_test(tmpdirname, sub_env + setup_env, ())
                 # Test all 3 official environments
                 for dcfile in ("devel", "test", "prod"):
                     sub_env["COMPOSE_FILE"] = f"{dcfile}.yaml"

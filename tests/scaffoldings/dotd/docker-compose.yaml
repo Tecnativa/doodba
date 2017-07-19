@@ -3,7 +3,7 @@ services:
     odoo:
         build:
             context: ./
-            dockerfile: ../${ODOO_MINOR}.Dockerfile
+            dockerfile: ${ODOO_MINOR}.Dockerfile
         tty: true
         depends_on:
             - db
