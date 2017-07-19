@@ -37,7 +37,7 @@ ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && ln -s /opt/odoo/custom/ssh ~root/.ssh \
-            && (chmod -R u=rwX,go= /opt/odoo/custom/ssh || true)
+            && chmod -R u=rwX,go= /opt/odoo/custom/ssh
 ONBUILD RUN ["/opt/odoo/common/build.sh"]
 ONBUILD USER odoo
 
