@@ -16,6 +16,8 @@ env:
     - IMAGE_NAME=$DOCKER_REPO:$DOCKER_TAG
 
 before_install:
+  - docker version
+  - docker info
   - ./hooks/build
 
 install:
