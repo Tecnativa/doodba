@@ -17,6 +17,8 @@
 [![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:10.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:10.0 "Get your own image badge on microbadger.com")
 [![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:10.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:10.0 "Get your own commit badge on microbadger.com")
 
+[![](https://api.travis-ci.org/Tecnativa/docker-odoo-base.svg)](https://travis-ci.org/Tecnativa/docker-odoo-base)
+
 Highly opinionated image ready to put [Odoo](https://www.odoo.com) inside it,
 but **without Odoo**.
 
@@ -850,6 +852,18 @@ This is the deprecated file path for the PIP requirements. Use
 
 Just [head to our project](https://github.com/Tecnativa/docker-odoo-base) and
 open an issue or pull request.
+
+If you plan to open a pull request, remember that you will usually have to open
+two of them:
+
+1. Targeting the `master` branch, from which the main images are built.
+   This pull request must include tests.
+2. Targeting the `scaffolding` branch, which serves as the base for projects
+   using this base image. This one is not always required.
+
+If you need to add a feature or fix for `scaffolding`, before merging that PR,
+we need tests that ensure that backwards compatibility with previous
+scaffolding versions is preserved.
 
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
 [`addons.yaml`]: #optodoocustomsrcaddonstxt
