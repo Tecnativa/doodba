@@ -752,6 +752,24 @@ To **add** the `www.` prefix, it is almost the same; use your imagination
 
 In `.env`, set `DOMAIN_PROD` to `host1.com,host2.com,www.host1.com`, etc.
 
+### When I try to `export UID="$(id -u $USER)"` bash says it is readonly
+
+I guess you were trying to follow the instructions to run the
+`setup-devel.yaml` environment and you use Bash as your shell.
+
+In such case, just do `export UID`, which just exports the
+already-existing-but-hidden-and-readonly bash `$UID` variable.
+
+Or you could switch to a better shell, such as [Fish][]. If you choose this
+option, you can export them for current terminal session with:
+
+    set -x UID (id -u $USER)
+    set -x GID (id -g $USER)
+    set -x UMASK (umask)
+
+You can make those variables universal (available in all terminals you open
+from now on) by using `set -Ux` instead of `set -x`.
+
 ### When I boot `devel.yaml` for the first time, Odoo crashes
 
 Most likely you are using versions `8.0` or `9.0` of the image. If so:
@@ -876,6 +894,7 @@ scaffolding versions is preserved.
 [`repos.yaml`]: #optodoocustomsrcreposyaml
 [builds]: https://hub.docker.com/r/tecnativa/odoo-base/builds/
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
+[Fish]: http://fishshell.com/
 [Let's Encrypt]: https://letsencrypt.org/
 [OCA]: https://odoo-community.org/
 [OCB]: https://github.com/OCA/OCB
