@@ -96,6 +96,8 @@ class ScaffoldingLookupCase(unittest.TestCase):
         commands = (
             # Must generate a configuration file
             ("test", "-f", "/opt/odoo/auto/odoo.conf"),
+            ("test", "-d", "/opt/odoo/custom/src/private"),
+            ("test", "-d", "/opt/odoo/custom/ssh"),
             # Must be able to install base addons
             ODOO_PREFIX + ("--init", "base"),
         )
