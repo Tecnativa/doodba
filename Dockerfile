@@ -127,9 +127,9 @@ RUN chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
-ARG ODOO_SOURCE=OCA/OCB
-ARG ODOO_VERSION=10.0
-ENV ODOO_VERSION="$ODOO_VERSION"
+ONBUILD ARG ODOO_SOURCE=OCA/OCB
+ONBUILD ARG ODOO_VERSION=10.0
+ONBUILD ENV ODOO_VERSION="$ODOO_VERSION"
 RUN install.sh
 
 # Metadata
