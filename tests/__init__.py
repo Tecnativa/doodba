@@ -3,6 +3,7 @@
 
 Each test must be a valid docker-compose.yaml file with a ``odoo`` service.
 """
+import logging
 import tempfile
 import unittest
 
@@ -13,10 +14,12 @@ from os.path import basename, dirname, join
 from pwd import getpwnam
 from subprocess import PIPE, Popen
 
+logging.basicConfig(level=logging.DEBUG)
+
 # Common test utilities
 DIR = dirname(__file__)
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
-ODOO_PREFIX = ("odoo", "--stop-after-init")
+ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 
 # Variable matrix
 ODOO_VERSIONS = frozenset((
@@ -46,9 +49,10 @@ def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
     )
 
 
-class ScaffoldingLookupCase(unittest.TestCase):
+class ScaffoldingCase(unittest.TestCase):
     def popen(self, *args, **kwargs):
         """Shortcut to open a subprocess and ensure it works."""
+        logging.info("Subtest execution: %s", self._subtest)
         self.assertFalse(Popen(*args, **kwargs).wait())
 
     def compose_test(self, workdir, sub_env, *commands):
@@ -98,18 +102,13 @@ class ScaffoldingLookupCase(unittest.TestCase):
             ("test", "-f", "/opt/odoo/auto/odoo.conf"),
             ("test", "-d", "/opt/odoo/custom/src/private"),
             ("test", "-d", "/opt/odoo/custom/ssh"),
-            # Must be able to install base addons
+            # Must be able to install and pass tests of base addon
             ODOO_PREFIX + ("--init", "base"),
+            ("unittest", "base"),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
-        # TODO Unit testing ``base`` should work in 8.0 too
         for sub_env in matrix(odoo_skip={"8.0"}):
-            self.compose_test(
-                smallest_dir, sub_env,
-                *commands,
-                # Must be able to test successfully base addons
-                ("unittest", "base"),
-            )
+            self.compose_test(smallest_dir, sub_env, *commands)
         for sub_env in matrix(odoo={"8.0"}):
             self.compose_test(
                 smallest_dir, sub_env,
@@ -139,11 +138,14 @@ class ScaffoldingLookupCase(unittest.TestCase):
                 ("cython", "--version"),
                 # ``dummy_addon`` and ``private_addon`` exist
                 ("test", "-d", "auto/addons/dummy_addon"),
-                ("test", "!", "-d", "custom/src/private/dummy_addon"),
+                ("test", "-h", "auto/addons/dummy_addon"),
+                ("test", "-f", "auto/addons/dummy_addon/__init__.py"),
+                ("test", "!", "-e", "custom/src/private/dummy_addon"),
                 ("test", "-d", "custom/src/private/private_addon"),
-                ("test", "!", "-d", "auto/addons/private_addon"),
+                ("test", "-f", "custom/src/private/private_addon/__init__.py"),
+                ("test", "!", "-e", "auto/addons/private_addon"),
                 # ``odoo`` command works
-                ("odoo", "--help"),
+                ("odoo", "--version"),
             )
 
     def test_main_scaffolding(self):
@@ -178,7 +180,7 @@ class ScaffoldingLookupCase(unittest.TestCase):
                     self.compose_test(
                         tmpdirname, sub_env,
                         # ``odoo`` command works
-                        ("odoo", "--help"),
+                        ("odoo", "--version"),
                     )
 
 

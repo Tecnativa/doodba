@@ -1,21 +1,29 @@
 version: "2.1"
 services:
-    odoo:
-        build:
-            context: ./
-            dockerfile: ${ODOO_MINOR}.Dockerfile
-            args:
-              CONFIG_BUILD: 'false'
-        tty: true
-        environment:
-          PGUSER: another_odoo
-          PGPASSWORD: anotherodoopassword
-          PGHOST: postgresql
-        depends_on:
-            - postgresql
+  odoo:
+    build:
+      context: ./
+      dockerfile: ${ODOO_MINOR}.Dockerfile
+      args:
+        CONFIG_BUILD: 'false'
+    tty: true
+    environment:
+      PGUSER: another_odoo
+      PGPASSWORD: anotherodoopassword
+      PGHOST: postgresql
+    depends_on:
+      - postgresql
+    volumes:
+      - filestore:/var/lib/odoo:z
 
-    postgresql:
-        image: postgres:${DB_VERSION}-alpine
-        environment:
-            POSTGRES_USER: another_odoo
-            POSTGRES_PASSWORD: anotherodoopassword
+  postgresql:
+    image: postgres:${DB_VERSION}-alpine
+    environment:
+      POSTGRES_USER: another_odoo
+      POSTGRES_PASSWORD: anotherodoopassword
+    volumes:
+      - db:/var/lib/postgresql/data:z
+
+volumes:
+  db:
+  filestore:

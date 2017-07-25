@@ -8,6 +8,13 @@ python:
 services:
   - docker
 
+git:
+  depth: 1
+
+branches:
+  only:
+    - master
+
 env:
   global:
     # Variables found by default in Docker Hub builder
@@ -16,8 +23,6 @@ env:
     - IMAGE_NAME=$DOCKER_REPO:$DOCKER_TAG
 
 before_install:
-  - docker version
-  - docker info
   - ./hooks/build
 
 install:
