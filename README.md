@@ -95,7 +95,10 @@ running the command you ask.
 
 #### `/opt/odoo/custom/build.d`
 
-Executables here will run just before those in `/opt/odoo/common/build.d`.
+Executables here will be aggregated with those in `/opt/odoo/common/build.d`.
+
+The resulting set of executables will then be sorted alphabetically (ascending)
+and then subsequently run.
 
 #### `/opt/odoo/custom/conf.d`
 
@@ -798,10 +801,6 @@ Most likely you are using versions `8.0` or `9.0` of the image. If so:
 3. Change it for a command that actually works with your version:
    - `odoo --workers 0` for Odoo 8.0.
    - `odoo --workers 0 --dev` for Odoo 9.0.
-
-### Why my `99-whatever.sh` script in `/opt/odoo/*/*.d/` does not execute?
-
-Files must be executable and have no `.` in their name.
 
 ### This project is too opinionated, but can I question any of those opinions?
 
