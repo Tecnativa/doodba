@@ -64,8 +64,8 @@ class AptInstaller(Installer):
     ]
     _install_command = [
         'apt-get',
-        '-o', 'Dpkg::Options::="--force-confdef"',
-        '-o', 'Dpkg::Options::="--force-confold"',
+        '-o', 'Dpkg::Options::=--force-confdef',
+        '-o', 'Dpkg::Options::=--force-confold',
         '-y', '--no-install-recommends', 'install',
     ]
     _remove_command = ["apt-get", "purge", "-y"]

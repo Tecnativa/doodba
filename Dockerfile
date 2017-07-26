@@ -82,6 +82,9 @@ RUN apt-get update \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
     && rm -Rf /var/lib/apt/lists/*
 
+# Make node find --global addons
+ENV NODE_PATH=/usr/local/lib/node_modules
+
 # Special case to get latest PostgreSQL client
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
