@@ -9,7 +9,7 @@ VOLUME ["/var/lib/odoo"]
 EXPOSE 8069 8072
 
 # Subimage triggers
-ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint.sh"]
+ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint"]
 ONBUILD CMD ["/usr/local/bin/odoo"]
 ONBUILD ARG AGGREGATE=true
 ONBUILD ARG DEPTH_DEFAULT=1
@@ -45,7 +45,7 @@ ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && ln -s /opt/odoo/custom/ssh ~root/.ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh
-ONBUILD RUN ["/opt/odoo/common/build.sh"]
+ONBUILD RUN ["/opt/odoo/common/build"]
 ONBUILD USER odoo
 
 ARG PYTHONOPTIMIZE=2
@@ -129,8 +129,8 @@ COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
 RUN mkdir -p auto/addons custom/src/private \
-    && ln /usr/local/bin/direxec.sh common/entrypoint.sh \
-    && ln /usr/local/bin/direxec.sh common/build.sh \
+    && ln /usr/local/bin/direxec common/entrypoint \
+    && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
     && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/odoobaselib
 

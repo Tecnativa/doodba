@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+
+import os
+import subprocess
+import sys
+
+mode = os.path.basename(__file__)
+
+dir_odoo = '/opt/odoo'
+dir_common = os.path.join(dir_odoo, 'common', '%s.d' % mode)
+dir_custom = os.path.join(dir_odoo, 'custom', '%s.d' % mode)
+
+files = [
+    os.path.join(dir_common, d) for d in os.listdir(dir_common)
+]
+
+try:
+    files += [
+        os.path.join(dir_custom, d) for d in os.listdir(dir_custom)
+    ]
+except OSError:
+    pass
+
+for command in sorted(files):
+    if os.access(command, os.X_OK):
+        subprocess.check_call(command)
+
+extra_command = sys.argv[1:]
+
+if extra_command:
+    if extra_command[0] == 'shell' or extra_command[0].startswith("-"):
+        extra_command.insert(0, "odoo")
+    os.execvp(extra_command[0], extra_command)
