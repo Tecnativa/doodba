@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
-import subprocess
 
 import yaml
 
@@ -47,18 +46,3 @@ def addons_config():
     except IOError:
         logging.debug('Could not find addons configuration yml.')
     return config
-
-
-def do_command(command, split=True, shell=False):
-    if split:
-        command = command.split()
-    logging.debug('Running Command: %s', command)
-    if shell:
-        proc = subprocess.Popen(
-            ' '.join(command),
-            env=os.environ,
-            shell=True,
-        )
-    else:
-        proc = subprocess.Popen(command, env=os.environ)
-    proc.communicate()
