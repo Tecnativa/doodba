@@ -174,6 +174,8 @@ class ScaffoldingCase(unittest.TestCase):
         for sub_env in matrix():
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "dotd"), sub_env,
+                # Odoo 8.0 does not autocreate the database
+                ("psql", "-d", "postgres", "-c", "create database prod"),
                 # ``custom/build.d`` was properly executed
                 ("test", "-f", "/home/odoo/created-at-build"),
                 # ``custom/entrypoint.d`` was properly executed
@@ -209,6 +211,9 @@ class ScaffoldingCase(unittest.TestCase):
                 ("odoo", "--version"),
                 # Implicit ``odoo`` command also works
                 ("--version",),
+                # Environment vars were converted to config
+                ("bash", "-c",
+                 "odoo --stop-after-init && custom/extras/goodconf.py"),
             )
 
     @unittest.skipUnless(
