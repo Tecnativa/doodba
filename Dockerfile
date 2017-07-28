@@ -16,7 +16,7 @@ ONBUILD ARG DEPTH_DEFAULT=1
 ONBUILD ARG DEPTH_MERGE=100
 ONBUILD ARG CLEAN=true
 ONBUILD ARG COMPILE=true
-ONBUILD ARG CONFIG_BUILD=false
+ONBUILD ARG CONFIG_BUILD=true
 ONBUILD ARG PIP_INSTALL_ODOO=true
 ONBUILD ARG ADMIN_PASSWORD=admin
 ONBUILD ARG SMTP_SERVER=smtp
@@ -115,15 +115,15 @@ WORKDIR /opt/odoo
 RUN pip install --no-cache-dir \
     astor git-aggregator openupgradelib ptvsd==3.0.0 pudb wdb
 COPY bin/* /usr/local/bin/
-COPY bin/direxec.sh common/entrypoint.sh
-RUN ln common/entrypoint.sh common/build.sh
+RUN ln /usr/local/bin/direxec.sh common/build.sh
 COPY lib/odoobaselib /usr/local/lib/python2.7/dist-packages/odoobaselib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
 RUN mkdir -p auto/addons custom/src/private
 RUN chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/odoobaselib
+    && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/odoobaselib \
+    && ln /usr/local/bin/direxec.sh common/entrypoint.sh
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time

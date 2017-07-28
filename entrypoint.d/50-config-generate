@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "${CONFIG_BUILD}" = true ]; then
-    log WARNING Skipping Odoo config generation - performed at build time.
+if [ -f  "${OPENERP_SERVER}" ]; then
+    log INFO File $OPENERP_SERVER exists, skipping config generation
     exit 0
 fi
 
