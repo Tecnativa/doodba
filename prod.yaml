@@ -13,6 +13,9 @@ services:
             - db
             - smtp
             - inbox
+        command:
+            - odoo
+            - --workers=2
         networks:
             default:
             inverseproxy_shared:
