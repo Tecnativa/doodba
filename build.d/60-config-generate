@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "${CONFIG_BUILD}" != true ]; then
+if [ "${CONFIG_BUILD}" != "true" ]; then
     log WARNING Skipping Odoo config generation - will perform during entrypoint.
     exit 0
 fi
