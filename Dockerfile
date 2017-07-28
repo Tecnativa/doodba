@@ -28,10 +28,16 @@ ONBUILD ARG PGUSER=odoo
 ONBUILD ARG PGPASSWORD=odoopassword
 ONBUILD ARG PGHOST=db
 ONBUILD ARG PGDATABASE=prod
-ONBUILD ENV PGUSER="$PGUSER" \
+# Config variables
+ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
+            UNACCENT="$UNACCENT" \
+            PGUSER="$PGUSER" \
             PGPASSWORD="$PGPASSWORD" \
             PGHOST="$PGHOST" \
-            PGDATABASE="$PGDATABASE"
+            PGDATABASE="$PGDATABASE" \
+            PROXY_MODE="$PROXY_MODE" \
+            SMTP_SERVER="$SMTP_SERVER" \
+            WITHOUT_DEMO="$WITHOUT_DEMO"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 # https://docs.python.org/2.7/library/logging.html#levels
