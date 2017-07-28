@@ -1,0 +1,4 @@
+# This installs gcc among other things
+build-essential
+# This is the basic need to build any python extensions, used here for Cython
+python-dev
