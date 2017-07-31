@@ -4,12 +4,18 @@ services:
         build:
             context: ./
             dockerfile: ${ODOO_MINOR}.Dockerfile
+            args:
+              CONFIG_BUILD: 'false'
         tty: true
+        environment:
+          PGUSER: another_odoo
+          PGPASSWORD: anotherodoopassword
+          PGHOST: postgresql
         depends_on:
-            - db
+            - postgresql
 
-    db:
+    postgresql:
         image: postgres:${DB_VERSION}-alpine
         environment:
-            POSTGRES_USER: odoo
-            POSTGRES_PASSWORD: odoopassword
+            POSTGRES_USER: another_odoo
+            POSTGRES_PASSWORD: anotherodoopassword

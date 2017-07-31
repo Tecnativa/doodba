@@ -16,6 +16,7 @@ ONBUILD ARG DEPTH_DEFAULT=1
 ONBUILD ARG DEPTH_MERGE=100
 ONBUILD ARG CLEAN=true
 ONBUILD ARG COMPILE=true
+ONBUILD ARG CONFIG_BUILD=true
 ONBUILD ARG PIP_INSTALL_ODOO=true
 ONBUILD ARG ADMIN_PASSWORD=admin
 ONBUILD ARG SMTP_SERVER=smtp
@@ -27,10 +28,16 @@ ONBUILD ARG PGUSER=odoo
 ONBUILD ARG PGPASSWORD=odoopassword
 ONBUILD ARG PGHOST=db
 ONBUILD ARG PGDATABASE=prod
-ONBUILD ENV PGUSER="$PGUSER" \
+# Config variables
+ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
+            UNACCENT="$UNACCENT" \
+            PGUSER="$PGUSER" \
             PGPASSWORD="$PGPASSWORD" \
             PGHOST="$PGHOST" \
-            PGDATABASE="$PGDATABASE"
+            PGDATABASE="$PGDATABASE" \
+            PROXY_MODE="$PROXY_MODE" \
+            SMTP_SERVER="$SMTP_SERVER" \
+            WITHOUT_DEMO="$WITHOUT_DEMO"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 # https://docs.python.org/2.7/library/logging.html#levels
@@ -116,15 +123,15 @@ RUN curl -SLo wkhtmltox.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releas
 WORKDIR /opt/odoo
 RUN pip install --no-cache-dir \
     astor git-aggregator openupgradelib ptvsd==3.0.0 pudb wdb
-COPY bin/autoaggregate bin/install.sh bin/log bin/pot bin/python-odoo-shell bin/unittest /usr/local/bin/
-COPY bin/direxec.sh common/entrypoint.sh
-RUN ln common/entrypoint.sh common/build.sh
+COPY bin/* /usr/local/bin/
 COPY lib/odoobaselib /usr/local/lib/python2.7/dist-packages/odoobaselib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
-RUN mkdir -p auto/addons custom/src/private
-RUN chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
+RUN mkdir -p auto/addons custom/src/private \
+    && ln /usr/local/bin/direxec.sh common/entrypoint.sh \
+    && ln /usr/local/bin/direxec.sh common/build.sh \
+    && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
     && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/odoobaselib
 
 # Execute installation script by Odoo version
