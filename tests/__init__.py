@@ -105,6 +105,8 @@ class ScaffoldingCase(unittest.TestCase):
             # Must be able to install and pass tests of base addon
             ODOO_PREFIX + ("--init", "base"),
             ("unittest", "base"),
+            # Auto updater must work
+            ("autoupdate",),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix(odoo_skip={"8.0"}):

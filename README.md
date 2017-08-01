@@ -704,6 +704,25 @@ Only Odoo's:
 
     docker-compose run --rm odoo odoo -u addon1,addon2 --stop-after-init
 
+##### Update changed addons only
+
+Add `module_auto_update` from https://github.com/OCA/server-tools to your
+installation following the standard methods of `repos.yaml` + `addons.yaml`.
+
+Now we will install the addon:
+
+    docker-compose up -d
+    docker-compose run --rm odoo --stop-after-init -u base
+    docker-compose run --rm odoo --stop-after-init -i module_auto_update
+    docker-compose restart odoo
+
+It will automatically update addons that got updated every night.
+To force that automatic update now in a separate container:
+
+    docker-compose up -d
+    docker-compose run --rm odoo autoupdate
+    docker-compose restart odoo
+
 ##### Export some addon's translations to stdout
 
     docker-compose run --rm odoo pot addon1[,addon2]
