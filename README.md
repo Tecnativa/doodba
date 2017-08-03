@@ -261,15 +261,8 @@ package managers:
 - `gem.txt`: run-time dependencies installed by gem.
 - `npm.txt`: run-time dependencies installed by npm.
 - `pip.txt`: a normal [pip `requirements.txt`][] file, for run-time
-  dependencies too.
-
-All of these files will install separately each line. See this example
-`apt_build.txt` to get the point.
-
-    # First it will install this
-    build-essential
-    # Then it will install these two at the same time
-    python-dev ruby-dev
+  dependencies too. It will get executed with `--update` flag, just in case
+  you want to overwrite any of the pre-bundled dependencies.
 
 ### `/opt/odoo/common`: The useful one
 

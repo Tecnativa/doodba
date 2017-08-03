@@ -1,2 +1,4 @@
 # Compiled locally, which would fail if `apt_build.txt` fails
 Cython --no-binary :all:
+# Odoo pins docutils==0.12, so let's check it gets upgraded
+docutils==0.14
