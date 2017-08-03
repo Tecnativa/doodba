@@ -102,9 +102,9 @@ class ScaffoldingCase(unittest.TestCase):
             ("test", "-f", "/opt/odoo/auto/odoo.conf"),
             ("test", "-d", "/opt/odoo/custom/src/private"),
             ("test", "-d", "/opt/odoo/custom/ssh"),
-            # Must be able to install and pass tests of base addon
+            ("test", "-x", "/usr/local/bin/unittest"),
+            # Must be able to install base addon
             ODOO_PREFIX + ("--init", "base"),
-            ("unittest", "base"),
             # Auto updater must work
             ("autoupdate",),
         )
