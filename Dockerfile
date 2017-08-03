@@ -44,7 +44,8 @@ ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && ln -s /opt/odoo/custom/ssh ~root/.ssh \
-            && chmod -R u=rwX,go= /opt/odoo/custom/ssh
+            && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
+            && sync
 ONBUILD RUN ["/opt/odoo/common/build"]
 ONBUILD USER odoo
 
@@ -132,7 +133,8 @@ RUN mkdir -p auto/addons custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/odoobaselib
+    && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/odoobaselib \
+    && sync
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
