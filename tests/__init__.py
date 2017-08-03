@@ -148,6 +148,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 # ``odoo`` command works
                 ("odoo", "--version"),
+                # Implicit ``odoo`` command also works
+                ("--version",),
             )
 
     def test_main_scaffolding(self):
