@@ -1,3 +1,4 @@
+checksumdir
 unicodecsv
 unidecode
 requests
