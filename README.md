@@ -737,6 +737,15 @@ Then open `http://localhost:$SomeFreePort`.
 
 ## FAQ
 
+### Will there be not retrocompatible changes on the image?
+
+This image is production-ready, but it is constantly evolving too, so some new
+features can break some old ones, or conflict with them, and some old features
+might get deprecated and removed at some point.
+
+The best you can do is to [subscribe to the compatibility breakage
+announcements issue][retrobreak].
+
 ### I need to force addition or removal of `www.` prefix in production
 
 [We hope that some day Traefik supports that feature][www-force], but in the
@@ -913,6 +922,7 @@ scaffolding versions is preserved.
 [OpenUpgrade]: https://github.com/OCA/OpenUpgrade/
 [Original Odoo]: https://github.com/odoo/odoo
 [pip `requirements.txt`]: https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
+[retrobreak]: https://github.com/Tecnativa/docker-odoo-base/issues/67
 [scaffolding]: #scaffolding
 [several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
 [ssh-conf]: https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client
