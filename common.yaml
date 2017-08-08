@@ -58,25 +58,18 @@ services:
             TALK: "$INBOX_REAL_TALK"
 
     backup:
-        image: tecnativa/server-backup
+        image: tecnativa/duplicity:postgres-s3
+        hostname: backup
+        domainname: "$DOMAIN_PROD"
         environment:
-            MAIL_RELAY_HOST: smtp
-            ROOT_EMAIL_FROM: "$BACKUP_ROOT_EMAIL_FROM"
-            ROOT_EMAIL_TO: "$BACKUP_ROOT_EMAIL_TO"
-            BACKUP_S3_ACCESS_KEY: "$BACKUP_S3_ACCESS_KEY"
-            BACKUP_S3_SECRET_KEY: "$BACKUP_S3_SECRET_KEY"
-            BACKUP_S3_BUCKET: "$BACKUP_S3_BUCKET"
-            BACKUP_S3_INSTANCE: "$BACKUP_S3_INSTANCE"
-            BACKUP_SEND_MAIL_ERR: "$BACKUP_SEND_MAIL_ERR"
-            BACKUP_SEND_MAIL_LOG: "$BACKUP_SEND_MAIL_LOG"
-            BACKUP_EMAIL_SUBJECT: "$BACKUP_EMAIL_SUBJECT"
-            BACKUP_EMAIL_FROM: "$BACKUP_EMAIL_FROM"
-            BACKUP_EMAIL_TO: "$BACKUP_EMAIL_TO"
-            BACKUP_ENCRYPT: "$BACKUP_ENCRYPT"
-            BACKUP_ENCRYPT_KEY: "$BACKUP_ENCRYPT_KEY"
-            BACKUP_SOURCES: /var/lib/odoo,0,1
-            PG_HOST: db
-            PG_USER: "$DB_USER"
-            PG_PASS: "$DB_PASSWORD"
+            AWS_ACCESS_KEY_ID: "$BACKUP_S3_ACCESS_KEY"
+            AWS_SECRET_ACCESS_KEY: "$BACKUP_S3_SECRET_KEY"
+            DST: "s3://s3.amazonaws.com/$BACKUP_S3_BUCKET"
+            EMAIL_FROM: "$BACKUP_EMAIL_FROM"
+            EMAIL_TO: "$BACKUP_EMAIL_TO"
+            PASSPHRASE: "$BACKUP_ENCRYPT_KEY"
+            PGDATABASE: prod
+            PGPASSWORD: "$DB_PASSWORD"
+            PGUSER: "$DB_USER"
         volumes:
-            - filestore$ODOO_MAJOR:/var/lib/odoo:z
+            - filestore$ODOO_MAJOR:/mnt/backup/src/odoo:z
