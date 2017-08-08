@@ -4,8 +4,13 @@ services:
         build:
             context: ./odoo
             args:
-                PGUSER: "$DB_USER"
-                PGPASSWORD: "$DB_PASSWORD"
+                CONFIG_BUILD: "false"
+        environment:
+            ADMIN_PASSWORD: "$ODOO_ADMIN_PASSWORD"
+            PGPASSWORD: "$DB_PASSWORD"
+            PGUSER: "$DB_USER"
+            PROXY_MODE: "$ODOO_PROXY_MODE"
+            PYTHONOPTIMIZE: 2
         tty: true
         volumes:
             - filestore$ODOO_MAJOR:/var/lib/odoo:z

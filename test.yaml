@@ -4,13 +4,10 @@ services:
         extends:
             file: common.yaml
             service: odoo
-        build:
-            args:
-                ADMIN_PASSWORD: "$ODOO_ADMIN_PASSWORD"
-                PGDATABASE: test
-                PROXY_MODE: "$ODOO_PROXY_MODE"
-                # You may want demo data for testing
-                WITHOUT_DEMO: "false"
+        environment:
+            PGDATABASE: test
+            # You may want demo data for testing
+            WITHOUT_DEMO: "false"
         depends_on:
             - db
             - smtp
