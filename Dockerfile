@@ -4,7 +4,8 @@ MAINTAINER Tecnativa <info@tecnativa.com>
 # Enable Odoo user and filestore
 RUN useradd -md /home/odoo -s /bin/false odoo \
     && mkdir -p /var/lib/odoo \
-    && chown -R odoo:odoo /var/lib/odoo
+    && chown -R odoo:odoo /var/lib/odoo \
+    && sync
 VOLUME ["/var/lib/odoo"]
 EXPOSE 8069 8072
 
