@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-export PYTHONOPTIMIZE=0  # You'll want to `assert` in your scripts
+export PYTHONOPTIMIZE=""  # You'll want to `assert` in your scripts
 exec odoo shell < "$1"
