@@ -26,10 +26,12 @@ class Installer(object):
     def install(self):
         """Install the requirements from the given file."""
         if self._requirements:
-            self._run_command(self._install_command + self._requirements)
+            return not self._run_command(
+                self._install_command + self._requirements)
         else:
             logging.info("No installable requirements found in %s",
                          self.file_path)
+        return False
 
     def remove(self):
         """Uninstall the requirements from the given file."""
@@ -102,7 +104,7 @@ class PipInstaller(Installer):
 
     def requirements(self):
         """Pip will use its ``--requirements`` feature."""
-        return [self.file_path]
+        return [self.file_path] if exists(self.file_path) else []
 
 
 INSTALLERS = {
@@ -111,3 +113,8 @@ INSTALLERS = {
     "npm": NpmInstaller,
     "pip": PipInstaller,
 }
+
+
+def install(installer, file_path):
+    """Perform a given type of installation from a given file."""
+    return INSTALLERS[installer](file_path).install()
