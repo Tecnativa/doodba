@@ -881,6 +881,11 @@ Dockerfile similar to this one:
 FROM tecnativa/odoo-base@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c98d5d3817699e1
 ```
 
+### What is `/opt/odoo/custom/src/requirements.txt`?
+
+This is the deprecated file path for the PIP requirements. Use
+`/opt/odoo/custom/dependencies/pip.txt` instead.
+
 ### How can I help?
 
 Just [head to our project](https://github.com/Tecnativa/docker-odoo-base) and
