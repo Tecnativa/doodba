@@ -7,16 +7,18 @@ services:
             service: odoo
         build:
             args:
-                PGDATABASE: devel
                 # To aggregate in development, use `setup-devel.yaml`
                 AGGREGATE: "false"
                 # No need for this in development
-                PYTHONOPTIMIZE: 0
                 PIP_INSTALL_ODOO: "false"
                 CLEAN: "false"
                 COMPILE: "false"
-                # You want demo data for development
-                WITHOUT_DEMO: "false"
+        environment:
+            ADMIN_PASSWORD: admin
+            PGDATABASE: devel
+            PYTHONOPTIMIZE: ""
+            # You want demo data for development
+            WITHOUT_DEMO: "false"
         ports:
             - "127.0.0.1:${ODOO_MAJOR}069:8069"
             - "127.0.0.1:${ODOO_MAJOR}072:8072"
