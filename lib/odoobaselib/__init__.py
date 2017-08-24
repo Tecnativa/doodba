@@ -10,7 +10,6 @@ SRC_DIR = os.path.join(CUSTOM_DIR, 'src')
 ADDONS_YAML = os.path.join(SRC_DIR, 'addons')
 ADDONS_DIR = "/opt/odoo/auto/addons"
 CLEAN = os.environ.get("CLEAN") == "true"
-AUTO_REQUIREMENTS = os.environ.get("AUTO_REQUIREMENTS") == "true"
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 FILE_APT_BUILD = os.path.join(
     CUSTOM_DIR, 'dependencies', 'apt_build.txt',
