@@ -1,2 +1,3 @@
 #!/usr/local/bin/python-odoo-shell
 env["base.module.upgrade"].upgrade_module()
+env.cr.commit()
