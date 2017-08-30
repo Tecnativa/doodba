@@ -34,8 +34,8 @@ services:
         command:
             - odoo
             - --workers=0
-            # XXX Odoo v8 has no `--dev` mode; Odoo v9 has no `all` parameter
-            - --dev=all
+            # XXX Odoo v8 has no `--dev` mode; Odoo v9 has no parameters
+            - --dev=reload,qweb,werkzeug,xml,wdb
 
     db:
         extends:
