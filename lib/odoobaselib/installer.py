@@ -78,7 +78,7 @@ class AptInstaller(Installer):
             super(AptInstaller, self).cleanup()
 
     def install(self):
-        if not self._dirty():
+        if not self._dirty() and self._requirements:
             self._run_command(['apt-get', 'update'])
         return super(AptInstaller, self).install()
 
