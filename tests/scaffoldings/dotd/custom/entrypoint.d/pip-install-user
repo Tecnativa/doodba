@@ -1,0 +1,8 @@
+#!/bin/bash
+set -ex
+
+# Check that --user installations work
+pip install --user pg_activity
+
+# Binary must be in $PATH
+pg_activity --version
