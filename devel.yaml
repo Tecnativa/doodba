@@ -58,6 +58,5 @@ services:
             - "127.0.0.1:1984:1984"
 
 volumes:
-    # XXX Odoo volume names must match $ODOO_MAJOR for quick branch switching
-    filestore10:
-    db10:
+    filestore:
+    db:
