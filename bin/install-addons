@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from odoobaselib import addons_active, do_command
+
+
+do_command(
+    'odoo --stop-after-init -i %s' % ','.join(addons_active())
+)

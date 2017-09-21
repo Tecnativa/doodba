@@ -54,6 +54,7 @@ ARG PYTHONOPTIMIZE=2
 ARG WKHTMLTOPDF_VERSION=0.12.4
 ARG WKHTMLTOPDF_CHECKSUM='049b2cdec9a8254f0ef8ac273afaf54f7e25459a273e27189591edc7d7cf29db'
 ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
+    WAIT_NOHOST='' \
     UNACCENT=true \
     # Git and git-aggregator
     GIT_AUTHOR_NAME=docker-odoo \
