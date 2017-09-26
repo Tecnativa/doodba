@@ -1,0 +1,25 @@
+version: "2.2"
+services:
+  odoo:
+    build:
+      context: ./
+      dockerfile: ${ODOO_MINOR}.Dockerfile
+    tty: true
+    depends_on:
+      - db
+    environment:
+      PGDATABASE: $DBNAME
+    volumes:
+      - filestore:/var/lib/odoo:z
+
+  db:
+    image: postgres:${DB_VERSION}-alpine
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoopassword
+    volumes:
+      - db:/var/lib/postgresql/data:z
+
+volumes:
+  db:
+  filestore:

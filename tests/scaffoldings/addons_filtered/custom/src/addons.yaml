@@ -1,0 +1,12 @@
+---
+# addons for all environments
+dummy_repo:
+  - addon_all
+
+---
+# addons only for test environments
+ONLY:
+  PGDATABASE:
+    - test
+dummy_repo:
+  - addon_test

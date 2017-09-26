@@ -95,6 +95,35 @@ class ScaffoldingCase(unittest.TestCase):
                     env=full_env,
                 )
 
+    def test_addons_filtered(self):
+        """Test addons filtering with ``ONLY`` keyword in ``addons.yaml``."""
+        project_dir = join(SCAFFOLDINGS_DIR, "addons_filtered")
+        commands_all = (
+            ("test", "-d", "auto/addons/addon_all"),
+            ("test", "-h", "auto/addons/addon_all"),
+        )
+        # In production we shouldn't have ``addon_test``
+        for sub_env in matrix(odoo_skip={"8.0"}):
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="prod"),
+                ("test", "!", "-e", "auto/addons/addon_test"),
+                ("bash", "-c",
+                 "addons-install -e | grep addon_all | grep -v addon_test"),
+                *commands_all
+            )
+        # ... unlike in test
+        for sub_env in matrix(odoo_skip={"8.0"}):
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="test"),
+                ("test", "-d", "auto/addons/addon_test"),
+                ("test", "-h", "auto/addons/addon_test"),
+                ("bash", "-c",
+                 "addons-install -e | grep addon_all | grep addon_test"),
+                *commands_all
+            )
+
     def test_smallest(self):
         """Tests for the smallest possible environment."""
         commands = (

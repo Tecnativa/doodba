@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+import os
+from argparse import ArgumentParser
+from subprocess import check_call
+from odoobaselib import addons_config, logging
+
+parser = ArgumentParser(description="Install all available addons")
+parser.add_argument(
+    "-p", "--private", action="store_true",
+    help="Install all private addons")
+parser.add_argument(
+    "-o", "--odoo", action="store_true",
+    help="Install all Odoo addons")
+parser.add_argument(
+    "-e", "--extra", action="store_true",
+    help="Install all extra addons")
+
+args = parser.parse_args()
+if not (args.private or args.odoo or args.extra):
+    parser.error("You have to choose an option at least")
+
+addons = set()
+if args.private:
+    base = "/opt/odoo/custom/src/private"
+    for addon in os.listdir(base):
+        if os.path.exists(os.path.join(base, addon, "__init__.py")):
+            addons.add(addon)
+if args.odoo:
+    base = "/opt/odoo/custom/src/odoo/addons"
+    addons |= set(os.listdir(base))
+if args.extra:
+    addons |= set(addons_config().values())
+
+addons = ",".join(addons)
+logging.info("Installing addons %s", addons)
+check_call(["odoo", "--stop-after-init", "--init", addons])

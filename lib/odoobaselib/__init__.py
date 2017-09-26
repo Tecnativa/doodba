@@ -40,6 +40,11 @@ def addons_config():
     try:
         with open(ADDONS_YAML) as addons_file:
             for doc in yaml.load_all(addons_file):
+                # Skip sections with ONLY and that don't match
+                for key, values in doc.get("ONLY", dict()).items():
+                    if os.environ.get(key) not in values:
+                        continue
+                # Flatten all sections in a single dict
                 for repo, addons in doc.items():
                     config.setdefault(repo, list())
                     config[repo] += addons
