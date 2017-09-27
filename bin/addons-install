@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 from argparse import ArgumentParser
+from itertools import chain
 from subprocess import check_call
 from odoobaselib import addons_config, logging
 
@@ -29,7 +30,7 @@ if args.odoo:
     base = "/opt/odoo/custom/src/odoo/addons"
     addons |= set(os.listdir(base))
 if args.extra:
-    addons |= set(addons_config().values())
+    addons |= set(chain.from_iterable(addons_config().values()))
 
 addons = ",".join(addons)
 logging.info("Installing addons %s", addons)
