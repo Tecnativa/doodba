@@ -53,40 +53,32 @@ ONBUILD USER odoo
 ARG PYTHONOPTIMIZE=2
 ARG WKHTMLTOPDF_VERSION=0.12.4
 ARG WKHTMLTOPDF_CHECKSUM='049b2cdec9a8254f0ef8ac273afaf54f7e25459a273e27189591edc7d7cf29db'
-ENV OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
-    UNACCENT=true \
-    # Git and git-aggregator
-    GIT_AUTHOR_NAME=docker-odoo \
-    EMAIL=https://hub.docker.com/r/tecnativa/odoo \
-    DEPTH_DEFAULT=1 \
+ENV DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
-    # Postgres
-    WAIT_DB=true \
-    # PuDB debugger
+    EMAIL=https://hub.docker.com/r/tecnativa/odoo \
+    GIT_AUTHOR_NAME=docker-odoo \
+    LC_ALL=C.UTF-8 \
+    OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
+    PATH="~/.local/bin:$PATH" \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
-    # WDB debugger
+    UNACCENT=true \
+    WAIT_DB=true \
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
-    WDB_WEB_SERVER=localhost \
-    # Other
-    LC_ALL=C.UTF-8 \
-    PATH="~/.local/bin:$PATH"
+    WDB_WEB_SERVER=localhost
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 RUN apt-get update \
     && apt-get -y upgrade \
     && apt-get install -y --no-install-recommends \
-        # Odoo direct dependencies
         python ruby-compass \
-        # Odoo indirect dependencies
         fontconfig libfreetype6 libxml2 libxslt1.1 libjpeg62-turbo zlib1g \
         libfreetype6 liblcms2-2 libopenjpeg5 libtiff5 tk tcl libpq5 \
         libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 \
         locales-all zlibc \
-        # This image's facilities
         bzip2 ca-certificates curl gettext-base git nano npm \
         openssh-client telnet xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \

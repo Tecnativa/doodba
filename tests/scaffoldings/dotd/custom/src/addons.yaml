@@ -1,2 +1,17 @@
 dummy_repo:
   - dummy_addon
+
+---
+ONLY:
+  PGDATABASE:
+    - limited_core
+odoo/addons:
+  - crm
+  - sale
+
+---
+ONLY:
+  PGDATABASE:
+    - limited_private
+    - limited_core
+private: []

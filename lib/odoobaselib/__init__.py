@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+from glob import iglob
 
 import yaml
 
@@ -14,6 +15,10 @@ LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
 FILE_APT_BUILD = os.path.join(
     CUSTOM_DIR, 'dependencies', 'apt_build.txt',
 )
+PRIVATE = "private"
+CORE = "odoo/addons"
+PRIVATE_DIR = os.path.join(SRC_DIR, PRIVATE)
+CORE_DIR = os.path.join(SRC_DIR, CORE)
 
 if os.path.isfile('%s.yaml' % ADDONS_YAML):
     ADDONS_YAML = '%s.yaml' % ADDONS_YAML
@@ -35,8 +40,10 @@ logging.root.setLevel(_log_level)
 
 
 def addons_config():
-    """Load configurations from ``ADDONS_YAML`` into a dict."""
+    """Yield addon name and path from ``ADDONS_YAML``."""
     config = dict()
+    private_done = False
+    core_done = False
     try:
         with open(ADDONS_YAML) as addons_file:
             for doc in yaml.load_all(addons_file):
@@ -46,8 +53,36 @@ def addons_config():
                         continue
                 # Flatten all sections in a single dict
                 for repo, addons in doc.items():
-                    config.setdefault(repo, list())
-                    config[repo] += addons
+                    if repo == PRIVATE:
+                        private_done = True
+                    elif repo == CORE:
+                        core_done = True
+                    for glob in addons:
+                        for addon in iglob(os.path.join(SRC_DIR, glob)):
+                            addon = os.path.basename(addon)
+                            config.setdefault(addon, set())
+                            config[addon].add(repo)
     except IOError:
         logging.debug('Could not find addons configuration yml.')
-    return config
+    # By default, all private and core addons are enabled
+    if not private_done:
+        config[PRIVATE] = set(map(
+            os.path.basename,
+            iglob(os.path.join(SRC_DIR, PRIVATE, "*")),
+        ))
+    if not core_done:
+        config[CORE] = set(map(
+            os.path.basename,
+            iglob(os.path.join(SRC_DIR, CORE, "*")),
+        ))
+    for addon, repos in config.items():
+        # Private addons are most important
+        if PRIVATE in repos:
+            yield addon, PRIVATE
+        # Odoo core addons are least important
+        elif repos == {CORE}:
+            yield addon, CORE
+        # Other addons fall in between
+        else:
+            repos.discard(CORE)
+            yield addon, repos.pop()

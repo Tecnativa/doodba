@@ -11,6 +11,7 @@ services:
       PGUSER: another_odoo
       PGPASSWORD: anotherodoopassword
       PGHOST: postgresql
+      PGDATABASE: ${DBNAME:-prod}
     depends_on:
       - postgresql
     volumes:

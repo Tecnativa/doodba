@@ -97,31 +97,37 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_addons_filtered(self):
         """Test addons filtering with ``ONLY`` keyword in ``addons.yaml``."""
-        project_dir = join(SCAFFOLDINGS_DIR, "addons_filtered")
-        commands_all = (
-            ("test", "-d", "auto/addons/addon_all"),
-            ("test", "-h", "auto/addons/addon_all"),
-        )
-        # In production we shouldn't have ``addon_test``
-        for sub_env in matrix(odoo_skip={"8.0"}):
+        project_dir = join(SCAFFOLDINGS_DIR, "dotd")
+        for sub_env in matrix():
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
-                ("test", "!", "-e", "auto/addons/addon_test"),
-                ("bash", "-c",
-                 "addons-install -e | grep addon_all | grep -v addon_test"),
-                *commands_all
+                ("test", "-e", "auto/addons/website"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("test", "-e", "auto/addons/private_addon"),
+                ("sh", "-c", 'test "$(addons-install -lp)" == private_addon'),
+                ("sh", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("sh", "-c", 'addons-install -lo | grep ,crm,'),
             )
-        # ... unlike in test
-        for sub_env in matrix(odoo_skip={"8.0"}):
             self.compose_test(
                 project_dir,
-                dict(sub_env, DBNAME="test"),
-                ("test", "-d", "auto/addons/addon_test"),
-                ("test", "-h", "auto/addons/addon_test"),
-                ("bash", "-c",
-                 "addons-install -e | grep addon_all | grep addon_test"),
-                *commands_all
+                dict(sub_env, DBNAME="limited_private"),
+                ("test", "-e", "auto/addons/website"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("test", "!", "-e", "auto/addons/private_addon"),
+                ("sh", "-c", 'test -z "$(addons-install -lp)"'),
+                ("sh", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("sh", "-c", 'addons-install -lo | grep ,crm,'),
+            )
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="limited_core"),
+                ("test", "!", "-e", "auto/addons/website"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("test", "!", "-e", "auto/addons/private_addon"),
+                ("sh", "-c", 'test -z "$(addons-install -lp)"'),
+                ("sh", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("sh", "-c", 'test "$(addons-install -lo)" == crm,sale'),
             )
 
     def test_smallest(self):

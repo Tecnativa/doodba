@@ -5,31 +5,28 @@ import os
 import shutil
 import sys
 
-import odoobaselib
+from odoobaselib import addons_config, CORE, CLEAN, SRC_DIR
 
-if not odoobaselib.CLEAN:
+if not CLEAN:
     logging.warning("Not cleaning garbage")
     sys.exit()
 
-config = odoobaselib.addons_config()
-for directory in os.listdir(odoobaselib.SRC_DIR):
+addons = set(addons_config())
+repos = {addon[1] for addon in addons}
+for directory in os.listdir(SRC_DIR):
     # Special directories must be preserved
-    if directory in {"private", "odoo"}:
-        continue
+    if directory == "odoo":
+        directory = CORE
 
     # Skip regular files
-    full = os.path.join(odoobaselib.SRC_DIR, directory)
+    full = os.path.join(SRC_DIR, directory)
     if not os.path.isdir(full):
         continue
 
     # Remove directories not listed in addons.yaml
-    if directory not in config:
+    if directory not in repos:
         logging.info("Removing directory %s", full)
         shutil.rmtree(full)
-        continue
-
-    # Skip wildcards
-    if '*' in config[directory]:
         continue
 
     # Traverse addons
@@ -39,6 +36,6 @@ for directory in os.listdir(odoobaselib.SRC_DIR):
         if not os.path.isdir(subfull):
             continue
         # Remove addon if not used
-        if subdirectory not in config[directory]:
+        if (subdirectory, directory) not in addons:
             logging.info("Removing subdirectory %s", subfull)
             shutil.rmtree(subfull)
