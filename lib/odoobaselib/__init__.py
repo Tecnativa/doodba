@@ -66,15 +66,15 @@ def addons_config():
         logging.debug('Could not find addons configuration yml.')
     # By default, all private and core addons are enabled
     if not private_done:
-        config[PRIVATE] = set(map(
-            os.path.basename,
-            iglob(os.path.join(SRC_DIR, PRIVATE, "*")),
-        ))
+        config.update({
+            os.path.basename(addon): PRIVATE
+            for addon in iglob(os.path.join(SRC_DIR, PRIVATE, "*"))
+        })
     if not core_done:
-        config[CORE] = set(map(
-            os.path.basename,
-            iglob(os.path.join(SRC_DIR, CORE, "*")),
-        ))
+        config.update({
+            os.path.basename(addon): CORE
+            for addon in iglob(os.path.join(SRC_DIR, CORE, "*"))
+        })
     for addon, repos in config.items():
         # Private addons are most important
         if PRIVATE in repos:
