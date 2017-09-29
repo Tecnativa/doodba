@@ -67,12 +67,12 @@ def addons_config():
     # By default, all private and core addons are enabled
     if not private_done:
         config.update({
-            os.path.basename(addon): PRIVATE
+            os.path.basename(addon): {PRIVATE}
             for addon in iglob(os.path.join(SRC_DIR, PRIVATE, "*"))
         })
     if not core_done:
         config.update({
-            os.path.basename(addon): CORE
+            os.path.basename(addon): {CORE}
             for addon in iglob(os.path.join(SRC_DIR, CORE, "*"))
         })
     for addon, repos in config.items():
