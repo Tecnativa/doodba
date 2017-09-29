@@ -107,7 +107,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/private_addon"),
                 ("sh", "-c", 'test "$(addons-install -lp)" == private_addon'),
                 ("sh", "-c", 'test "$(addons-install -le)" == dummy_addon'),
-                ("sh", "-c", 'addons-install -lo | grep ,crm,'),
+                ("sh", "-c", 'addons-install -lc | grep ,crm,'),
             )
             self.compose_test(
                 project_dir,
@@ -117,7 +117,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("sh", "-c", 'test -z "$(addons-install -lp)"'),
                 ("sh", "-c", 'test "$(addons-install -le)" == dummy_addon'),
-                ("sh", "-c", 'addons-install -lo | grep ,crm,'),
+                ("sh", "-c", 'addons-install -lc | grep ,crm,'),
             )
             self.compose_test(
                 project_dir,
@@ -127,7 +127,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("sh", "-c", 'test -z "$(addons-install -lp)"'),
                 ("sh", "-c", 'test "$(addons-install -le)" == dummy_addon'),
-                ("sh", "-c", 'test "$(addons-install -lo)" == crm,sale'),
+                ("sh", "-c", 'test "$(addons-install -lc)" == crm,sale'),
             )
 
     def test_smallest(self):

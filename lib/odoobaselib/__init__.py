@@ -58,7 +58,7 @@ def addons_config():
                     elif repo == CORE:
                         core_done = True
                     for glob in addons:
-                        for addon in iglob(os.path.join(SRC_DIR, glob)):
+                        for addon in iglob(os.path.join(SRC_DIR, repo, glob)):
                             addon = os.path.basename(addon)
                             config.setdefault(addon, set())
                             config[addon].add(repo)
