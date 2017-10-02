@@ -98,16 +98,16 @@ class ScaffoldingCase(unittest.TestCase):
     def test_addons_filtered(self):
         """Test addons filtering with ``ONLY`` keyword in ``addons.yaml``."""
         project_dir = join(SCAFFOLDINGS_DIR, "dotd")
-        for sub_env in matrix():
+        for sub_env in matrix(odoo={"10.0"}):
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
                 ("test", "-e", "auto/addons/website"),
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "-e", "auto/addons/private_addon"),
-                ("sh", "-c", 'test "$(addons-install -lp)" == private_addon'),
-                ("sh", "-c", 'test "$(addons-install -le)" == dummy_addon'),
-                ("sh", "-c", 'addons-install -lc | grep ,crm,'),
+                ("bash", "-c", 'test "$(addons-install -lp)" == private_addon'),
+                ("bash", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("bash", "-c", 'addons-install -lc | grep ,crm,'),
             )
             self.compose_test(
                 project_dir,
@@ -115,9 +115,9 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/website"),
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
-                ("sh", "-c", '[ -z "$(addons-install -lp)" ]'),
-                ("sh", "-c", '[ "$(addons-install -le)" == dummy_addon ]'),
-                ("sh", "-c", 'addons-install -lc | grep ,crm,'),
+                ("bash", "-c", 'test -z "$(addons-install -lp)"'),
+                ("bash", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("bash", "-c", 'addons-install -lc | grep ,crm,'),
             )
             self.compose_test(
                 project_dir,
@@ -125,9 +125,9 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-e", "auto/addons/website"),
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
-                ("sh", "-c", '[ -z "$(addons-install -lp)" ]'),
-                ("sh", "-c", '[ "$(addons-install -le)" == dummy_addon ]'),
-                ("sh", "-c", '[ "$(addons-install -lc)" == crm,sale ]'),
+                ("bash", "-c", 'test -z "$(addons-install -lp)"'),
+                ("bash", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("bash", "-c", 'test "$(addons-install -lc)" == crm,sale'),
             )
 
     def test_smallest(self):
