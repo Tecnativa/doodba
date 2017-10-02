@@ -23,10 +23,10 @@ env:
     - IMAGE_NAME=$DOCKER_REPO:$DOCKER_TAG
 
 before_install:
-  - ./hooks/build
+  - pip install -r requirements-ci.txt
 
 install:
-  - pip install -r requirements-ci.txt
+  - ./hooks/build
 
 script:
   - python -m unittest -v tests

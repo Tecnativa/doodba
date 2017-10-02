@@ -23,6 +23,7 @@ ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 
 # Variable matrix
 ODOO_VERSIONS = frozenset((
+    "11.0",
     "10.0",
     "9.0",
     "8.0",
