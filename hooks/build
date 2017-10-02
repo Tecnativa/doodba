@@ -1,22 +1,50 @@
-#!/bin/bash
-set -ex
+#!/usr/bin/env python
+from __future__ import print_function
+import json
+import logging
+import os
+from datetime import datetime
+from glob import iglob
 
-build () {
-    # See http://label-schema.org/rc1/#build-time-labels
-    time docker build \
-        --build-arg VCS_REF="$GIT_SHA1" \
-        --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
-        "$@" .
-}
+import docker
 
-# Build requested tag, probably "latest"
-build --tag "$IMAGE_NAME"
+CLIENT = docker.client.from_env()
+DEFAULT_VERSION = "11.0"
+DOCKER_REPO = os.environ.get("DOCKER_REPO", "tecnativa/odoo-base")
+GIT_SHA1 = os.environ.get("GIT_SHA1", "")
+ODOO_VERSIONS = frozenset(os.environ.get(
+    "ODOO_VERSIONS", "8.0 9.0 10.0 11.0").split())
 
-if [ "$DOCKER_TAG" == latest ]; then
-    # Build other tags, using cache to get it faster
-    source hooks/variables
-    docker tag "$IMAGE_NAME" "$DOCKER_REPO:$DEFAULT_VERSION"
-    for ver in $OTHER_VERSIONS; do
-        build --build-arg ODOO_VERSION="$ver" --tag "$DOCKER_REPO:$ver"
-    done
-fi
+logging.basicConfig(level=logging.INFO)
+
+# Build version-specific images
+for dockerfile in iglob("*.Dockerfile"):
+    version = dockerfile.replace(".Dockerfile", "")
+    if version not in ODOO_VERSIONS:
+        continue
+    logging.info("Building image for version %s", version)
+    # Low-level api for building images and streaming output
+    response = CLIENT.api.build(
+        path=".",
+        dockerfile=dockerfile,
+        tag=u"{}:{}".format(DOCKER_REPO, version),
+        buildargs={
+            "BUILD_DATE": datetime.utcnow().isoformat(),
+            "ODOO_VERSION": version,
+            "VCS_REF": GIT_SHA1,
+        }
+    )
+    status = None
+    for line in response:
+        line = json.loads(line)
+        if line.get("status") not in {status, None}:
+            status = line["status"]
+            print(status)
+        if line.get("stream"):
+            print(line["stream"], end="")
+
+# Tag default version
+if DEFAULT_VERSION in ODOO_VERSIONS:
+    logging.info("Tagging latest")
+    image = CLIENT.images.get(u"{}:{}".format(DOCKER_REPO, DEFAULT_VERSION))
+    image.tag(DOCKER_REPO, "latest")
