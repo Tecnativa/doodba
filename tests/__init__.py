@@ -115,8 +115,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/website"),
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
-                ("sh", "-c", 'test -z "$(addons-install -lp)"'),
-                ("sh", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("sh", "-c", '[ -z "$(addons-install -lp)" ]'),
+                ("sh", "-c", '[ "$(addons-install -le)" == dummy_addon ]'),
                 ("sh", "-c", 'addons-install -lc | grep ,crm,'),
             )
             self.compose_test(
@@ -125,9 +125,9 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-e", "auto/addons/website"),
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
-                ("sh", "-c", 'test -z "$(addons-install -lp)"'),
-                ("sh", "-c", 'test "$(addons-install -le)" == dummy_addon'),
-                ("sh", "-c", 'test "$(addons-install -lc)" == crm,sale'),
+                ("sh", "-c", '[ -z "$(addons-install -lp)" ]'),
+                ("sh", "-c", '[ "$(addons-install -le)" == dummy_addon ]'),
+                ("sh", "-c", '[ "$(addons-install -lc)" == crm,sale ]'),
             )
 
     def test_smallest(self):
