@@ -6,6 +6,7 @@ services:
       dockerfile: ${ODOO_MINOR}.Dockerfile
       args:
         CONFIG_BUILD: 'false'
+        LOG_LEVEL: DEBUG
     tty: true
     environment:
       PGUSER: another_odoo
