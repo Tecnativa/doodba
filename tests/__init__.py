@@ -50,6 +50,10 @@ def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
 
 
 class ScaffoldingCase(unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.compose_run = ("docker-compose", "run", "--rm", "odoo")
+
     def popen(self, *args, **kwargs):
         """Shortcut to open a subprocess and ensure it works."""
         logging.info("Subtest execution: %s", self._subtest)
@@ -83,8 +87,7 @@ class ScaffoldingCase(unittest.TestCase):
                 for command in commands:
                     with self.subTest(command=command):
                         self.popen(
-                            ("docker-compose", "run", "--rm", "odoo") +
-                            command,
+                            self.compose_run + command,
                             cwd=workdir,
                             env=full_env,
                         )
