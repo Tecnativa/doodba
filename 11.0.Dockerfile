@@ -138,7 +138,7 @@ RUN apt-get update \
         zlib1g-dev \
     && pip install --no-cache-dir -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && python3 -m compileall -q /usr/local/lib/python3.5/ || true \
-    && apt purge -y build-essential '*-dev' \
+    && apt purge -yqq build-essential '*-dev' \
     && apt-mark manual '*' \
     && rm -Rf /var/lib/apt/lists/*
 
