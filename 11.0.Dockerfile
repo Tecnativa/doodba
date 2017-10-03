@@ -139,7 +139,7 @@ RUN apt-get update \
     && pip install --no-cache-dir -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && python3 -m compileall -q /usr/local/lib/python3.5/ || true \
     && apt purge -yqq build-essential '*-dev' \
-    && apt-mark manual '*' \
+    && apt-mark -qq manual '*' \
     && rm -Rf /var/lib/apt/lists/*
 
 # Metadata
