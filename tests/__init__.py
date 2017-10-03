@@ -217,10 +217,12 @@ class ScaffoldingCase(unittest.TestCase):
             for sub_env in matrix(odoo={"10.0"}):
                 # Setup the devel environment
                 self.compose_test(tmpdirname, dict(sub_env, **setup_env), ())
-                self.popen(
-                    ("chown", "1000:1000",
-                     join(tmpdirname, "odoo", "auto", "addons")),
-                )
+                # Travis seems to have a different UID than 1000
+                if environ.get("TRAVIS"):
+                    self.popen(
+                        ("sudo", "chown", "1000:1000",
+                         join(tmpdirname, "odoo", "auto", "addons")),
+                    )
                 # Test all 3 official environments
                 for dcfile in ("devel", "test", "prod"):
                     sub_env["COMPOSE_FILE"] = f"{dcfile}.yaml"
