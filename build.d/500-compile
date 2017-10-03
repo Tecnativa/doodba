@@ -7,4 +7,5 @@ if [ "$COMPILE" != true ]; then
 fi
 
 log INFO Compiling all Python code in /opt/odoo
+# TODO Remove `|| true` when odoo code compilation doesn't fail (v12?)
 PYTHONOPTIMIZE=2 python -m compileall -q /opt/odoo || true
