@@ -19,6 +19,8 @@ logging.basicConfig(level=logging.DEBUG)
 # Common test utilities
 DIR = dirname(__file__)
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
+SKIP_ODOO_VERSIONS = frozenset(environ.get("SKIP_ODOO_VERSIONS", "").split())
+SKIP_PG_VERSIONS = frozenset(environ.get("SKIP_PG_VERSIONS", "").split())
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 
 # Variable matrix
@@ -44,8 +46,8 @@ def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
     return map(
         dict,
         product(
-            product(("ODOO_MINOR",), odoo ^ odoo_skip),
-            product(("DB_VERSION",), pg ^ pg_skip),
+            product(("ODOO_MINOR",), odoo - odoo_skip - SKIP_ODOO_VERSIONS),
+            product(("DB_VERSION",), pg - pg_skip - SKIP_PG_VERSIONS),
         )
     )
 
