@@ -1,0 +1,97 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import yaml
+import logging
+import urllib2
+from glob import iglob
+
+from odoobaselib import (
+    CUSTOM_DIR, AUTO_ADDONS_YAML, AUTO_REPOS_YAML, ADDONS_YAML, REPOS_YAML
+)
+
+# Skip aggregation of dependencies if AGGREGATE env var is not set
+if not os.environ.get('AGGREGATE'):
+    logging.warning("Skipping oca dependency aggregation")
+    sys.exit()
+
+BASE_URL = 'https://raw.githubusercontent.com/OCA'
+
+
+# Method from maintainer-quality-tools
+def parse_depfile(depfile, owner='OCA'):
+    deps = set()
+    for line in depfile:
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        parts = line.split()
+        repo = parts[0]
+        if len(parts) > 2:
+            branch = parts[2]
+        else:
+            branch = os.environ['ODOO_VERSION']
+        if len(parts) > 1:
+            url = parts[1]
+        else:
+            url = os.environ['DEFAULT_REPO_PATTERN'] % repo
+        deps.add((repo, url, branch))
+    return deps
+
+
+def process_dependencies(dep_list):
+    """Attempt fetching oca_dependencies.txt files from github to build a list
+    of dependencies in order to aggregate only once"""
+    processed_dependencies = set()
+    for dep in dep_list:
+        if dep in processed_dependencies:
+            continue
+        oca_dep_url = '%s/%s/%s/oca_dependencies.txt' % (
+            BASE_URL, dep[0], branch
+        )
+        logging.info('Attempting to fetch %s' % oca_dep_url)
+        try:
+            data = urllib2.urlopen(oca_dep_url)
+            dependencies = set(parse_depfile(data))
+            if dep[0] not in ADDONS_YAML.keys():
+                processed_dependencies.add(dep)
+            processed_dependencies |= process_dependencies(dependencies)
+            logging.info('Fetched dependencies for %s' % oca_dep_url)
+        except Exception as e:
+            # Not neccesairly error but it might not have oca_dependencies.txt
+            logging.warning('Error fetching url "%s". Error: %s' % (
+                oca_dep_url, e.code)
+            )
+            # TODO: Retry mechanism
+    return processed_dependencies
+
+branch = os.environ['ODOO_VERSION']
+
+# Find all dependency files after initial aggregation
+dep_files = iglob('%s/*/oca_dependencies.txt' % CUSTOM_DIR)
+initial_dependencies = set()
+
+# Get all initial repositories across all projects
+for dep in dep_files:
+    file_obj = open(dep, 'r')
+    deps = set(parse_depfile(file_obj))
+    initial_dependencies.update(deps)
+
+# Get all subsequent repositories from oca_dependencies via github
+dependencies = process_dependencies(initial_dependencies)
+
+# Generate auto_addons and auto_repos yaml files
+for dep in dependencies:
+    ADDONS_YAML[dep[0]] = ['*']
+
+    repo_vals = {
+        'defaults': {'depth': '$DEPTH_DEFAULT'},
+        'remotes': {'origin': dep[1]},
+        'target': {'origin': '$ODOO_VERSION'},
+        'merges': [{'origin': '$ODOO_VERSION'}],
+    }
+    REPOS_YAML[dep[0]] = {'%s' % dep[0]: repo_vals}
+
+yaml.dump(ADDONS_YAML, AUTO_ADDONS_YAML, default_flow_style=False)
+yaml.dump(REPOS_YAML, AUTO_REPOS_YAML, default_flow_style=False)
