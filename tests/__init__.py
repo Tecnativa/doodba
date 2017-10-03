@@ -9,7 +9,7 @@ import unittest
 
 from glob import iglob
 from itertools import product, starmap
-from os import environ
+from os import environ, getlogin
 from os.path import basename, dirname, join
 from pwd import getpwnam
 from subprocess import PIPE, Popen
@@ -230,6 +230,12 @@ class ScaffoldingCase(unittest.TestCase):
                         tmpdirname, sub_env,
                         # ``odoo`` command works
                         ("odoo", "--version"),
+                    )
+                # Restore owner in Travis so directory can be removed
+                if environ.get("TRAVIS"):
+                    self.popen(
+                        ("sudo", "chown", "-R", "{0}:{0}".format(getlogin()),
+                         join(tmpdirname, "odoo", "auto", "addons")),
                     )
 
 
