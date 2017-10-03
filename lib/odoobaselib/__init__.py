@@ -10,13 +10,34 @@ import yaml
 
 # Constants needed in scripts
 CUSTOM_DIR = "/opt/odoo/custom"
+AUTO_DIR = "/opt/odoo/auto"
+ADDONS_DIR = os.path.join(AUTO_DIR, 'addons')
 SRC_DIR = os.path.join(CUSTOM_DIR, 'src')
+
 ADDONS_YAML = os.path.join(SRC_DIR, 'addons')
 if os.path.isfile('%s.yaml' % ADDONS_YAML):
     ADDONS_YAML = '%s.yaml' % ADDONS_YAML
 else:
     ADDONS_YAML = '%s.yml' % ADDONS_YAML
-ADDONS_DIR = "/opt/odoo/auto/addons"
+
+REPOS_YAML = os.path.join(SRC_DIR, 'repos')
+if os.path.isfile('%s.yaml' % REPOS_YAML):
+    REPOS_YAML = '%s.yaml' % REPOS_YAML
+else:
+    REPOS_YAML = '%s.yml' % REPOS_YAML
+
+AUTO_ADDONS_YAML = os.path.join(AUTO_DIR, 'addons')
+if os.path.isfile('%s.yaml' % AUTO_ADDONS_YAML):
+    AUTO_ADDONS_YAML = '%s.yaml' % AUTO_ADDONS_YAML
+else:
+    AUTO_ADDONS_YAML = '%s.yml' % AUTO_ADDONS_YAML
+
+AUTO_REPOS_YAML = os.path.join(AUTO_DIR, 'repos')
+if os.path.isfile('%s.yaml' % AUTO_REPOS_YAML):
+    AUTO_REPOS_YAML = '%s.yaml' % AUTO_REPOS_YAML
+else:
+    AUTO_REPOS_YAML = '%s.yml' % AUTO_REPOS_YAML
+
 CLEAN = os.environ.get("CLEAN") == "true"
 AUTO_REQUIREMENTS = os.environ.get("AUTO_REQUIREMENTS") == "true"
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
