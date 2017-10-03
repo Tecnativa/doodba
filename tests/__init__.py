@@ -218,7 +218,8 @@ class ScaffoldingCase(unittest.TestCase):
                 # Setup the devel environment
                 self.compose_test(tmpdirname, dict(sub_env, **setup_env), ())
                 self.popen(
-                    ("chown", "1000:1000", join(tmpdirname, "auto", "addons")),
+                    ("chown", "1000:1000",
+                     join(tmpdirname, "odoo", "auto", "addons")),
                 )
                 # Test all 3 official environments
                 for dcfile in ("devel", "test", "prod"):
