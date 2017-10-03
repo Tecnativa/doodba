@@ -9,7 +9,7 @@ import unittest
 
 from glob import iglob
 from itertools import product, starmap
-from os import environ
+from os import environ, getlogin
 from os.path import basename, dirname, join
 from pwd import getpwnam
 from subprocess import PIPE, Popen
@@ -50,6 +50,10 @@ def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
 
 
 class ScaffoldingCase(unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.compose_run = ("docker-compose", "run", "--rm", "odoo")
+
     def popen(self, *args, **kwargs):
         """Shortcut to open a subprocess and ensure it works."""
         logging.info("Subtest execution: %s", self._subtest)
@@ -83,8 +87,7 @@ class ScaffoldingCase(unittest.TestCase):
                 for command in commands:
                     with self.subTest(command=command):
                         self.popen(
-                            ("docker-compose", "run", "--rm", "odoo") +
-                            command,
+                            self.compose_run + command,
                             cwd=workdir,
                             env=full_env,
                         )
@@ -94,6 +97,41 @@ class ScaffoldingCase(unittest.TestCase):
                     cwd=workdir,
                     env=full_env,
                 )
+
+    def test_addons_filtered(self):
+        """Test addons filtering with ``ONLY`` keyword in ``addons.yaml``."""
+        project_dir = join(SCAFFOLDINGS_DIR, "dotd")
+        for sub_env in matrix(odoo={"10.0"}):
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="prod"),
+                ("test", "-e", "auto/addons/website"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("test", "-e", "auto/addons/private_addon"),
+                ("bash", "-c", 'test "$(addons-install -lp)" == private_addon'),
+                ("bash", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("bash", "-c", 'addons-install -lc | grep ,crm,'),
+            )
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="limited_private"),
+                ("test", "-e", "auto/addons/website"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("test", "!", "-e", "auto/addons/private_addon"),
+                ("bash", "-c", 'test -z "$(addons-install -lp)"'),
+                ("bash", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("bash", "-c", 'addons-install -lc | grep ,crm,'),
+            )
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="limited_core"),
+                ("test", "!", "-e", "auto/addons/website"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("test", "!", "-e", "auto/addons/private_addon"),
+                ("bash", "-c", 'test -z "$(addons-install -lp)"'),
+                ("bash", "-c", 'test "$(addons-install -le)" == dummy_addon'),
+                ("bash", "-c", 'test "$(addons-install -lc)" == crm,sale'),
+            )
 
     def test_smallest(self):
         """Tests for the smallest possible environment."""
@@ -146,7 +184,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-e", "custom/src/private/dummy_addon"),
                 ("test", "-d", "custom/src/private/private_addon"),
                 ("test", "-f", "custom/src/private/private_addon/__init__.py"),
-                ("test", "!", "-e", "auto/addons/private_addon"),
+                ("test", "-e", "auto/addons/private_addon"),
                 # ``odoo`` command works
                 ("odoo", "--version"),
                 # Implicit ``odoo`` command also works
@@ -179,6 +217,12 @@ class ScaffoldingCase(unittest.TestCase):
             for sub_env in matrix(odoo={"10.0"}):
                 # Setup the devel environment
                 self.compose_test(tmpdirname, dict(sub_env, **setup_env), ())
+                # Travis seems to have a different UID than 1000
+                if environ.get("TRAVIS"):
+                    self.popen(
+                        ("sudo", "chown", "1000:1000",
+                         join(tmpdirname, "odoo", "auto", "addons")),
+                    )
                 # Test all 3 official environments
                 for dcfile in ("devel", "test", "prod"):
                     sub_env["COMPOSE_FILE"] = f"{dcfile}.yaml"
@@ -186,6 +230,12 @@ class ScaffoldingCase(unittest.TestCase):
                         tmpdirname, sub_env,
                         # ``odoo`` command works
                         ("odoo", "--version"),
+                    )
+                # Restore owner in Travis so directory can be removed
+                if environ.get("TRAVIS"):
+                    self.popen(
+                        ("sudo", "chown", "-R", "{0}:{0}".format(getlogin()),
+                         join(tmpdirname, "odoo", "auto", "addons")),
                     )
 
 

@@ -196,58 +196,65 @@ web:
     - web_responsive
 ```
 
-You can bundle [several YAML documents][] if you want to logically group your
-addons and some repos are repeated among groups, by separating each document
-with `---`:
+Advanced features:
+
+- You can bundle [several YAML documents][] if you want to logically group your
+  addons and some repos are repeated among groups, by separating each document
+  with `---`.
+
+- Addons under `private` and `odoo/addons` are linked automatically unless you
+  specify them.
+
+- You can use `ONLY` to supply a dictionary of environment variables and a
+  list of possible values to enable that document in the matching environments.
+
+- If an addon is found in several places at the same time, it will get linked
+  according to this priority table:
+
+  1. Addons in [`private`][].
+  2. Addons in other repositories (in case one is matched in several, it will
+     be random, BEWARE!). Better have no duplicated names if possible.
+  3. Core Odoo addons from [`odoo/addons`][`odoo`].
+
+- If an addon is specified but not available at runtime, it will fail silently.
+
+- You can use any wildcards supported by [Python's glob module][glob].
+
+This example shows these advanced features:
 
 ```yaml
 # Spanish Localization
 l10n-spain:
-    - l10n_es
+  - l10n_es # Overrides built-in l10n_es under odoo/addons
 server-tools:
-    - date_range
+  - "*date*" # All modules that contain "date" in their name
+  - module_auto_update # Makes `autoupdate` script actually autoupdate addons
+web:
+  - "*" # All web addons
 ---
-# SEO tools
+# Different YAML document to separate SEO Tools
 website:
-    - website_blog_excertp_img
+  - website_blog_excertp_img
 server-tools: # Here we repeat server-tools, but no problem because it's a
               # different document
-    - html_image_url_extractor
-    - html_text
+  - html_image_url_extractor
+  - html_text
+---
+# Enable demo ribbon only for devel and test environments
+ONLY:
+  PGDATABASE: # This environment variable must exist and be in the list
+    - devel
+    - test
+server-tools:
+  - web_environment_ribbon
+---
+# Enable special authentication methods only in production environment
+ONLY:
+  PGDATABASE:
+    - prod
+server-tools:
+  - auth_*
 ```
-
-You can add all modules in a repo by using a `*`:
-
-```yaml
-website:
-    - "*"
-```
-
-Important notes:
-
-- Do not add repos for the required [`odoo`][] and [`private`][] directories;
-  those are automatic.
-
-- Only addons here are symlinked in [`/opt/odoo/auto/addons`][]. Addons from
-  the required directories above are added directly in the [`odoo.conf`][]
-  file.
-
-- This means that if you have an addon with the same name in any of [`odoo`][],
-  [`private`][] or [`/opt/odoo/auto/addons`][] directories, this will be the
-  importance order in which they will be loaded (from most to least important):
-
-  1. Addons in [`private`][].
-  2. Custom addons listed in [`addons.yaml`][].
-  3. Core Odoo addons from [`./odoo/addons`][`odoo`].
-
-  Although it is better to simply have no name conflicts if possible.
-
-- Any other addon not listed here will not be usable in Odoo (and will be
-  removed by default, to keep the resulting image thin).
-
-- If you list 2 addons with the same name, you'll get a build error.
-
-- If you use the wildcard (`*`), it must be encapsulated in quotes.
 
 ##### `/opt/odoo/custom/dependencies/*.txt`
 
@@ -309,6 +316,15 @@ now keep this in mind:
   where it should go, and relax.
 
 ## Bundled tools
+
+### `addons-install`
+
+A handy CLI tool to automate addon management based on the current environment.
+It allows you to install, update, test and/or list private, extra and/or core
+addons available to current container, based on current [`addons.yaml`][]
+configuration.
+
+Call `addons-install --help` for usage instructions.
 
 ### [`nano`][]
 
@@ -915,6 +931,7 @@ scaffolding versions is preserved.
 [builds]: https://hub.docker.com/r/tecnativa/odoo-base/builds/
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
 [Fish]: http://fishshell.com/
+[glob]: https://docs.python.org/3/library/glob.html
 [Let's Encrypt]: https://letsencrypt.org/
 [OCA]: https://odoo-community.org/
 [OCB]: https://github.com/OCA/OCB

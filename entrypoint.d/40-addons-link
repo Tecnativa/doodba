@@ -2,39 +2,26 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+from glob import iglob
 
-import odoobaselib
+from odoobaselib import (
+    addons_config,
+    ADDONS_DIR,
+    ADDONS_YAML,
+    SRC_DIR,
+)
 
 logging.info(
     "Linking all addons from %s in %s",
-    odoobaselib.ADDONS_YAML,
-    odoobaselib.ADDONS_DIR)
+    ADDONS_YAML,
+    ADDONS_DIR)
 
-for repo, addons in odoobaselib.addons_config().items():
-    while addons:
-        addon = addons.pop()
-        if addon == '*':
-            addon_dir = os.path.join(odoobaselib.SRC_DIR, repo)
-            try:
-                modules = next(os.walk(addon_dir))[1]
-            except StopIteration:
-                continue
-            for module in modules:
-                if not module.startswith('.') and module != 'setup':
-                    addons.append(module)
-            continue
-        src = os.path.relpath(
-            os.path.join(odoobaselib.SRC_DIR, repo, addon),
-            odoobaselib.ADDONS_DIR)
-        dst = os.path.join(odoobaselib.ADDONS_DIR, addon)
-        try:
-            ok = os.readlink(dst) == src
-        except OSError:
-            ok = False
-        if not ok:
-            try:
-                os.remove(dst)
-            except OSError:
-                pass
-            os.symlink(src, dst)
-            logging.debug("Linked %s in %s", src, dst)
+# Remove all links in addons dir
+for link in iglob(os.path.join(ADDONS_DIR, "*")):
+    os.remove(link)
+# Add new links
+for addon, repo in addons_config():
+    src = os.path.relpath(os.path.join(SRC_DIR, repo, addon), ADDONS_DIR)
+    dst = os.path.join(ADDONS_DIR, addon)
+    os.symlink(src, dst)
+    logging.debug("Linked %s in %s", src, dst)

@@ -6,11 +6,13 @@ services:
       dockerfile: ${ODOO_MINOR}.Dockerfile
       args:
         CONFIG_BUILD: 'false'
+        LOG_LEVEL: DEBUG
     tty: true
     environment:
       PGUSER: another_odoo
       PGPASSWORD: anotherodoopassword
       PGHOST: postgresql
+      PGDATABASE: ${DBNAME:-prod}
     depends_on:
       - postgresql
     volumes:
