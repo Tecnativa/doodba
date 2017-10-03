@@ -36,7 +36,7 @@ for dockerfile in iglob("*.Dockerfile"):
             status = line["status"]
             print(status)
         if line.get("stream"):
-            print(line["stream"]), end="")
+            print(line["stream"], end="")
 
 # Tag default version
 logging.info("Tagging latest")
