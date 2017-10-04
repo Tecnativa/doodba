@@ -7,5 +7,5 @@ if [ "$COMPILE" != true ]; then
 fi
 
 log INFO Compiling all Python code in /opt/odoo
-log DEBUG PYTHONOPTIMIZE set to $PYTHONOPTIMIZE
-python -m compileall -q /opt/odoo
+# TODO Remove `|| true` when fixed https://github.com/odoo/odoo/issues/19871
+PYTHONOPTIMIZE=2 python -m compileall -q /opt/odoo || true
