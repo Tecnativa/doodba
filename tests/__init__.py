@@ -186,7 +186,7 @@ class ScaffoldingCase(unittest.TestCase):
             )
 
     @unittest.skipUnless(
-        MAIN_SCAFFOLDING_VERSION & ODOO_VERSIONS,
+        MAIN_SCAFFOLDING_VERSION in ODOO_VERSIONS,
         "Main scaffolding version is not being tested")
     def test_main_scaffolding(self):
         """Test the official scaffolding."""
