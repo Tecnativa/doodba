@@ -17,7 +17,7 @@ from subprocess import PIPE, Popen
 logging.basicConfig(level=logging.DEBUG)
 
 MAIN_SCAFFOLDING_VERSION = "10.0"
-DIR = dirname version is not being tested(__file__)
+DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 ODOO_VERSIONS = frozenset(environ.get(
     "ODOO_VERSIONS", "8.0 9.0 10.0 11.0").split())
