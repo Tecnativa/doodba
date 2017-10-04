@@ -28,6 +28,8 @@ env:
     - ODOO_VERSIONS=11.0
 
 before_install:
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::=--force-confnew install docker-ce
   - pip install -r requirements-ci.txt
 
 install:
