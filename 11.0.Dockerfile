@@ -69,8 +69,8 @@ ENV DEPTH_DEFAULT=1 \
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 RUN apt-get update \
-    && apt-get -y upgrade \
-    && apt-get install -y --no-install-recommends \
+    && apt-get -yq upgrade \
+    && apt-get install -yq --no-install-recommends \
         python3 ruby-compass \
         fontconfig libfreetype6 libxml2 libxslt1.1 libjpeg62-turbo zlib1g \
         libfreetype6 liblcms2-2 libtiff5 tk tcl libpq5 \
@@ -80,9 +80,9 @@ RUN apt-get update \
         openssh-client postgresql-client telnet xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin --no-cache-dir \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get -y purge python2.7 \
-    && apt-get -y autoremove \
+    && apt-get install -yq nodejs \
+    && apt-get -yq purge python2.7 \
+    && apt-get -yq autoremove \
     && rm -Rf /var/lib/apt/lists/*
 
 # Special case to get latest Less and PhantomJS
