@@ -21,6 +21,11 @@ env:
     - DOCKER_REPO=tecnativa/odoo-base
     - DOCKER_TAG=latest
     - IMAGE_NAME=$DOCKER_REPO:$DOCKER_TAG
+  matrix:
+    - ODOO_VERSIONS=8.0
+    - ODOO_VERSIONS=9.0
+    - ODOO_VERSIONS=10.0
+    - ODOO_VERSIONS=11.0
 
 before_install:
   - pip install -r requirements-ci.txt

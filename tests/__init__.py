@@ -16,23 +16,14 @@ from subprocess import PIPE, Popen
 
 logging.basicConfig(level=logging.DEBUG)
 
-# Common test utilities
-DIR = dirname(__file__)
-SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
-SKIP_ODOO_VERSIONS = frozenset(environ.get("SKIP_ODOO_VERSIONS", "").split())
-SKIP_PG_VERSIONS = frozenset(environ.get("SKIP_PG_VERSIONS", "").split())
+MAIN_SCAFFOLDING_VERSION = "10.0"
+DIR = dirname version is not being tested(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
-
-# Variable matrix
-ODOO_VERSIONS = frozenset((
-    "11.0",
-    "10.0",
-    "9.0",
-    "8.0",
-))
-PG_VERSIONS = frozenset((
-    "9.6",
-))
+ODOO_VERSIONS = frozenset(environ.get(
+    "ODOO_VERSIONS", "8.0 9.0 10.0 11.0").split())
+PG_VERSIONS = frozenset(environ.get(
+    "PG_VERSIONS", "9.6").split())
+SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 
 
 def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
@@ -46,8 +37,8 @@ def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
     return map(
         dict,
         product(
-            product(("ODOO_MINOR",), odoo - odoo_skip - SKIP_ODOO_VERSIONS),
-            product(("DB_VERSION",), pg - pg_skip - SKIP_PG_VERSIONS),
+            product(("ODOO_MINOR",), ODOO_VERSIONS & odoo - odoo_skip),
+            product(("DB_VERSION",), PG_VERSIONS & pg - pg_skip),
         )
     )
 
@@ -194,6 +185,9 @@ class ScaffoldingCase(unittest.TestCase):
                 ("--version",),
             )
 
+    @unittest.skipUnless(
+        MAIN_SCAFFOLDING_VERSION & ODOO_VERSIONS,
+        "Main scaffolding version is not being tested")
     def test_main_scaffolding(self):
         """Test the official scaffolding."""
         with tempfile.TemporaryDirectory() as tmpdirname:

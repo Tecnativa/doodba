@@ -12,14 +12,15 @@ CLIENT = docker.client.from_env()
 DEFAULT_VERSION = "11.0"
 DOCKER_REPO = os.environ.get("DOCKER_REPO", "tecnativa/odoo-base")
 GIT_SHA1 = os.environ.get("GIT_SHA1", "")
+ODOO_VERSIONS = frozenset(os.environ.get(
+    "ODOO_VERSIONS", "8.0 9.0 10.0 11.0").split())
+
 logging.basicConfig(level=logging.INFO)
-SKIP_ODOO_VERSIONS = frozenset(
-    os.environ.get("SKIP_ODOO_VERSIONS", "").split())
 
 # Build version-specific images
 for dockerfile in iglob("*.Dockerfile"):
     version = dockerfile.replace(".Dockerfile", "")
-    if version in SKIP_ODOO_VERSIONS:
+    if version not in ODOO_VERSIONS:
         continue
     logging.info("Building image for version %s", version)
     # Low-level api for building images and streaming output
@@ -43,7 +44,7 @@ for dockerfile in iglob("*.Dockerfile"):
             print(line["stream"], end="")
 
 # Tag default version
-if DEFAULT_VERSION not in SKIP_ODOO_VERSIONS:
+if DEFAULT_VERSION in ODOO_VERSIONS:
     logging.info("Tagging latest")
     image = CLIENT.images.get(u"{}:{}".format(DOCKER_REPO, DEFAULT_VERSION))
     image.tag(DOCKER_REPO, "latest")
