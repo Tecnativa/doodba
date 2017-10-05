@@ -44,7 +44,7 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && ln -s /opt/odoo/custom/ssh ~root/.ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
-ONBUILD RUN ["/opt/odoo/common/build"]
+ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD USER odoo
 
 ARG WKHTMLTOPDF_VERSION=0.12.4
