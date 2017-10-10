@@ -20,6 +20,8 @@ services:
                 "${DB_USER}:${ODOO_ADMIN_PASSWORD_BCRYPT}"
             traefik.dbmanager.frontend.rule:
                 "Host:${DOMAIN_TEST};PathPrefix:/web/database/"
+            traefik.dbselector.frontend.rule:
+                "Host:${DOMAIN_TEST};PathPrefix:/web/database/{p:selector|list}"
             traefik.longpolling.frontend.rule:
                 "Host:${DOMAIN_TEST};PathPrefix:/longpolling/"
             traefik.websiteinfo.frontend.auth.basic:
