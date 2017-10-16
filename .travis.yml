@@ -19,13 +19,11 @@ env:
   global:
     # Variables found by default in Docker Hub builder
     - DOCKER_REPO=tecnativa/odoo-base
-    - DOCKER_TAG=latest
-    - IMAGE_NAME=$DOCKER_REPO:$DOCKER_TAG
   matrix:
-    - DOCKER_TAG=8.0 ODOO_VERSIONS=8.0
-    - DOCKER_TAG=9.0 ODOO_VERSIONS=9.0
-    - DOCKER_TAG=10.0 ODOO_VERSIONS=10.0
-    - DOCKER_TAG=11.0 ODOO_VERSIONS=11.0
+    - DOCKER_TAG=8.0
+    - DOCKER_TAG=9.0
+    - DOCKER_TAG=10.0
+    - DOCKER_TAG=11.0
 
 before_install:
   - sudo apt-get update
