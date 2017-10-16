@@ -169,7 +169,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c", "echo $NODE_PATH"),
                 ("node", "-e", "require('test-npm-install')"),
                 ("aloha_world",),
-                ("cython", "--version"),
+                ("python", "-c", "import Crypto; print(Crypto.__version__)"),
                 ("sh", "-c", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # ``dummy_addon`` and ``private_addon`` exist
                 ("test", "-d", "auto/addons/dummy_addon"),
