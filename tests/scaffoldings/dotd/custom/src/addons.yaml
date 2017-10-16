@@ -1,5 +1,6 @@
 dummy_repo:
   - dummy_addon
+  - product
 
 ---
 ONLY:
