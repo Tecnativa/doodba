@@ -179,6 +179,10 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-d", "custom/src/private/private_addon"),
                 ("test", "-f", "custom/src/private/private_addon/__init__.py"),
                 ("test", "-e", "auto/addons/private_addon"),
+                # Addon from extra repo takes higher priority than core version
+                ("realpath", "auto/addons/product"),
+                ("bash", "-c", 'test "$(realpath auto/addons/product)" == '
+                               '/opt/odoo/custom/src/dummy_repo/product'),
                 # ``odoo`` command works
                 ("odoo", "--version"),
                 # Implicit ``odoo`` command also works
