@@ -7,6 +7,10 @@ else
     dockerfile="$DOCKER_TAG.Dockerfile"
 fi
 
+if [ -z "$IMAGE_NAME" ]; then
+    IMAGE_NAME="$DOCKER_REPO:$DOCKER_TAG"
+fi
+
 # See http://label-schema.org/rc1/#build-time-labels
 time docker image build \
     --build-arg VCS_REF="$GIT_SHA1" \
