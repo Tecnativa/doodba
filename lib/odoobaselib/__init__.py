@@ -42,6 +42,7 @@ def addons_config():
     """Yield addon name and path from ``ADDONS_YAML``."""
     config = dict()
     special_missing = {PRIVATE, CORE}
+    manifest_files = set(['__manifest__.py', '__openerp__.py'])
     try:
         with open(ADDONS_YAML) as addons_file:
             for doc in yaml.load_all(addons_file):
@@ -57,6 +58,15 @@ def addons_config():
                     for glob in addons:
                         logging.debug("Expanding glob %s", glob)
                         for addon in iglob(os.path.join(SRC_DIR, repo, glob)):
+                            if not os.path.isdir(addon):
+                                continue
+                            addon_files = set(os.listdir(addon))
+                            has_manifest = manifest_files & addon_files
+                            py_module = '__init__.py' in addon_files
+                            if not py_module or not has_manifest:
+                                logging.debug("Skipping '%s' as it is not a "
+                                    "valid Odoo module" % addon)
+                                continue
                             logging.debug("Registering addon %s", addon)
                             addon = os.path.basename(addon)
                             config.setdefault(addon, set())
