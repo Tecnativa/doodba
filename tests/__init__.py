@@ -171,6 +171,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("aloha_world",),
                 ("python", "-c", "import Crypto; print(Crypto.__version__)"),
                 ("sh", "-c", "rst2html.py --version | grep 'Docutils 0.14'"),
+                # ``requirements.txt`` from addon repos were processed
+                ("python", "-c", "import cfssl"),
                 # ``dummy_addon`` and ``private_addon`` exist
                 ("test", "-d", "auto/addons/dummy_addon"),
                 ("test", "-h", "auto/addons/dummy_addon"),

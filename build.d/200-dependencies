@@ -2,9 +2,9 @@
 # Copyright 2017 LasLabs Inc.
 
 from os.path import join
+from glob import glob
 
 from odoobaselib import (
-    addons_config,
     AUTO_REQUIREMENTS,
     CUSTOM_DIR,
     FILE_APT_BUILD,
@@ -20,8 +20,7 @@ for name in INSTALLERS:
     req_files = []
     # pip `requirements.txt` files found in repositories
     if name == "pip" and AUTO_REQUIREMENTS:
-        for repo in addons_config():
-            req_files.append(join(SRC_DIR, repo, 'requirements.txt'))
+        req_files += glob(join(SRC_DIR, "*", "requirements.txt"))
     # Normal dependency installation
     req_files.append(join(CUSTOM_DIR, 'dependencies', '%s.txt' % name))
     for req_file in req_files:
