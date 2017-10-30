@@ -65,6 +65,8 @@ def addons_config(filtered=True):
                     continue
                 # Flatten all sections in a single dict
                 for repo, addons in doc.items():
+                    if repo == "ONLY":
+                        continue
                     logging.debug("Processing %s repo", repo)
                     special_missing.discard(repo)
                     for glob in addons:

@@ -95,7 +95,7 @@ class ScaffoldingCase(unittest.TestCase):
     def test_addons_filtered(self):
         """Test addons filtering with ``ONLY`` keyword in ``addons.yaml``."""
         project_dir = join(SCAFFOLDINGS_DIR, "dotd")
-        for sub_env in matrix(odoo={"10.0"}):
+        for sub_env in matrix():
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
@@ -103,7 +103,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test "$(addons list -p)" == private_addon'),
-                ("bash", "-c", 'test "$(addons list -e)" == dummy_addon'),
+                ("bash", "-c",
+                 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
             )
             self.compose_test(
@@ -113,7 +114,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test -z "$(addons list -p)"'),
-                ("bash", "-c", 'test "$(addons list -e)" == dummy_addon'),
+                ("bash", "-c",
+                 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
             )
             self.compose_test(
@@ -123,7 +125,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test -z "$(addons list -p)"'),
-                ("bash", "-c", 'test "$(addons list -e)" == dummy_addon'),
+                ("bash", "-c",
+                 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
             )
 
