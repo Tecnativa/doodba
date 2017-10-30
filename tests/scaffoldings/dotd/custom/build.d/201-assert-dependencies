@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # Dependencies are processed at step 200
 set -ex
 which busybox
