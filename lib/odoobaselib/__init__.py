@@ -52,11 +52,15 @@ def addons_config(filtered=True):
     try:
         with open(ADDONS_YAML) as addons_file:
             for doc in yaml.load_all(addons_file):
+                # When not filtering, private and core addons should be either
+                # defined under every doc, or defaulted to `*` in the
+                # ones where it is missing
+                if not filtered:
+                    doc.setdefault(CORE, ["*"])
+                    doc.setdefault(PRIVATE, ["*"])
                 # Skip sections with ONLY and that don't match
-                if (filtered and
-                        any(os.environ.get(key) not in values
-                            for key, values
-                            in doc.get("ONLY", dict()).items())):
+                elif any(os.environ.get(key) not in values
+                         for key, values in doc.get("ONLY", dict()).items()):
                     logging.debug("Skipping section with ONLY %s", doc["ONLY"])
                     continue
                 # Flatten all sections in a single dict
