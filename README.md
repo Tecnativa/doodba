@@ -317,14 +317,14 @@ now keep this in mind:
 
 ## Bundled tools
 
-### `addons-install`
+### `addons`
 
 A handy CLI tool to automate addon management based on the current environment.
 It allows you to install, update, test and/or list private, extra and/or core
 addons available to current container, based on current [`addons.yaml`][]
 configuration.
 
-Call `addons-install --help` for usage instructions.
+Call `addons --help` for usage instructions.
 
 ### [`nano`][]
 

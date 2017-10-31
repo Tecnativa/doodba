@@ -39,21 +39,34 @@ else:
 logging.root.setLevel(_log_level)
 
 
-def addons_config():
-    """Yield addon name and path from ``ADDONS_YAML``."""
+def addons_config(filtered=True):
+    """Yield addon name and path from ``ADDONS_YAML``.
+
+    :param bool filtered:
+        Use ``False`` to include all addon definitions. Use ``True`` (default)
+        to include only those matched by ``ONLY`` clauses, if any.
+    """
     config = dict()
     special_missing = {PRIVATE, CORE}
     manifest_files = ['__manifest__.py', '__openerp__.py']
     try:
         with open(ADDONS_YAML) as addons_file:
             for doc in yaml.load_all(addons_file):
+                # When not filtering, private and core addons should be either
+                # defined under every doc, or defaulted to `*` in the
+                # ones where it is missing
+                if not filtered:
+                    doc.setdefault(CORE, ["*"])
+                    doc.setdefault(PRIVATE, ["*"])
                 # Skip sections with ONLY and that don't match
-                if any(os.environ.get(key) not in values
-                       for key, values in doc.get("ONLY", dict()).items()):
+                elif any(os.environ.get(key) not in values
+                         for key, values in doc.get("ONLY", dict()).items()):
                     logging.debug("Skipping section with ONLY %s", doc["ONLY"])
                     continue
                 # Flatten all sections in a single dict
                 for repo, addons in doc.items():
+                    if repo == "ONLY":
+                        continue
                     logging.debug("Processing %s repo", repo)
                     special_missing.discard(repo)
                     for glob in addons:

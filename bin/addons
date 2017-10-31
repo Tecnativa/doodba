@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 from __future__ import print_function
+import os
 import sys
 from argparse import ArgumentParser
 from subprocess import check_call
-from odoobaselib import addons_config, CORE, PRIVATE, logging
+from odoobaselib import addons_config, CORE, PRIVATE, SRC_DIR, logging
 
 # Define CLI options
 parser = ArgumentParser(description="Install addons in current environment")
+parser.add_argument(
+    "action", choices=("init", "update", "list"),
+    help="What to do with the matched addons.")
 parser.add_argument(
     "-c", "--core", action="store_true",
     help="Install all Odoo core addons")
@@ -14,49 +18,39 @@ parser.add_argument(
     "-e", "--extra", action="store_true",
     help="Install all extra addons")
 parser.add_argument(
-    "-l", "--list", action="store_true",
-    help="Only list addons instead of installing them")
+    "-f", "--fullpath", action="store_true",
+    help="Print addon's full path, only useful with list mode")
 parser.add_argument(
     "-p", "--private", action="store_true",
     help="Install all private addons")
 parser.add_argument(
     "-s", "--separator", type=str, default=",",
-    help="String that separates addons when using --list")
+    help="String that separates addons only useful with list mode")
 parser.add_argument(
     "-t", "--test", action="store_true",
-    help="Run unit tests for these addons, usually combined with --update")
-parser.add_argument(
-    "-u", "--update", action="store_true",
-    help="Update addons instead of installing them")
-
-# Check no CLI conflicts
-args = parser.parse_args()
-if not (args.private or args.core or args.extra):
-    parser.error("You have to choose an option at least")
-if args.list and args.update:
-    parser.error("Cannot --list and --update together")
-if args.separator != "," and not args.list:
-    parser.error("Cannot use --separator without --list")
+    help="Run unit tests for these addons, usually combined with update")
 
 # Generate the matching addons set
+args = parser.parse_args()
 addons = set()
 for addon, repo in addons_config():
     core_ok = args.core and repo == CORE
     extra_ok = args.extra and repo not in {CORE, PRIVATE}
     private_ok = args.private and repo == PRIVATE
     if private_ok or core_ok or extra_ok:
+        if args.fullpath and args.action == "list":
+            addon = os.path.join(SRC_DIR, repo, addon)
         addons.add(addon)
 
 # Do the required action
 if not addons:
     sys.exit("No addons found")
 addons = args.separator.join(sorted(addons))
-if args.list:
+if args.action == "list":
     print(addons)
 else:
-    command = ["odoo", "--stop-after-init"]
+    command = ["odoo", "--stop-after-init", "--{}".format(args.action), addons]
     if args.test:
         command += ["--test-enable", "--workers", "0"]
-    command += ["--update" if args.update else "--init", addons]
     logging.info("Executing %s", " ".join(command))
     check_call(command)
