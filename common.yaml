@@ -13,7 +13,7 @@ services:
             PYTHONOPTIMIZE: 2
         tty: true
         volumes:
-            - filestore$ODOO_MAJOR:/var/lib/odoo:z
+            - filestore:/var/lib/odoo:z
         labels:
             traefik.docker.network: "inverseproxy_shared"
             traefik.enable: "true"
@@ -27,7 +27,7 @@ services:
             POSTGRES_USER: "$DB_USER"
             POSTGRES_PASSWORD: "$DB_PASSWORD"
         volumes:
-            - db$ODOO_MAJOR:/var/lib/postgresql/data:z
+            - db:/var/lib/postgresql/data:z
 
     smtpfake:
         image: tecnativa/smtp-sink
@@ -72,4 +72,4 @@ services:
             PGPASSWORD: "$DB_PASSWORD"
             PGUSER: "$DB_USER"
         volumes:
-            - filestore$ODOO_MAJOR:/mnt/backup/src/odoo:z
+            - filestore:/mnt/backup/src/odoo:z
