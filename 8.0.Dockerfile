@@ -104,7 +104,7 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 
 # Special case for PhantomJS
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
-    && npm install -g phantomjs-prebuilt \
+    && npm install -g phantomjs-prebuilt@2.1.15 \
     && rm -Rf ~/.npm /tmp/*
 
 # Special case for wkhtmltox
