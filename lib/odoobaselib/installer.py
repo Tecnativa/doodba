@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 from os.path import exists
 from subprocess import check_call
 from odoobaselib import logging
@@ -107,14 +108,15 @@ class PipInstaller(Installer):
         return [self.file_path] if exists(self.file_path) else []
 
 
-INSTALLERS = {
-    "apt": AptInstaller,
-    "gem": GemInstaller,
-    "npm": NpmInstaller,
-    "pip": PipInstaller,
-}
+INSTALLERS = OrderedDict([
+    ("apt", AptInstaller),
+    ("gem", GemInstaller),
+    ("npm", NpmInstaller),
+    ("pip", PipInstaller),
+])
 
 
 def install(installer, file_path):
     """Perform a given type of installation from a given file."""
     return INSTALLERS[installer](file_path).install()
+
