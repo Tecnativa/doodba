@@ -916,6 +916,11 @@ If you need to add a feature or fix for `scaffolding`, before merging that PR,
 we need tests that ensure that backwards compatibility with previous
 scaffolding versions is preserved.
 
+## Related Projects
+
+[Ansible role for automated deployment / update from Le Filament](https://github.com/remi-filament/ansible_role_odoo_docker)
+
+
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
 [`addons.yaml`]: #optodoocustomsrcaddonstxt
 [`COMPOSE_FILE` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
