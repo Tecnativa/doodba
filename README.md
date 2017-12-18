@@ -918,7 +918,7 @@ scaffolding versions is preserved.
 
 ## Related Projects
 
-[Ansible role for automated deployment / update from Le Filament](https://github.com/remi-filament/ansible_role_odoo_docker)
+- [Ansible role for automated deployment / update from Le Filament](https://github.com/remi-filament/ansible_role_odoo_docker)
 
 
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
