@@ -51,8 +51,9 @@ ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD USER odoo
 
 ARG PYTHONOPTIMIZE=2
-ARG WKHTMLTOPDF_VERSION=0.12.4
-ARG WKHTMLTOPDF_CHECKSUM='049b2cdec9a8254f0ef8ac273afaf54f7e25459a273e27189591edc7d7cf29db'
+ARG WKHTMLTOPDF_VERSION=0.12.1
+ARG WKHTMLTOPDF_CHECKSUM='3ae78d7f7323f6bbc76238eb548729f17ab0db5bed59455a023b9c93fb0c35c4'
+ARG WKHTMLTOPDF_URL=http://nightly.odoo.com/extra/wkhtmltox-0.12.1.2_linux-jessie-amd64.deb
 ENV DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
@@ -108,10 +109,12 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
     && rm -Rf ~/.npm /tmp/*
 
 # Special case for wkhtmltox
-RUN curl -SLo wkhtmltox.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox-${WKHTMLTOPDF_VERSION}_linux-generic-amd64.tar.xz \
-    && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.tar.xz" | sha256sum -c - \
-    && tar --strip-components 1 -C /usr/local/ -xf wkhtmltox.tar.xz \
-    && rm wkhtmltox.tar.xz \
+RUN curl -SLo wkhtmltox.deb "${WKHTMLTOPDF_URL}" \
+    && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
+    && dpkg --force-depends -i wkhtmltox.deb \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends -f \
+    && rm -Rf /var/lib/apt/lists/* wkhtmltox.deb \
     && wkhtmltopdf --version
 
 # Other facilities
