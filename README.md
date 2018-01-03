@@ -899,6 +899,11 @@ Dockerfile similar to this one:
 FROM tecnativa/odoo-base@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c98d5d3817699e1
 ```
 
+### How to get proper assets when printing reports?
+
+Make sure there's a `ir.config_parameter` called `report.url` with the value
+`http://localhost:8069`.
+
 ### How can I help?
 
 Just [head to our project](https://github.com/Tecnativa/docker-odoo-base) and
