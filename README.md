@@ -1,4 +1,4 @@
-# [Dockerized Odoo Base Image](https://hub.docker.com/r/tecnativa/odoo-base)
+# Doodba ([Dockerized Odoo Base Image](https://hub.docker.com/r/tecnativa/odoo-base))
 
 [![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own version badge on microbadger.com")
 [![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own image badge on microbadger.com")
@@ -923,6 +923,7 @@ scaffolding versions is preserved.
 
 ## Related Projects
 
+- [QA tools for Doodba-based projects](https://github.com/Tecnativa/doodba-qa)
 - [Ansible role for automated deployment / update from Le Filament](https://github.com/remi-filament/ansible_role_odoo_docker)
 
 
