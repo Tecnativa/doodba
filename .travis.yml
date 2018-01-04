@@ -31,6 +31,7 @@ before_install:
   - pip install -r requirements-ci.txt
 
 install:
+  - chown -R $USER:$USER .
   - ./hooks/build
 
 script:
