@@ -176,6 +176,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("sh", "-c", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # ``requirements.txt`` from addon repos were processed
                 ("python", "-c", "import cfssl"),
+                # Local executable binaries found in $PATH
+                ("sh", "-c", "pip install --user -q flake8 && which flake8"),
                 # ``dummy_addon`` and ``private_addon`` exist
                 ("test", "-d", "auto/addons/dummy_addon"),
                 ("test", "-h", "auto/addons/dummy_addon"),
