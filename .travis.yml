@@ -32,6 +32,7 @@ before_install:
 
 install:
   - chown -R $USER:$USER .
+  - chmod -R +r .
   - ./hooks/build
 
 script:
