@@ -17,6 +17,8 @@ services:
             ADMIN_PASSWORD: admin
             PGDATABASE: devel
             PYTHONOPTIMIZE: ""
+            SMTP_SERVER: "smtp"
+            SMTP_PORT: "1025"
             # You want demo data for development
             WITHOUT_DEMO: "false"
         ports:
