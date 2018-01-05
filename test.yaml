@@ -48,6 +48,15 @@ services:
         extends:
             file: common.yaml
             service: smtpfake
+        networks:
+            default:
+            inverseproxy_shared:
+        labels:
+            traefik.docker.network: "inverseproxy_shared"
+            traefik.enable: "true"
+            traefik.frontend.passHostHeader: "true"
+            traefik.port: "8025"
+            traefik.frontend.rule: "Host:${DOMAIN_TEST};PathPrefixStrip:/smtpfake/"
 
 networks:
     default:
