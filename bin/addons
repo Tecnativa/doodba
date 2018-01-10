@@ -1,10 +1,18 @@
 #!/usr/bin/env python
 from __future__ import print_function
+import ast
 import os
 import sys
 from argparse import ArgumentParser
 from subprocess import check_call
-from odoobaselib import addons_config, CORE, PRIVATE, SRC_DIR, logging
+from odoobaselib import (
+    addons_config,
+    CORE,
+    logging,
+    MANIFESTS,
+    PRIVATE,
+    SRC_DIR,
+)
 
 # Define CLI options
 parser = ArgumentParser(description="Install addons in current environment")
@@ -20,6 +28,9 @@ parser.add_argument(
 parser.add_argument(
     "-f", "--fullpath", action="store_true",
     help="Print addon's full path, only useful with list mode")
+parser.add_argument(
+    "-i", "--installable", action="store_true",
+    help="Include only installable addons")
 parser.add_argument(
     "-p", "--private", action="store_true",
     help="Install all private addons")
@@ -38,8 +49,26 @@ for addon, repo in addons_config():
     extra_ok = args.extra and repo not in {CORE, PRIVATE}
     private_ok = args.private and repo == PRIVATE
     if private_ok or core_ok or extra_ok:
+        addon_path = os.path.join(SRC_DIR, repo, addon)
+        if args.installable:
+            installable = False
+            manifests = list(MANIFESTS)
+            while True:
+                try:
+                    manifest = os.path.join(addon_path, manifests.pop())
+                    with open(manifest, "r") as code:
+                        manifest = ast.literal_eval(code.read())
+                except IndexError:
+                    break
+                except IOError:
+                    continue
+                else:
+                    installable = manifest.get("installable", True)
+                    break
+            if not installable:
+                continue
         if args.fullpath and args.action == "list":
-            addon = os.path.join(SRC_DIR, repo, addon)
+            addon = addon_path
         addons.add(addon)
 
 # Do the required action
