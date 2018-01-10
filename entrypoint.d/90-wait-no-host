@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -z "${WAIT_NO_HOST}" ]; then
+    exit 0
+fi
+
+log INFO "Waiting for the ${WAIT_NO_HOST} container to stop."
+
+while ping -c1 "${WAIT_NO_HOST}" &> /dev/null; do
+    log DEBUG "${WAIT_NO_HOST} responded to ping."
+    sleep 1
+done
+
+log INFO "${WAIT_NO_HOST} has stopped responding; resuming startup."
+
+exit 0
