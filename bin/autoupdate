@@ -1,3 +1,5 @@
 #!/usr/local/bin/python-odoo-shell
+
+# Note: ``module_auto_update`` must be installed in Odoo for this to work.
 env["base.module.upgrade"].upgrade_module()
 env.cr.commit()
