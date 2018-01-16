@@ -100,13 +100,10 @@ class ScaffoldingCase(unittest.TestCase):
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
                 ("test", "-e", "auto/addons/website"),
-                ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "-e", "auto/addons/private_addon"),
                 ("bash", "-c",
                  'test "$(addons list -p)" == disabled_addon,private_addon'),
                 ("bash", "-c", 'test "$(addons list -ip)" == private_addon'),
-                ("bash", "-c",
-                 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
                 ("bash", "-c", "! addons list -px"),
             )
@@ -114,23 +111,40 @@ class ScaffoldingCase(unittest.TestCase):
                 project_dir,
                 dict(sub_env, DBNAME="limited_private"),
                 ("test", "-e", "auto/addons/website"),
-                ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test -z "$(addons list -p)"'),
-                ("bash", "-c",
-                 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
             )
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="limited_core"),
                 ("test", "!", "-e", "auto/addons/website"),
-                ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test -z "$(addons list -p)"'),
+                ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
+            )
+        # Skip Odoo versions that don't support __manifest__.py files
+        for sub_env in matrix(odoo_skip={"8.0", "9.0"}):
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="prod"),
+                ("test", "-e", "auto/addons/dummy_addon"),
                 ("bash", "-c",
                  'test "$(addons list -e)" == dummy_addon,product'),
-                ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
+            )
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="limited_private"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("bash", "-c",
+                 'test "$(addons list -e)" == dummy_addon,product'),
+            )
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="limited_core"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("bash", "-c",
+                 'test "$(addons list -e)" == dummy_addon,product'),
             )
 
     def test_settings(self):
