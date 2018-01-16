@@ -108,6 +108,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c",
                  'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
+                ("bash", "-c", "! addons list -px"),
             )
             self.compose_test(
                 project_dir,
