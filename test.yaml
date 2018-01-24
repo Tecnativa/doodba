@@ -8,7 +8,6 @@ services:
             PGDATABASE: test
             # You may want demo data for testing
             WITHOUT_DEMO: "false"
-            SMTP_SERVER: "smtp"
             SMTP_PORT: "1025"
         depends_on:
             - db
