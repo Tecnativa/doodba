@@ -132,6 +132,19 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
             )
 
+    def test_settings(self):
+        """Test settings are filled OK"""
+        folder = join(SCAFFOLDINGS_DIR, "settings")
+        commands = (
+            # Odoo should install
+            ("--stop-after-init",),
+            # SMTP settings work
+            ("./custom/scripts/test_smtp_settings.py",),
+        )
+        # Odoo 8.0 has no shell
+        for sub_env in matrix(odoo_skip={"8.0"}):
+            self.compose_test(folder, sub_env, *commands)
+
     def test_smallest(self):
         """Tests for the smallest possible environment."""
         commands = (
