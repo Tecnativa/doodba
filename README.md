@@ -582,7 +582,7 @@ version: "2.1"
 
 services:
     proxy:
-        image: traefik:1.3-alpine
+        image: traefik:1.5-alpine
         networks:
             shared:
             private:
@@ -600,6 +600,7 @@ services:
             - --ACME.ACMELogging
             - --ACME.Email=you@example.com
             - --ACME.EntryPoint=https
+            - --ACME.HTTPChallenge.entryPoint=http
             - --ACME.OnHostRule
             - --ACME.Storage=/etc/traefik/acme/acme.json
             - --DefaultEntryPoints=http,https
