@@ -629,10 +629,12 @@ services:
 
 networks:
     shared:
+        internal: true
         driver_opts:
             encrypted: 1
 
     private:
+        internal: true
         driver_opts:
             encrypted: 1
 
