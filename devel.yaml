@@ -43,11 +43,6 @@ services:
             file: common.yaml
             service: db
 
-    inbox:
-        extends:
-            file: common.yaml
-            service: inboxfake
-
     smtp:
         extends:
             file: common.yaml
@@ -59,6 +54,10 @@ services:
         image: yajo/wdb-server
         ports:
             - "127.0.0.1:1984:1984"
+
+networks:
+    default:
+        internal: true
 
 volumes:
     filestore:

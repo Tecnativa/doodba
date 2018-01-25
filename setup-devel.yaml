@@ -20,6 +20,8 @@ services:
                 PIP_INSTALL_ODOO: "false"
                 CLEAN: "false"
                 COMPILE: "false"
+        networks:
+            - public
         volumes:
             - ./odoo/custom/src:/opt/odoo/custom/src:rw,z
         environment:
@@ -30,3 +32,6 @@ services:
             UMASK: "$UMASK"
         user: root
         entrypoint: autoaggregate
+
+networks:
+    public:
