@@ -2,7 +2,7 @@
 ./odoo:
     defaults:
         # Shallow repositories ($DEPTH_DEFAULT=1) are faster & thinner
-        # You may need a bigger depth when merging PRs (use $DEPTH_MERGE 
+        # You may need a bigger depth when merging PRs (use $DEPTH_MERGE
         # for a sane value of 100 commits)
         depth: $DEPTH_DEFAULT
     remotes:
