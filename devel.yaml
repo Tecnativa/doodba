@@ -17,6 +17,7 @@ services:
             ADMIN_PASSWORD: admin
             PGDATABASE: devel
             PYTHONOPTIMIZE: ""
+            SMTP_PORT: "1025"
             # You want demo data for development
             WITHOUT_DEMO: "false"
         ports:
@@ -51,6 +52,8 @@ services:
         extends:
             file: common.yaml
             service: smtpfake
+        ports:
+            - "127.0.0.1:8025:8025"
 
     wdb:
         image: yajo/wdb-server

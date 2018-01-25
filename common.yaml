@@ -30,7 +30,7 @@ services:
             - db:/var/lib/postgresql/data:z
 
     smtpfake:
-        image: tecnativa/smtp-sink
+        image: mailhog/mailhog
 
     smtpreal:
         image: tecnativa/postfix-relay
