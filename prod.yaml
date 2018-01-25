@@ -33,12 +33,6 @@ services:
             service: db
         restart: unless-stopped
 
-    inbox:
-        extends:
-            file: common.yaml
-            service: inboxreal
-        restart: unless-stopped
-
     smtp:
         extends:
             file: common.yaml

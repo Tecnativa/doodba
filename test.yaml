@@ -40,11 +40,6 @@ services:
             file: common.yaml
             service: db
 
-    inbox:
-        extends:
-            file: common.yaml
-            service: inboxfake
-
     smtp:
         extends:
             file: common.yaml
@@ -61,6 +56,7 @@ services:
 
 networks:
     default:
+        internal: true
         driver_opts:
             encrypted: 1
 

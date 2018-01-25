@@ -45,18 +45,6 @@ services:
             MAIL_CANONICAL_DOMAINS: "$SMTP_REAL_CANONICAL_DOMAINS"
             MAIL_NON_CANONICAL_DEFAULT: "$SMTP_REAL_NON_CANONICAL_DEFAULT"
 
-    inboxfake:
-        image: tecnativa/tcp-proxy
-        environment:
-            LISTEN: "$INBOX_FAKE_LISTEN"
-            TALK: "$INBOX_FAKE_TALK"
-
-    inboxreal:
-        image: tecnativa/tcp-proxy
-        environment:
-            LISTEN: "$INBOX_REAL_LISTEN"
-            TALK: "$INBOX_REAL_TALK"
-
     backup:
         image: tecnativa/duplicity:postgres-s3
         hostname: backup
