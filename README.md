@@ -512,7 +512,7 @@ I will assume you know how to use Git, Docker and Docker Compose.
     ln -s devel.yaml docker-compose.yml
     chown -R $USER:1000 odoo/auto
     chmod -R ug+rwX odoo/auto
-    export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
+    export UID GID="$(id -g $USER)" UMASK="$(umask)"
     docker-compose build --pull
     docker-compose -f setup-devel.yaml run --rm odoo
     docker-compose up
@@ -543,7 +543,7 @@ you on making it work.
 
 Set it up with:
 
-    export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
+    export UID GID="$(id -g $USER)" UMASK="$(umask)"
     docker-compose -f setup-devel.yaml run --rm odoo
 
 Once finished, you can start using Odoo with:
@@ -555,7 +555,7 @@ Docker builds.
 
 You might consider adding this line to your `~/.bashrc`:
 
-    export UID="$(id -u $USER)" GID="$(id -g $USER)" UMASK="$(umask)"
+    export UID GID="$(id -g $USER)" UMASK="$(umask)"
 
 ##### Production
 
@@ -800,16 +800,9 @@ To **add** the `www.` prefix, it is almost the same; use your imagination
 
 In `.env`, set `DOMAIN_PROD` to `host1.com,host2.com,www.host1.com`, etc.
 
-### When I try to `export UID="$(id -u $USER)"` bash says it is readonly
+### I use [Fish][], how to export needed variables?
 
-I guess you were trying to follow the instructions to run the
-`setup-devel.yaml` environment and you use Bash as your shell.
-
-In such case, just do `export UID`, which just exports the
-already-existing-but-hidden-and-readonly bash `$UID` variable.
-
-Or you could switch to a better shell, such as [Fish][]. If you choose this
-option, you can export them for current terminal session with:
+Do:
 
     set -x UID (id -u $USER)
     set -x GID (id -g $USER)
