@@ -317,6 +317,9 @@ now keep this in mind:
 
 ## Bundled tools
 
+There is a good collections of tools available in the image that help dealing
+with Odoo and its peculiarities:
+
 ### `addons`
 
 A handy CLI tool to automate addon management based on the current environment.
@@ -386,21 +389,7 @@ database, you just need to execute:
 
     docker exec -it your_container psql
 
-### [`wdb`](https://github.com/Kozea/wdb/)
-
-In our opinion, this is the greatest Python debugger available, mostly for
-Docker-based development, so here you have it preinstalled.
-
-I told you, this image is opinionated. :wink:
-
-To use it, write this in any Python script:
-
-```python
-import wdb
-wdb.set_trace()
-```
-
-**DO NOT USE IT IN PRODUCTION ENVIRONMENTS.** (I had to say it).
+The same is true for any other [Postgres client applications][].
 
 ### [`ptvsd`](https://github.com/DonJayamanne/pythonVSCode)
 
@@ -443,7 +432,7 @@ Then, execute that configuration as usual.
 ### [`pudb`](https://github.com/inducer/pudb)
 
 This is another great debugger that includes remote debugging via telnet, which
-can be useful for some cases, or for people that prefer it over wdb.
+can be useful for some cases, or for people that prefer it over [wdb](#wdb).
 
 To use it, inject this in any Python script:
 
@@ -454,8 +443,8 @@ pudb.remote.set_trace(term_size=(80, 24))
 
 Then open a telnet connection to it (running in `0.0.0.0:6899` by default).
 
-It is safe to use in production environments **if you know what you are doing
-and do not expose the debugging port to attackers**. Assuming you use the
+It is safe to use in [production][] environments **if you know what you are
+doing and do not expose the debugging port to attackers**. Assuming you use the
 [scaffolding][] production environment, you can achieve that with:
 
     docker-compose -f prod.yaml exec odoo telnet localhost 6899
@@ -557,6 +546,53 @@ You might consider adding this line to your `~/.bashrc`:
 
     export UID GID="$(id -g $USER)" UMASK="$(umask)"
 
+To browse Odoo go to `http://localhost:${ODOO_MAJOR}069`
+(i.e. for Odoo 11.0 this would be `http://localhost:11069`).
+
+This environment has several special features:
+
+###### [`wdb`](https://github.com/Kozea/wdb/)
+
+This is one of the greatest Python debugger available, and even more for
+Docker-based development, so here you have it preinstalled.
+
+I told you, this image is opinionated. :wink:
+
+To use it, write this in any Python script:
+
+```python
+import wdb
+wdb.set_trace()
+```
+
+It's available by default on the [development][] environment,
+where you can browse http://localhost:1984 to use it.
+
+**DO NOT USE IT IN PRODUCTION ENVIRONMENTS.** (I had to say it).
+
+###### [MailHog](https://github.com/mailhog/MailHog)
+
+It provides a fake SMTP server that intercepts all mail sent by Odoo and
+displays a simple interface that lets you see and debug all that mail
+comfortably, including headers sent, attachments, etc.
+
+- For [development][], it's in http://localhost:8025
+- For [testing][], it's in http://$DOMAIN_TEST/smtpfake/
+- For [production][], it's not used.
+
+All environments are configured by default to use the bundled SMTP relay.
+They are configured by these environment variables:
+
+- `SMTP_SERVER`
+- `SMTP_PORT`
+- `SMTP_USER`
+- `SMTP_PASSWORD`
+- `SMTP_SSL`
+- `EMAIL_FROM`
+
+For them to be useful, you need to remove any `ir.mail_server` records in your
+database.
+
 ##### Production
 
 This environment is just a template. **It is not production-ready**. You must
@@ -572,8 +608,8 @@ Remember that you will want to backup the filestore in `/var/lib/odoo` volume.
 
 ###### Global inverse proxy
 
-For production and test templates to work fine, you need to have a working
-[Traefik][] inverse proxy in each node.
+For [production][] and [test][] templates to work fine, you need to have a
+working [Traefik][] inverse proxy in each node.
 
 To have it, use this `inverseproxy.yaml` file:
 
@@ -651,7 +687,7 @@ Then boot it up with:
 
 This will intercept all requests coming from port 80 (`http`) and redirect them
 to port 443 (`https`), it will download and install required SSL certificates
-from [Let's Encrypt][] whenever you boot a new production instance, add the
+from [Let's Encrypt][] whenever you boot a new [production][] instance, add the
 required proxy headers to the request, and then redirect all traffic to/from
 odoo automatically.
 
@@ -667,16 +703,18 @@ This allows you to:
 ##### Testing
 
 A good rule of thumb is test in testing before uploading to production, so this
-environment tries to imitate the production one in everything, but *removing
-possible pollution points*:
+environment tries to imitate the [production][] one in everything,
+but *removing possible pollution points*:
 
-- It has no `smtp` service.
+- It has a fake `smtp` service based on [MailHog][].
 
 - It has no `backup` service.
 
 Test it in your machine with:
 
     docker-compose -f test.yaml up --build
+
+This environment also needs a [global inverse proxy](#global-inverse-proxy).
 
 #### Other usage scenarios
 
@@ -838,8 +876,8 @@ general-purpose one, please send us a pull request.
 
 ### Can I skip the `-f <environment>.yaml` part for `docker-compose` commands?
 
-Let's suppose you want to use `test.yaml` environment by default, no matter
-where you clone the project:
+Let's suppose you want to use [`test.yaml`][testing] environment by default,
+no matter where you clone the project:
 
     ln -s test.yaml docker-compose.yaml
     git add docker-compose.yaml
@@ -930,20 +968,25 @@ scaffolding versions is preserved.
 [`PYTHONOPTIMIZE=2`]: https://docs.python.org/2/using/cmdline.html#envvar-PYTHONOPTIMIZE
 [`repos.yaml`]: #optodoocustomsrcreposyaml
 [builds]: https://hub.docker.com/r/tecnativa/odoo-base/builds/
+[development]: #development
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
 [Fish]: http://fishshell.com/
 [glob]: https://docs.python.org/3/library/glob.html
 [Let's Encrypt]: https://letsencrypt.org/
+[MailHog]: #mailhog
 [OCA]: https://odoo-community.org/
 [OCB]: https://github.com/OCA/OCB
 [Odoo S.A.]: https://www.odoo.com
 [OpenUpgrade]: https://github.com/OCA/OpenUpgrade/
 [Original Odoo]: https://github.com/odoo/odoo
 [pip `requirements.txt`]: https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
+[Postgres client applications]: https://www.postgresql.org/docs/current/static/reference-client.html
+[production]: #production
 [retrobreak]: https://github.com/Tecnativa/docker-odoo-base/issues/67
 [scaffolding]: #scaffolding
 [several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
 [ssh-conf]: https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client
+[testing]: #testing
 [Traefik]: https://traefik.io/
 [VSCode]: https://code.visualstudio.com/
 [www-force]: https://github.com/containous/traefik/issues/1380
