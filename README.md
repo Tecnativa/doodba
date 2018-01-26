@@ -593,6 +593,23 @@ They are configured by these environment variables:
 For them to be useful, you need to remove any `ir.mail_server` records in your
 database.
 
+###### Network isolation
+
+The Docker network is in `--internal` mode, which means that it has
+no access to the Internet. This feature protects you in cases where
+a [production][] database is restored and Odoo tries to connect to
+SMTP/IMAP/POP3 servers to send or receive emails. Also when you are
+using [connectors](https://github.com/OCA/connector),
+[mail trackers](https://www.odoo.com/apps/modules/browse?search=mail_tracking)
+or any API sync/calls.
+
+If you still need to have public access, set `internal: false` in the
+environment file, detach all containers from that network, remove the network,
+reatach all containers to it, and possibly restart them. You can also just do:
+
+    docker-compose down
+    docker-compose up -d
+
 ##### Production
 
 This environment is just a template. **It is not production-ready**. You must
@@ -709,6 +726,8 @@ but *removing possible pollution points*:
 - It has a fake `smtp` service based on [MailHog][].
 
 - It has no `backup` service.
+
+- It is [isolated](#network-isolation).
 
 Test it in your machine with:
 
