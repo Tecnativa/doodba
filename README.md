@@ -855,12 +855,6 @@ use the `.yml` one if both are found, so that's the one we considered you
 should use in your local clones, and that's the one that will be git-ignored by
 default by the scaffolding `.gitignore` file.
 
-Another option is that you use the [`COMPOSE_FILE` environment variable][].
-Returning to the example where you are in your local development machine, you
-might want to add this to your `~/.bashrc` or equivalent:
-
-    export COMPOSE_FILE=docker-compose.yml:docker-compose.yaml:devel.yaml
-
 As a design choice, the scaffolding defaults to being explicit.
 
 ### How can I pin an image version?
