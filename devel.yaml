@@ -30,7 +30,6 @@ services:
         depends_on:
             - db
             - smtp
-            - inbox
             - wdb
         command:
             - odoo

@@ -12,7 +12,6 @@ services:
         depends_on:
             - db
             - smtp
-            - inbox
         networks:
             default:
             inverseproxy_shared:
