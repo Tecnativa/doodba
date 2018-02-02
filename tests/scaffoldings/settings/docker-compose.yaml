@@ -14,6 +14,7 @@ services:
       PGUSER: another_odoo
       PGPASSWORD: anotherodoopassword
       PGHOST: postgresql
+      PGPORT: 15432
       PGDATABASE: ${DBNAME:-prod}
       SMTP_SERVER: mailhog
       SMTP_PORT: 1025 # MailHog default
@@ -27,6 +28,7 @@ services:
     environment:
       POSTGRES_USER: another_odoo
       POSTGRES_PASSWORD: anotherodoopassword
+    command: -p 15432
     volumes:
       - db:/var/lib/postgresql/data:z
 
