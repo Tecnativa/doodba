@@ -156,7 +156,7 @@ class ScaffoldingCase(unittest.TestCase):
                 dict(sub_env, DBNAME="limited_core"),
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("bash", "-c",
-                 '[ "$(addons list -s. -pwfake1,fake2)" == fake1.fake2 ]'),
+                 '[ "$(addons list -s. -pwfake1 -wfake2)" == fake1.fake2 ]'),
                 ("bash", "-c",
                  'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
