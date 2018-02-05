@@ -115,7 +115,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test -z "$(addons list -p)"'),
                 ("bash", "-c",
-                 '[ "$(addons list -s. -pwfake1,fake2)" == fake1.fake2 ]'),
+                 '[ "$(addons list -s. -pwfake1 -wfake2)" == fake1.fake2 ]'),
                 ("bash", "-c", "! addons list -wrepeat -Wrepeat"),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
             )
