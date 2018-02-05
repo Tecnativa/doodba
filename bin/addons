@@ -56,7 +56,7 @@ addons = set(args.with_.split(",")) - {""}
 without = set(args.without.split(",")) - {""}
 if addons & without:
     sys.exit("Cannot include and exclude the same addon!")
-for addon, repo in addons_config():
+for addon, repo in addons_config(strict=args.explicit):
     if addon in without:
         continue
     core_ok = args.core and repo == CORE
