@@ -117,8 +117,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c",
                  '[ "$(addons list -s. -pwfake1,fake2)" == fake1.fake2 ]'),
                 ("bash", "-c", "! addons list -wrepeat -Wrepeat"),
-                ("bash", "-c",
-                 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
             )
             self.compose_test(
