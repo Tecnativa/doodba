@@ -52,8 +52,8 @@ parser.add_argument(
 
 # Generate the matching addons set
 args = parser.parse_args()
-addons = set(args.with_.split(","))
-without = set(args.without.split(","))
+addons = set(args.with_.split(",")) - {""}
+without = set(args.without.split(",")) - {""}
 if addons & without:
     sys.exit("Cannot include and exclude the same addon!")
 for addon, repo in addons_config():
