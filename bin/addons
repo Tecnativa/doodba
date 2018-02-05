@@ -44,10 +44,10 @@ parser.add_argument(
     "-x", "--explicit", action="store_true",
     help="Fail if any addon is explicitly declared but not found")
 parser.add_argument(
-    "-w", "--with", action="append", dest="with_",
+    "-w", "--with", action="append", dest="with_", default=[],
     help="Addons to include always.")
 parser.add_argument(
-    "-W", "--without", action="append",
+    "-W", "--without", action="append", default=[],
     help="Addons to exclude always.")
 
 # Generate the matching addons set
