@@ -21,10 +21,10 @@ parser.add_argument(
     help="What to do with the matched addons.")
 parser.add_argument(
     "-c", "--core", action="store_true",
-    help="Install all Odoo core addons")
+    help="Use all Odoo core addons")
 parser.add_argument(
     "-e", "--extra", action="store_true",
-    help="Install all extra addons")
+    help="Use all extra addons")
 parser.add_argument(
     "-f", "--fullpath", action="store_true",
     help="Print addon's full path, only useful with list mode")
@@ -33,18 +33,21 @@ parser.add_argument(
     help="Include only installable addons")
 parser.add_argument(
     "-p", "--private", action="store_true",
-    help="Install all private addons")
+    help="Use all private addons")
 parser.add_argument(
     "-s", "--separator", type=str, default=",",
     help="String that separates addons only useful with list mode")
 parser.add_argument(
     "-t", "--test", action="store_true",
     help="Run unit tests for these addons, usually combined with update")
+parser.add_argument(
+    "-x", "--explicit", action="store_true",
+    help="Fail if any addon is explicitly declared but not found")
 
 # Generate the matching addons set
 args = parser.parse_args()
 addons = set()
-for addon, repo in addons_config():
+for addon, repo in addons_config(strict=args.explicit):
     core_ok = args.core and repo == CORE
     extra_ok = args.extra and repo not in {CORE, PRIVATE}
     private_ok = args.private and repo == PRIVATE

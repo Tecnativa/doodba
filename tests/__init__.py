@@ -100,36 +100,60 @@ class ScaffoldingCase(unittest.TestCase):
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
                 ("test", "-e", "auto/addons/website"),
-                ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "-e", "auto/addons/private_addon"),
                 ("bash", "-c",
                  'test "$(addons list -p)" == disabled_addon,private_addon'),
                 ("bash", "-c", 'test "$(addons list -ip)" == private_addon'),
-                ("bash", "-c",
-                 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
+                # absent_addon is missing and should fail
+                ("bash", "-c", "! addons list -px"),
             )
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="limited_private"),
                 ("test", "-e", "auto/addons/website"),
-                ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test -z "$(addons list -p)"'),
-                ("bash", "-c",
-                 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
             )
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="limited_core"),
                 ("test", "!", "-e", "auto/addons/website"),
-                ("test", "-e", "auto/addons/dummy_addon"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test -z "$(addons list -p)"'),
+                ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
+            )
+        # Skip Odoo versions that don't support __manifest__.py files
+        for sub_env in matrix(odoo_skip={"8.0", "9.0"}):
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="prod"),
+                # ``dummy_addon`` and ``private_addon`` exist
+                ("test", "-d", "auto/addons/dummy_addon"),
+                ("test", "-h", "auto/addons/dummy_addon"),
+                ("test", "-f", "auto/addons/dummy_addon/__init__.py"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                # Addon from extra repo takes higher priority than core version
+                ("realpath", "auto/addons/product"),
+                ("bash", "-c", 'test "$(realpath auto/addons/product)" == '
+                               '/opt/odoo/custom/src/dummy_repo/product'),
                 ("bash", "-c",
                  'test "$(addons list -e)" == dummy_addon,product'),
-                ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
+            )
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="limited_private"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("bash", "-c",
+                 'test "$(addons list -e)" == dummy_addon,product'),
+            )
+            self.compose_test(
+                project_dir,
+                dict(sub_env, DBNAME="limited_core"),
+                ("test", "-e", "auto/addons/dummy_addon"),
+                ("bash", "-c",
+                 'test "$(addons list -e)" == dummy_addon,product'),
             )
 
     def test_settings(self):
@@ -193,18 +217,10 @@ class ScaffoldingCase(unittest.TestCase):
                 ("python", "-c", "import cfssl"),
                 # Local executable binaries found in $PATH
                 ("sh", "-c", "pip install --user -q flake8 && which flake8"),
-                # ``dummy_addon`` and ``private_addon`` exist
-                ("test", "-d", "auto/addons/dummy_addon"),
-                ("test", "-h", "auto/addons/dummy_addon"),
-                ("test", "-f", "auto/addons/dummy_addon/__init__.py"),
                 ("test", "!", "-e", "custom/src/private/dummy_addon"),
                 ("test", "-d", "custom/src/private/private_addon"),
                 ("test", "-f", "custom/src/private/private_addon/__init__.py"),
                 ("test", "-e", "auto/addons/private_addon"),
-                # Addon from extra repo takes higher priority than core version
-                ("realpath", "auto/addons/product"),
-                ("bash", "-c", 'test "$(realpath auto/addons/product)" == '
-                               '/opt/odoo/custom/src/dummy_repo/product'),
                 # ``odoo`` command works
                 ("odoo", "--version"),
                 # Implicit ``odoo`` command also works

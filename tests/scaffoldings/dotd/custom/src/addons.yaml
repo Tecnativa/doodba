@@ -1,4 +1,5 @@
 dummy_repo:
+  - absent_addon
   - dummy_addon
   - product
 

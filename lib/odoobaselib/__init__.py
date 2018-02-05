@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
-from glob import iglob
+from glob import glob
 
 import yaml
 
@@ -43,16 +43,18 @@ else:
 logging.root.setLevel(_log_level)
 
 
-def addons_config(filtered=True):
+def addons_config(filtered=True, strict=False):
     """Yield addon name and path from ``ADDONS_YAML``.
 
     :param bool filtered:
         Use ``False`` to include all addon definitions. Use ``True`` (default)
         to include only those matched by ``ONLY`` clauses, if any.
+
+    :param bool strict:
+        Use ``True`` to raise an exception if any declared addon is not found.
     """
     config = dict()
     special_missing = {PRIVATE, CORE}
-    manifest_files = ['__manifest__.py', '__openerp__.py']
     try:
         with open(ADDONS_YAML) as addons_file:
             for doc in yaml.load_all(addons_file):
@@ -73,13 +75,20 @@ def addons_config(filtered=True):
                         continue
                     logging.debug("Processing %s repo", repo)
                     special_missing.discard(repo)
-                    for glob in addons:
-                        logging.debug("Expanding glob %s", glob)
-                        for addon in iglob(os.path.join(SRC_DIR, repo, glob)):
+                    for partial_glob in addons:
+                        logging.debug("Expanding glob %s", partial_glob)
+                        full_glob = os.path.join(SRC_DIR, repo, partial_glob)
+                        found = glob(full_glob)
+                        if strict and not found:
+                            raise Exception("Addons not found", full_glob)
+                        for addon in found:
                             manifests = (
-                                os.path.join(addon, m) for m in manifest_files
+                                os.path.join(addon, m) for m in MANIFESTS
                             )
                             if not any(os.path.isfile(m) for m in manifests):
+                                if strict:
+                                    raise Exception("Addon without manifest",
+                                                    addon)
                                 logging.debug(
                                     "Skipping '%s' as it is not a valid Odoo "
                                     "module", addon)
@@ -93,7 +102,7 @@ def addons_config(filtered=True):
     # By default, all private and core addons are enabled
     for repo in special_missing:
         logging.debug("Auto-adding all addons from %s", repo)
-        for addon in iglob(os.path.join(SRC_DIR, repo, "*")):
+        for addon in glob(os.path.join(SRC_DIR, repo, "*")):
             addon = os.path.basename(addon)
             config.setdefault(addon, set())
             config[addon].add(repo)
