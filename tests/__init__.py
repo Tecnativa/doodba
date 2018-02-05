@@ -114,6 +114,11 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/website"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test -z "$(addons list -p)"'),
+                ("bash", "-c",
+                 '[ "$(addons list -s. -pwfake1,fake2)" == fake1.fake2 ]'),
+                ("bash", "-c", "! addons list -wrepeat -Wrepeat"),
+                ("bash", "-c",
+                 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
             )
             self.compose_test(
@@ -153,7 +158,11 @@ class ScaffoldingCase(unittest.TestCase):
                 dict(sub_env, DBNAME="limited_core"),
                 ("test", "-e", "auto/addons/dummy_addon"),
                 ("bash", "-c",
+                 '[ "$(addons list -s. -pwfake1,fake2)" == fake1.fake2 ]'),
+                ("bash", "-c",
                  'test "$(addons list -e)" == dummy_addon,product'),
+                ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
+                ("bash", "-c", 'test "$(addons list -cWsale)" == crm'),
             )
 
     def test_settings(self):

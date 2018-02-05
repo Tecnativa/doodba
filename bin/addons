@@ -43,11 +43,22 @@ parser.add_argument(
 parser.add_argument(
     "-x", "--explicit", action="store_true",
     help="Fail if any addon is explicitly declared but not found")
+parser.add_argument(
+    "-w", "--with", action="store", dest="with_", default="",
+    help="Comma-separated list of addons to include always.")
+parser.add_argument(
+    "-W", "--without", action="store", default="",
+    help="Comma-separated list of addons to exclude always.")
 
 # Generate the matching addons set
 args = parser.parse_args()
-addons = set()
-for addon, repo in addons_config(strict=args.explicit):
+addons = set(args.with_.split(","))
+without = set(args.without.split(","))
+if addons & without:
+    sys.exit("Cannot include and exclude the same addon!")
+for addon, repo in addons_config():
+    if addon in without:
+        continue
     core_ok = args.core and repo == CORE
     extra_ok = args.extra and repo not in {CORE, PRIVATE}
     private_ok = args.private and repo == PRIVATE
