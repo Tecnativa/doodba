@@ -128,7 +128,15 @@ class ScaffoldingCase(unittest.TestCase):
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
+                # ``dummy_addon`` and ``private_addon`` exist
+                ("test", "-d", "auto/addons/dummy_addon"),
+                ("test", "-h", "auto/addons/dummy_addon"),
+                ("test", "-f", "auto/addons/dummy_addon/__init__.py"),
                 ("test", "-e", "auto/addons/dummy_addon"),
+                # Addon from extra repo takes higher priority than core version
+                ("realpath", "auto/addons/product"),
+                ("bash", "-c", 'test "$(realpath auto/addons/product)" == '
+                               '/opt/odoo/custom/src/dummy_repo/product'),
                 ("bash", "-c",
                  'test "$(addons list -e)" == dummy_addon,product'),
             )
@@ -208,18 +216,10 @@ class ScaffoldingCase(unittest.TestCase):
                 ("python", "-c", "import cfssl"),
                 # Local executable binaries found in $PATH
                 ("sh", "-c", "pip install --user -q flake8 && which flake8"),
-                # ``dummy_addon`` and ``private_addon`` exist
-                ("test", "-d", "auto/addons/dummy_addon"),
-                ("test", "-h", "auto/addons/dummy_addon"),
-                ("test", "-f", "auto/addons/dummy_addon/__init__.py"),
                 ("test", "!", "-e", "custom/src/private/dummy_addon"),
                 ("test", "-d", "custom/src/private/private_addon"),
                 ("test", "-f", "custom/src/private/private_addon/__init__.py"),
                 ("test", "-e", "auto/addons/private_addon"),
-                # Addon from extra repo takes higher priority than core version
-                ("realpath", "auto/addons/product"),
-                ("bash", "-c", 'test "$(realpath auto/addons/product)" == '
-                               '/opt/odoo/custom/src/dummy_repo/product'),
                 # ``odoo`` command works
                 ("odoo", "--version"),
                 # Implicit ``odoo`` command also works
