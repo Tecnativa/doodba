@@ -87,7 +87,8 @@ for addon, repo in addons_config(strict=args.explicit):
 
 # Do the required action
 if not addons:
-    sys.exit("No addons found")
+    print("No addons found", file=sys.stderr)
+    sys.exit(2)
 addons = args.separator.join(sorted(addons))
 if args.action == "list":
     print(addons)
