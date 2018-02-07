@@ -302,7 +302,7 @@ class ScaffoldingCase(unittest.TestCase):
                     )
                 # Test all 3 official environments
                 for dcfile in ("devel", "test", "prod"):
-                    sub_env["COMPOSE_FILE"] = f"{dcfile}.yaml"
+                    sub_env["COMPOSE_FILE"] = "{}.yaml".format(dcfile)
                     self.compose_test(
                         tmpdirname, sub_env,
                         # ``odoo`` command works
