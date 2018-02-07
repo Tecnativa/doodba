@@ -234,6 +234,37 @@ class ScaffoldingCase(unittest.TestCase):
                 ("--version",),
             )
 
+    def test_dependencies(self):
+        """Test dependencies installation."""
+        dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies")
+        for sub_env in matrix():
+            self.compose_test(
+                dependencies_dir, sub_env,
+                ("test", "!", "-f", "custom/dependencies/apt.txt"),
+                ("test", "!", "-f", "custom/dependencies/gem.txt"),
+                ("test", "!", "-f", "custom/dependencies/npm.txt"),
+                ("test", "!", "-f", "custom/dependencies/pip.txt"),
+                # apt_build.txt
+                ("test", "-f", "custom/dependencies/apt_build.txt"),
+                ("test", "!", "-e", "/usr/bin/gcc"),
+                # apt-without-sequence.txt
+                ("test", "-f", "custom/dependencies/apt-without-sequence.txt"),
+                ("test", "!", "-e", "/bin/busybox"),
+                # 070-apt-bc.txt
+                ("test", "-f", "custom/dependencies/070-apt-bc.txt"),
+                ("test", "-e", "/usr/bin/bc"),
+                # 150-npm-aloha_world-install.txt
+                ("test", "-f", "custom/dependencies/150-npm-aloha_world-install.txt"),
+                ("node", "-e", "require('test-npm-install')"),
+                # 200-pip-without-ext
+                ("test", "-f", "custom/dependencies/200-pip-without-ext"),
+                ("python", "-c", "import Crypto; print(Crypto.__version__)"),
+                ("sh", "-c", "rst2html.py --version | grep 'Docutils 0.14'"),
+                # 270-gem.txt
+                ("test", "-f", "custom/dependencies/270-gem.txt"),
+                ("aloha_world",),
+            )
+
     @unittest.skipUnless(
         MAIN_SCAFFOLDING_VERSION in ODOO_VERSIONS,
         "Main scaffolding version is not being tested")
@@ -271,7 +302,7 @@ class ScaffoldingCase(unittest.TestCase):
                     )
                 # Test all 3 official environments
                 for dcfile in ("devel", "test", "prod"):
-                    sub_env["COMPOSE_FILE"] = f"{dcfile}.yaml"
+                    sub_env["COMPOSE_FILE"] = "{}.yaml".format(dcfile)
                     self.compose_test(
                         tmpdirname, sub_env,
                         # ``odoo`` command works
