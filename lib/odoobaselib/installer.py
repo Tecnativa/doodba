@@ -119,4 +119,3 @@ INSTALLERS = OrderedDict([
 def install(installer, file_path):
     """Perform a given type of installation from a given file."""
     return INSTALLERS[installer](file_path).install()
-
