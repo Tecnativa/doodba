@@ -444,10 +444,9 @@ pudb.remote.set_trace(term_size=(80, 24))
 Then open a telnet connection to it (running in `0.0.0.0:6899` by default).
 
 It is safe to use in [production][] environments **if you know what you are
-doing and do not expose the debugging port to attackers**. Assuming you use the
-[scaffolding][] production environment, you can achieve that with:
+doing and do not expose the debugging port to attackers**. Usage:
 
-    docker-compose -f prod.yaml exec odoo telnet localhost 6899
+    docker-compose exec odoo telnet localhost 6899
 
 ### [`git-aggregator`](https://pypi.python.org/pypi/git-aggregator)
 
@@ -464,19 +463,21 @@ step.
 
 This example merges [several sources][`odoo`]:
 
-    ./odoo:
-        defaults:
-            # Shallow repositores are faster & thinner. You better use
-            # $DEPTH_DEFAULT here when you need no merges.
-            depth: $DEPTH_MERGE
-        remotes:
-            ocb: https://github.com/OCA/OCB.git
-            odoo: https://github.com/odoo/odoo.git
-        target:
-            ocb $ODOO_VERSION
-        merges:
-            - ocb $ODOO_VERSION
-            - odoo refs/pull/13635/head
+```yaml
+./odoo:
+    defaults:
+        # Shallow repositores are faster & thinner. You better use
+        # $DEPTH_DEFAULT here when you need no merges.
+        depth: $DEPTH_MERGE
+    remotes:
+        ocb: https://github.com/OCA/OCB.git
+        odoo: https://github.com/odoo/odoo.git
+    target:
+        ocb $ODOO_VERSION
+    merges:
+        - ocb $ODOO_VERSION
+        - odoo refs/pull/13635/head
+```
 
 ### [`odoo`](https://www.odoo.com/documentation/10.0/reference/cmdline.html)
 
@@ -609,6 +610,9 @@ reatach all containers to it, and possibly restart them. You can also just do:
 
     docker-compose down
     docker-compose up -d
+
+Usually a better option is
+[whitelisting](#how-can-i-whitelist-a-service-and-allow-external-access-to-it).
 
 ##### Production
 
@@ -953,6 +957,18 @@ FROM tecnativa/odoo-base@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c956805794
 
 Make sure there's a `ir.config_parameter` called `report.url` with the value
 `http://localhost:8069`.
+
+### How can I whitelist a service and allow external access to it?
+
+This can become useful when you have isolated environments
+(like in `devel.yaml` and `test.yaml` by default) but you need to allow
+some external API access for them. I.e., you could use
+Google Fonts API for your customer's reports, and those reports
+would take forever and end up rendering badly in staging environments.
+
+In such case, we recommend using the
+[tecnativa/whitelist](https://hub.docker.com/r/tecnativa/whitelist/) image.
+Read its docs there.
 
 ### How can I help?
 
