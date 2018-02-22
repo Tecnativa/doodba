@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
     odoo_proxy:
-        image: alpine
+        image: tecnativa/whitelist
         depends_on:
             - odoo
         networks: &public
@@ -10,7 +10,9 @@ services:
             public:
         ports:
             - "127.0.0.1:${ODOO_MAJOR}069:8069"
-        command: [nc, -lkp, "8069", -e, nc, odoo, "8069"]
+        environment:
+            PORT: 8069
+            TARGET: odoo
 
     odoo:
         extends:
