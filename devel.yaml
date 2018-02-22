@@ -1,6 +1,19 @@
 version: "2.1"
 
 services:
+    odoo_proxy:
+        image: tecnativa/whitelist
+        depends_on:
+            - odoo
+        networks: &public
+            default:
+            public:
+        ports:
+            - "127.0.0.1:${ODOO_MAJOR}069:8069"
+        environment:
+            PORT: 8069
+            TARGET: odoo
+
     odoo:
         extends:
             file: common.yaml
@@ -20,10 +33,6 @@ services:
             SMTP_PORT: "1025"
             # You want demo data for development
             WITHOUT_DEMO: "false"
-        ports:
-            - "127.0.0.1:${ODOO_MAJOR}069:8069"
-            - "127.0.0.1:${ODOO_MAJOR}072:8072"
-            - "127.0.0.1:6899:6899"
         volumes:
             - ./odoo/custom:/opt/odoo/custom:ro,z
             - ./odoo/auto/addons:/opt/odoo/auto/addons:rw,z
@@ -46,17 +55,20 @@ services:
         extends:
             file: common.yaml
             service: smtpfake
+        networks: *public
         ports:
             - "127.0.0.1:8025:8025"
 
     wdb:
         image: yajo/wdb-server
+        networks: *public
         ports:
             - "127.0.0.1:1984:1984"
 
 networks:
     default:
         internal: true
+    public:
 
 volumes:
     filestore:
