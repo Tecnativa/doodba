@@ -39,18 +39,12 @@ else
     pip_deps="psutil==4.3.1 pydot==1.2.3"
 fi
 
-# psycopg2 will be installed later
-sed -ir 's/psycopg2/#\0/' $reqs
-
 optimize="$PYTHONOPTIMIZE"
 if [ $PYTHONOPTIMIZE -gt 1 ]; then
     export PYTHONOPTIMIZE=1
 fi
 pip install --no-cache-dir $pip_deps
 export PYTHONOPTIMIZE="$optimize"
-
-# Security upgrades
-pip install --no-cache-dir "psycopg2>=2.7" # ODOO-SA-2017-06-15-1
 
 # Build and install Odoo dependencies with pip
 pip install --no-cache-dir --requirement $reqs
