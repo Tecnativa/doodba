@@ -9,6 +9,7 @@ services:
             # You may want demo data for testing
             WITHOUT_DEMO: "false"
             SMTP_PORT: "1025"
+        restart: unless-stopped
         depends_on:
             - db
             - smtp
@@ -38,11 +39,13 @@ services:
         extends:
             file: common.yaml
             service: db
+        restart: unless-stopped
 
     smtp:
         extends:
             file: common.yaml
             service: smtpfake
+        restart: unless-stopped
         networks:
             default:
             inverseproxy_shared:
@@ -53,6 +56,33 @@ services:
             traefik.port: "8025"
             traefik.frontend.rule: "Host:${DOMAIN_TEST};PathPrefixStrip:/smtpfake/"
 
+    # Whitelist outgoing traffic for tests, reports, etc.
+    fonts_googleapis_proxy:
+        image: tecnativa/tcp-proxy
+        restart: unless-stopped
+        networks:
+            default:
+                aliases:
+                    - fonts.googleapis.com
+            public:
+        environment:
+            LISTEN: :80 :443
+            TALK: fonts.googleapis.com:80 fonts.googleapis.com:443
+            PRE_RESOLVE: 1
+
+    fonts_gstatic_proxy:
+        image: tecnativa/tcp-proxy
+        restart: unless-stopped
+        networks:
+            default:
+                aliases:
+                    - fonts.gstatic.com
+            public:
+        environment:
+            LISTEN: :80 :443
+            TALK: fonts.gstatic.com:80 fonts.gstatic.com:443
+            PRE_RESOLVE: 1
+
 networks:
     default:
         internal: true
@@ -61,6 +91,8 @@ networks:
 
     inverseproxy_shared:
         external: true
+
+    public:
 
 volumes:
     filestore:
