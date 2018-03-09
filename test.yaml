@@ -57,6 +57,19 @@ services:
             traefik.frontend.rule: "Host:${DOMAIN_TEST};PathPrefixStrip:/smtpfake/"
 
     # Whitelist outgoing traffic for tests, reports, etc.
+    cdnjs_cloudflare_proxy:
+        image: tecnativa/tcp-proxy
+        restart: unless-stopped
+        networks:
+            default:
+                aliases:
+                    - cdnjs.cloudflare.com
+            public:
+        environment:
+            LISTEN: :80 :443
+            TALK: cdnjs.cloudflare.com:80 cdnjs.cloudflare.com:443
+            PRE_RESOLVE: 1
+
     fonts_googleapis_proxy:
         image: tecnativa/tcp-proxy
         restart: unless-stopped
