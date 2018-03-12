@@ -61,7 +61,7 @@ services:
 
     # Whitelist outgoing traffic for tests, reports, etc.
     cdnjs_cloudflare_proxy:
-        image: tecnativa/tcp-proxy
+        image: tecnativa/whitelist
         restart: unless-stopped
         networks:
             default:
@@ -69,12 +69,11 @@ services:
                     - cdnjs.cloudflare.com
             public:
         environment:
-            LISTEN: :80 :443
-            TALK: cdnjs.cloudflare.com:80 cdnjs.cloudflare.com:443
+            TARGET: cdnjs.cloudflare.com
             PRE_RESOLVE: 1
 
     fonts_googleapis_proxy:
-        image: tecnativa/tcp-proxy
+        image: tecnativa/whitelist
         restart: unless-stopped
         networks:
             default:
@@ -82,12 +81,11 @@ services:
                     - fonts.googleapis.com
             public:
         environment:
-            LISTEN: :80 :443
-            TALK: fonts.googleapis.com:80 fonts.googleapis.com:443
+            TARGET: fonts.googleapis.com
             PRE_RESOLVE: 1
 
     fonts_gstatic_proxy:
-        image: tecnativa/tcp-proxy
+        image: tecnativa/whitelist
         restart: unless-stopped
         networks:
             default:
@@ -95,8 +93,7 @@ services:
                     - fonts.gstatic.com
             public:
         environment:
-            LISTEN: :80 :443
-            TALK: fonts.gstatic.com:80 fonts.gstatic.com:443
+            TARGET: fonts.gstatic.com
             PRE_RESOLVE: 1
 
 networks:

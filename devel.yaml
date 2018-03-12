@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
     odoo_proxy:
-        image: tecnativa/tcp-proxy
+        image: tecnativa/whitelist
         depends_on:
             - odoo
         networks: &public
@@ -11,8 +11,8 @@ services:
         ports:
             - "127.0.0.1:${ODOO_MAJOR}069:8069"
         environment:
-            LISTEN: :8069
-            TALK: odoo:8069
+            PORT: 8069
+            TARGET: odoo
 
     odoo:
         extends:
