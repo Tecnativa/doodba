@@ -967,7 +967,7 @@ Google Fonts API for your customer's reports, and those reports
 would take forever and end up rendering badly in staging environments.
 
 In such case, we recommend using the
-[tecnativa/tcp-proxy](https://hub.docker.com/r/tecnativa/tcp-proxy/) image.
+[tecnativa/whitelist](https://hub.docker.com/r/tecnativa/whitelist/) image.
 Read its docs there.
 
 ### How can I help?
