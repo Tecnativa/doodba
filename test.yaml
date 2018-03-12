@@ -11,7 +11,10 @@ services:
             SMTP_PORT: "1025"
         restart: unless-stopped
         depends_on:
+            - cdnjs_cloudflare_proxy
             - db
+            - fonts_googleapis_proxy
+            - fonts_gstatic_proxy
             - smtp
         networks:
             default:
