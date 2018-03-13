@@ -28,6 +28,10 @@ if [ "$ODOO_VERSION" == "8.0" ]; then
     sed -ir 's/pyparsing|six/#\0/' $reqs
     # Extra dependencies for Odoo at runtime
     apt-get install -y --no-install-recommends file
+    # Extra dependencies for 'document' (doc & pdf support)
+    apt-get install -y --no-install-recommends antiword poppler-utils
+    # Extra dependencies for Workflow reports
+    apt-get install -y --no-install-recommends graphviz ghostscript
 fi
 
 # Build and install Odoo dependencies with pip
