@@ -1,5 +1,20 @@
 #!/usr/local/bin/python-odoo-shell
+import os
+
 
 # Note: ``module_auto_update`` must be installed in Odoo for this to work.
-env["base.module.upgrade"].upgrade_module()
+try:
+    env["ir.module.module"].upgrade_changed_checksum
+except AttributeError:
+    env["base.module.upgrade"].upgrade_module()
+else:
+    # Disable deprecated stuff
+    env["ir.config_param"].set_param(
+        "module_auto_update.enable_deprecated",
+        "0",
+    )
+    # Newer versions of ``module_auto_update`` recommend this approach
+    env["ir.module.module"].upgrade_changed_checksum(
+        os.environ.get("I18N_OVERWRITE") == "1",
+    )
 env.cr.commit()
