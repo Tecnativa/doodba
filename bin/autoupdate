@@ -9,7 +9,7 @@ except AttributeError:
     env["base.module.upgrade"].upgrade_module()
 else:
     # Disable deprecated stuff
-    env["ir.config_param"].set_param(
+    env["ir.config_parameter"].set_param(
         "module_auto_update.enable_deprecated",
         "0",
     )
