@@ -10,7 +10,6 @@ services:
             PGPASSWORD: "$DB_PASSWORD"
             PGUSER: "$DB_USER"
             PROXY_MODE: "$ODOO_PROXY_MODE"
-            PYTHONOPTIMIZE: 2
         tty: true
         volumes:
             - filestore:/var/lib/odoo:z
