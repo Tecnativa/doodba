@@ -16,7 +16,7 @@ services:
             args:
                 AGGREGATE: "false"
                 DEPTH_DEFAULT: 100
-                PYTHONOPTIMIZE: 0
+                PYTHONOPTIMIZE: ""
                 PIP_INSTALL_ODOO: "false"
                 CLEAN: "false"
                 COMPILE: "false"
