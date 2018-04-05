@@ -278,7 +278,7 @@ the code.
 
 Only some notes:
 
-- Will compile your code with [`PYTHONOPTIMIZE=2`][] by default.
+- Will compile your code with [`PYTHONOPTIMIZE=1`][] by default.
 
 - Will remove all code not used from the image by default (not listed in
   `/opt/odoo/custom/src/addons.yaml`), to keep it thin.
@@ -1000,7 +1000,7 @@ scaffolding versions is preserved.
 [`odoo.conf`]: #optodooautoodooconf
 [`odoo`]: #optodoocustomsrcodoo
 [`private`]: #optodoocustomsrcprivate
-[`PYTHONOPTIMIZE=2`]: https://docs.python.org/2/using/cmdline.html#envvar-PYTHONOPTIMIZE
+[`PYTHONOPTIMIZE=1`]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONOPTIMIZE
 [`repos.yaml`]: #optodoocustomsrcreposyaml
 [builds]: https://hub.docker.com/r/tecnativa/odoo-base/builds/
 [development]: #development
