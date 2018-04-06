@@ -72,6 +72,7 @@ ENV DEPTH_DEFAULT=1 \
     PATH="/home/odoo/.local/bin:$PATH" \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
+    PYTHONOPTIMIZE=1 \
     UNACCENT=true \
     WAIT_DB=true \
     WDB_NO_BROWSER_AUTO_OPEN=True \
