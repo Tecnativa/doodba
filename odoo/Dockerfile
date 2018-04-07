@@ -1,2 +1,2 @@
 # XXX Base version must match $ODOO_VERSION in .env file
-FROM tecnativa/odoo-base:10.0
+FROM tecnativa/odoo-base:11.0
