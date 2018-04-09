@@ -70,6 +70,7 @@ ENV DEPTH_DEFAULT=1 \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
+    PIP_NO_CACHE_DIR=0 \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
     PYTHONOPTIMIZE=1 \
@@ -92,7 +93,7 @@ RUN apt-get -qq update \
         locales-all zlibc \
         bzip2 ca-certificates curl gettext-base git gnupg2 nano \
         openssh-client postgresql-client telnet xz-utils \
-    && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin --no-cache-dir \
+    && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -yqq nodejs \
     && apt-get -yqq purge python2.7 \
@@ -117,7 +118,7 @@ RUN curl -SLo wkhtmltox.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releas
 
 # Other facilities
 WORKDIR /opt/odoo
-RUN pip install --no-cache-dir \
+RUN pip install \
     astor git-aggregator openupgradelib ptvsd==3.0.0 pudb wdb
 COPY bin/* /usr/local/bin/
 COPY lib/odoobaselib /usr/local/lib/python3.5/dist-packages/odoobaselib
@@ -150,11 +151,16 @@ RUN apt-get update \
         libxslt1-dev \
         python3-dev \
         zlib1g-dev \
-    && pip install --no-cache-dir -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    && pip install -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
     && apt-get purge -yqq build-essential '*-dev' \
     && apt-mark -qq manual '*' \
     && rm -Rf /var/lib/apt/lists/*
+
+# HACK Special case for Werkzeug
+USER odoo
+RUN pip install --user Werkzeug==0.14.1
+USER root
 
 # Metadata
 ARG VCS_REF

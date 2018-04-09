@@ -69,6 +69,7 @@ ENV DEPTH_DEFAULT=1 \
     LC_ALL=C.UTF-8 \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
+    PIP_NO_CACHE_DIR=0 \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
     PYTHONOPTIMIZE=1 \
@@ -91,7 +92,7 @@ RUN apt-get update \
         locales-all zlibc \
         bzip2 ca-certificates curl gettext-base git nano npm \
         openssh-client telnet xz-utils \
-    && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin --no-cache-dir \
+    && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin \
     && rm -Rf /var/lib/apt/lists/*
 
 # Make node find --global addons
@@ -126,7 +127,7 @@ RUN curl -SLo wkhtmltox.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releas
 
 # Other facilities
 WORKDIR /opt/odoo
-RUN pip install --no-cache-dir \
+RUN pip install \
     astor git-aggregator openupgradelib ptvsd==3.0.0 pudb wdb
 COPY bin/* /usr/local/bin/
 COPY lib/odoobaselib /usr/local/lib/python2.7/dist-packages/odoobaselib
@@ -147,6 +148,11 @@ ARG ODOO_SOURCE=OCA/OCB
 ARG ODOO_VERSION=10.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 RUN install.sh
+
+# HACK Special case for Werkzeug
+USER odoo
+RUN pip install --user Werkzeug==0.14.1
+USER root
 
 # Metadata
 ARG VCS_REF

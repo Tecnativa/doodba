@@ -31,7 +31,7 @@ if [ "$ODOO_VERSION" == "8.0" ]; then
 fi
 
 # Build and install Odoo dependencies with pip
-pip install --no-cache-dir --requirement $reqs
+pip install --requirement $reqs
 
 # Remove all installed garbage
 apt-get -y purge $apt_deps
