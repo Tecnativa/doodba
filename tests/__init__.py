@@ -170,13 +170,18 @@ class ScaffoldingCase(unittest.TestCase):
             ("--stop-after-init",),
             # SMTP settings work
             ("./custom/scripts/test_smtp_settings.py",),
+        )
+        # Odoo 8.0 has no shell, and --load-language doesn't work fine in 9.0
+        for sub_env in matrix(odoo={"9.0"}):
+            self.compose_test(folder, sub_env, *commands)
+        # Extra tests for versions >= 10.0, that support --load-language fine
+        commands += (
             # DB was created with the correct language
             ("bash", "-c",
              """test "$(psql -Atqc "SELECT code FROM res_lang
                                     WHERE active = TRUE")" == es_ES"""),
         )
-        # Odoo 8.0 has no shell, and doesn't autocreate DB
-        for sub_env in matrix(odoo_skip={"8.0"}):
+        for sub_env in matrix(odoo_skip={"8.0", "9.0"}):
             self.compose_test(folder, sub_env, *commands)
 
     def test_smallest(self):
