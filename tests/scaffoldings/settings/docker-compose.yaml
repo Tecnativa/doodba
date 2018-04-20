@@ -11,6 +11,7 @@ services:
     tty: true
     environment:
       EMAIL_FROM: test@example.com
+      INITIAL_LANG: es_ES
       PGUSER: another_odoo
       PGPASSWORD: anotherodoopassword
       PGHOST: postgresql

@@ -7,12 +7,11 @@ import logging
 import tempfile
 import unittest
 
-from glob import iglob
-from itertools import product, starmap
+from itertools import product
 from os import environ, getlogin
-from os.path import basename, dirname, join
+from os.path import dirname, join
 from pwd import getpwnam
-from subprocess import PIPE, Popen
+from subprocess import Popen
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -171,8 +170,12 @@ class ScaffoldingCase(unittest.TestCase):
             ("--stop-after-init",),
             # SMTP settings work
             ("./custom/scripts/test_smtp_settings.py",),
+            # DB was created with the correct language
+            ("bash", "-c",
+             """test "$(psql -Atqc "SELECT code FROM res_lang
+                                    WHERE active = TRUE")" == es_ES"""),
         )
-        # Odoo 8.0 has no shell
+        # Odoo 8.0 has no shell, and doesn't autocreate DB
         for sub_env in matrix(odoo_skip={"8.0"}):
             self.compose_test(folder, sub_env, *commands)
 

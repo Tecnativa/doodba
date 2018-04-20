@@ -4,6 +4,8 @@ import os
 import subprocess
 import sys
 
+from psycopg2 import connect, OperationalError
+
 from odoobaselib import logging
 
 # Call this file linked from another file called `build` or `entrypoint`
@@ -32,5 +34,13 @@ extra_command = sys.argv[1:]
 if extra_command:
     if extra_command[0] == 'shell' or extra_command[0].startswith("-"):
         extra_command.insert(0, "odoo")
+    # Set the DB creation language, if needed
+    if extra_command[0] == "odoo" and os.environ.get("INITIAL_LANG"):
+        try:
+            connection = connect(dbname=os.environ.get("PGDATABASE"))
+            connection.close()
+        except OperationalError:
+            # No DB exists, set initial language
+            extra_command += ["--load-language", os.environ["INITIAL_LANG"]]
     logging.info("Executing %s", " ".join(extra_command))
     os.execvp(extra_command[0], extra_command)
