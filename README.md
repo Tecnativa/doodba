@@ -861,6 +861,16 @@ To **add** the `www.` prefix, it is almost the same; use your imagination
 
 In `.env`, set `DOMAIN_PROD` to `host1.com,host2.com,www.host1.com`, etc.
 
+### How to choose initial DB creation language?
+
+This image includes a hack that will set the initial language to load when
+Odoo creates its database for the first time. These conditions must match:
+
+- `$PGDATABASE` is set.
+- That database does not yet exist.
+- `$INITIAL_LANG` is set to any Odoo lang code. I.e. `es_ES`.
+- Odoo is booted.
+
 ### I use [Fish][], how to export needed variables?
 
 Do:

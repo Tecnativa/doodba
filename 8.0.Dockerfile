@@ -66,6 +66,7 @@ ENV DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
     GIT_AUTHOR_NAME=docker-odoo \
+    INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \

@@ -7,12 +7,11 @@ import logging
 import tempfile
 import unittest
 
-from glob import iglob
-from itertools import product, starmap
+from itertools import product
 from os import environ, getlogin
-from os.path import basename, dirname, join
+from os.path import dirname, join
 from pwd import getpwnam
-from subprocess import PIPE, Popen
+from subprocess import Popen
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -172,8 +171,17 @@ class ScaffoldingCase(unittest.TestCase):
             # SMTP settings work
             ("./custom/scripts/test_smtp_settings.py",),
         )
-        # Odoo 8.0 has no shell
-        for sub_env in matrix(odoo_skip={"8.0"}):
+        # Odoo 8.0 has no shell, and --load-language doesn't work fine in 9.0
+        for sub_env in matrix(odoo={"9.0"}):
+            self.compose_test(folder, sub_env, *commands)
+        # Extra tests for versions >= 10.0, that support --load-language fine
+        commands += (
+            # DB was created with the correct language
+            ("bash", "-c",
+             """test "$(psql -Atqc "SELECT code FROM res_lang
+                                    WHERE active = TRUE")" == es_ES"""),
+        )
+        for sub_env in matrix(odoo_skip={"8.0", "9.0"}):
             self.compose_test(folder, sub_env, *commands)
 
     def test_smallest(self):
