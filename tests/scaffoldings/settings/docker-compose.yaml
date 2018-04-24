@@ -17,6 +17,7 @@ services:
       PGHOST: postgresql
       PGPORT: 15432
       PGDATABASE: ${DBNAME:-prod}
+      DBFILTER: ${DBFILTER:-.*}
       SMTP_SERVER: mailhog
       SMTP_PORT: 1025 # MailHog default
     depends_on:
