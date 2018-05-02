@@ -96,7 +96,7 @@ RUN apt-get -qq update \
         bzip2 ca-certificates curl gettext-base git gnupg2 nano \
         openssh-client postgresql-client telnet xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin \
-    && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt-get install -yqq nodejs \
     && apt-get -yqq purge python2.7 \
     && apt-get -yqq autoremove \
