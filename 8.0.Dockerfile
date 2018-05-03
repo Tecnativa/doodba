@@ -69,6 +69,7 @@ ENV DB_FILTER=.* \
     GIT_AUTHOR_NAME=docker-odoo \
     INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
+    NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
     PIP_NO_CACHE_DIR=0 \
@@ -98,9 +99,6 @@ RUN apt-get update \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -yqq nodejs \
     && rm -Rf /var/lib/apt/lists/*
-
-# Make node find --global addons
-ENV NODE_PATH=/usr/local/lib/node_modules
 
 # Special case to get latest PostgreSQL client
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
