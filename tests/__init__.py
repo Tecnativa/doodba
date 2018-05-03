@@ -168,8 +168,8 @@ class ScaffoldingCase(unittest.TestCase):
         commands = (
             # Odoo should install
             ("--stop-after-init",),
-            # SMTP settings work
-            ("./custom/scripts/test_smtp_settings.py",),
+            # Odoo settings work
+            ("./custom/scripts/test_settings.py",),
         )
         # Odoo 8.0 has no shell, and --load-language doesn't work fine in 9.0
         for sub_env in matrix(odoo={"9.0"}):

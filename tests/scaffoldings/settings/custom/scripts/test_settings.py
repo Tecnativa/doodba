@@ -11,3 +11,4 @@ assert config.get("smtp_port") == 1025
 assert config.get("smtp_server") == "mailhog"
 assert config.get("smtp_ssl") is False
 assert config.get("smtp_user") is False
+assert config.get("dbfilter") == ".*"
