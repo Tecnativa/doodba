@@ -95,7 +95,7 @@ RUN apt-get update \
         bzip2 ca-certificates curl gettext-base git nano \
         openssh-client telnet xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin \
-    && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -yqq nodejs \
     && rm -Rf /var/lib/apt/lists/*
 
@@ -109,18 +109,14 @@ RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc
     && apt-get install -y --no-install-recommends postgresql-client \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
-# Special case to get latest Less
-RUN npm install -g less \
+# Special case to get latest Less and PhantomJS
+RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
+    && npm install -g less@2 less-plugin-clean-css@1 phantomjs-prebuilt@2 \
     && rm -Rf ~/.npm /tmp/*
 
 # Special case to get bootstrap-sass, required by Odoo for Sass assets
 RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<4' \
     && rm -Rf ~/.gem /var/lib/gems/*/cache/
-
-# Special case for PhantomJS
-RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
-    && npm install -g phantomjs-prebuilt@2.1.15 \
-    && rm -Rf ~/.npm /tmp/*
 
 # Special case for wkhtmltox
 RUN curl -SLo wkhtmltox.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox-${WKHTMLTOPDF_VERSION}_linux-generic-amd64.tar.xz \

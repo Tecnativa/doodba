@@ -96,7 +96,7 @@ RUN apt-get -qq update \
         bzip2 ca-certificates curl gettext-base git gnupg2 nano \
         openssh-client postgresql-client telnet xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin \
-    && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -yqq nodejs \
     && apt-get -yqq purge python2.7 \
     && apt-get -yqq autoremove \
@@ -104,7 +104,7 @@ RUN apt-get -qq update \
 
 # Special case to get latest Less and PhantomJS
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
-    && npm install -g less phantomjs-prebuilt \
+    && npm install -g less@2 less-plugin-clean-css@1 phantomjs-prebuilt@2 \
     && rm -Rf ~/.npm /tmp/*
 
 # Special case to get bootstrap-sass, required by Odoo for Sass assets
