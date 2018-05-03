@@ -10,6 +10,7 @@ services:
             INITIAL_LANG: "$INITIAL_LANG"
             PGPASSWORD: "$DB_PASSWORD"
             PGUSER: "$DB_USER"
+            DB_FILTER: "$DB_FILTER"
             PROXY_MODE: "$ODOO_PROXY_MODE"
         tty: true
         volumes:
