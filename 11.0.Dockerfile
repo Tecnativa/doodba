@@ -104,7 +104,7 @@ RUN apt-get -qq update \
 
 # Special case to get latest Less and PhantomJS
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
-    && npm install -g less phantomjs-prebuilt \
+    && npm install -g less@2 less-plugin-clean-css@1 phantomjs-prebuilt@2 \
     && rm -Rf ~/.npm /tmp/*
 
 # Special case to get bootstrap-sass, required by Odoo for Sass assets
