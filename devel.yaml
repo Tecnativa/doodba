@@ -72,7 +72,6 @@ services:
     # Whitelist outgoing traffic for tests, reports, etc.
     cdnjs_cloudflare_proxy:
         image: tecnativa/whitelist
-        restart: unless-stopped
         networks:
             default:
                 aliases:
@@ -84,7 +83,6 @@ services:
 
     fonts_googleapis_proxy:
         image: tecnativa/whitelist
-        restart: unless-stopped
         networks:
             default:
                 aliases:
@@ -96,7 +94,6 @@ services:
 
     fonts_gstatic_proxy:
         image: tecnativa/whitelist
-        restart: unless-stopped
         networks:
             default:
                 aliases:
@@ -108,7 +105,6 @@ services:
 
     gravatar_proxy:
         image: tecnativa/whitelist
-        restart: unless-stopped
         networks:
             default:
                 aliases:
