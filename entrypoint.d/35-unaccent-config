@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+# correct unaccent in config to the given environment value
+sed -i 's/\(unaccent = \)\(.*\)$/\1 '$UNACCENT'/' /opt/odoo/auto/odoo.conf
