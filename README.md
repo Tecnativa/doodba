@@ -833,29 +833,19 @@ announcements issue][retrobreak].
 
 ### I need to force addition or removal of `www.` prefix in production
 
-[We hope that some day Traefik supports that feature][www-force], but in the
-mean time, you must add an additional proxy to do that.
+These instructions assume you use the official [scaffolding][].
+To **remove** the `www.` prefix, set these params in the `.env` file:
 
-To **remove** the `www.` prefix, add this service to `prod.yaml`:
+    DOMAIN_PROD=example.com
+    DOMAIN_PROD_ALT=www.example.com
 
-```yaml
-www_remove:
-    image: tecnativa/odoo-proxy
-    environment:
-        FORCEHOST: $DOMAIN_PROD
-    networks:
-        default:
-        inverseproxy_shared:
-    labels:
-        traefik.docker.network: "inverseproxy_shared"
-        traefik.enable: "true"
-        traefik.frontend.passHostHeader: "true"
-        traefik.port: "80"
-        traefik.frontend.rule: "Host:www.${DOMAIN_PROD}"
-```
+To **add** the `www.` prefix, it is almost the same:
 
-To **add** the `www.` prefix, it is almost the same; use your imagination
-:wink:.
+    DOMAIN_PROD=www.example.com
+    DOMAIN_PROD_ALT=example.com
+
+Of course, both domains should point to the same machine before booting, or
+Let's Encrypt might ban your server for some time.
 
 ### How to allow access from several host names?
 
@@ -1034,4 +1024,3 @@ scaffolding versions is preserved.
 [testing]: #testing
 [Traefik]: https://traefik.io/
 [VSCode]: https://code.visualstudio.com/
-[www-force]: https://github.com/containous/traefik/issues/1380
