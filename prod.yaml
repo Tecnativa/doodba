@@ -25,6 +25,11 @@ services:
             traefik.websiteinfo.frontend.rule:
                 "Host:${DOMAIN_PROD};Path:/website/info"
             traefik.www.frontend.rule: "Host:${DOMAIN_PROD}"
+            traefik.alt.frontend.rule: "Host:${DOMAIN_PROD_ALT}"
+            traefik.alt.frontend.redirect.regex:
+                "^(.*)://${DOMAIN_PROD_ALT}/(.*)$$"
+            traefik.alt.frontend.redirect.replacement:
+                "$$1://${DOMAIN_PROD}/$$2"
 
     db:
         extends:
