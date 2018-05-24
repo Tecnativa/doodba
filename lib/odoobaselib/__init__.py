@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+
 from glob import glob
+from pprint import pformat
 
 import yaml
 
@@ -54,6 +56,8 @@ def addons_config(filtered=True, strict=False):
         Use ``True`` to raise an exception if any declared addon is not found.
     """
     config = dict()
+    missing_glob = set()
+    missing_manifest = set()
     special_missing = {PRIVATE, CORE}
     try:
         with open(ADDONS_YAML) as addons_file:
@@ -79,16 +83,18 @@ def addons_config(filtered=True, strict=False):
                         logging.debug("Expanding glob %s", partial_glob)
                         full_glob = os.path.join(SRC_DIR, repo, partial_glob)
                         found = glob(full_glob)
-                        if strict and not found:
-                            raise Exception("Addons not found", full_glob)
+                        if not found:
+                            missing_glob.add(full_glob)
+                            logging.debug(
+                                "Skipping unexpandable glob '%s'",
+                                full_glob)
+                            continue
                         for addon in found:
                             manifests = (
                                 os.path.join(addon, m) for m in MANIFESTS
                             )
                             if not any(os.path.isfile(m) for m in manifests):
-                                if strict:
-                                    raise Exception("Addon without manifest",
-                                                    addon)
+                                missing_manifest.add(addon)
                                 logging.debug(
                                     "Skipping '%s' as it is not a valid Odoo "
                                     "module", addon)
@@ -99,6 +105,15 @@ def addons_config(filtered=True, strict=False):
                             config[addon].add(repo)
     except IOError:
         logging.debug('Could not find addons configuration yaml.')
+    # Fail now if running in strict mode
+    if strict:
+        error = []
+        if missing_glob:
+            error += ["Addons not found:", pformat(missing_glob)]
+        if missing_manifest:
+            error += ["Addons without manifest:", pformat(missing_manifest)]
+        if error:
+            raise Exception("\n".join(error), missing_glob, missing_manifest)
     # By default, all private and core addons are enabled
     for repo in special_missing:
         logging.debug("Auto-adding all addons from %s", repo)
