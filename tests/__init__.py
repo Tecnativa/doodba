@@ -15,7 +15,7 @@ from subprocess import Popen
 
 logging.basicConfig(level=logging.DEBUG)
 
-MAIN_SCAFFOLDING_VERSION = "10.0"
+MAIN_SCAFFOLDING_VERSION = "11.0"
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 ODOO_VERSIONS = frozenset(environ.get(
