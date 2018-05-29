@@ -15,6 +15,7 @@ services:
             - db
             - fonts_googleapis_proxy
             - fonts_gstatic_proxy
+            - google_proxy
             - gravatar_proxy
             - smtp
         networks:
@@ -95,6 +96,18 @@ services:
             public:
         environment:
             TARGET: fonts.gstatic.com
+            PRE_RESOLVE: 1
+
+    google_proxy:
+        image: tecnativa/whitelist
+        restart: unless-stopped
+        networks:
+            default:
+                aliases:
+                    - www.google.com
+            public:
+        environment:
+            TARGET: www.google.com
             PRE_RESOLVE: 1
 
     gravatar_proxy:
