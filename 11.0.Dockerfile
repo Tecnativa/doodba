@@ -121,7 +121,7 @@ RUN curl -SLo wkhtmltox.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releas
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
-    astor git-aggregator openupgradelib 'pg_activity<1.5' ptvsd==3.0.0 pudb wdb
+    astor git-aggregator openupgradelib ptvsd==3.0.0 pudb wdb
 COPY bin/* /usr/local/bin/
 COPY lib/odoobaselib /usr/local/lib/python3.5/dist-packages/odoobaselib
 COPY build.d common/build.d
@@ -154,6 +154,7 @@ RUN apt-get update \
         python3-dev \
         zlib1g-dev \
     && pip install -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    && pip install 'pg_activity<1.5' \
     && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
     && apt-get purge -yqq build-essential '*-dev' \
     && apt-mark -qq manual '*' \
