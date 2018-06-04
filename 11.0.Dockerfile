@@ -154,6 +154,7 @@ RUN apt-get update \
         python3-dev \
         zlib1g-dev \
     && pip install -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    && pip install 'pg_activity<1.5' \
     && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
     && apt-get purge -yqq build-essential '*-dev' \
     && apt-mark -qq manual '*' \

@@ -146,6 +146,7 @@ ARG ODOO_SOURCE=OCA/OCB
 ARG ODOO_VERSION=10.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 RUN install.sh
+RUN pip install 'pg_activity<1.5'
 
 # HACK Special case for Werkzeug
 USER odoo
