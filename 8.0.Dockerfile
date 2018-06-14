@@ -60,8 +60,8 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
 ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD USER odoo
 
-ARG WKHTMLTOPDF_VERSION=0.12.4
-ARG WKHTMLTOPDF_CHECKSUM='049b2cdec9a8254f0ef8ac273afaf54f7e25459a273e27189591edc7d7cf29db'
+ARG WKHTMLTOPDF_VERSION=0.12.5
+ARG WKHTMLTOPDF_CHECKSUM='2583399a865d7604726da166ee7cec656b87ae0a6016e6bce7571dcd3045f98b'
 ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
@@ -98,6 +98,12 @@ RUN apt-get update \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -yqq nodejs \
+    && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.jessie_amd64.deb \
+    && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
+    && (dpkg --install wkhtmltox.deb || true) \
+    && apt-get install -yqq --no-install-recommends --fix-broken \
+    && rm wkhtmltox.deb \
+    && wkhtmltopdf --version \
     && rm -Rf /var/lib/apt/lists/*
 
 # Special case to get latest PostgreSQL client
@@ -115,13 +121,6 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
 # Special case to get bootstrap-sass, required by Odoo for Sass assets
 RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<4' \
     && rm -Rf ~/.gem /var/lib/gems/*/cache/
-
-# Special case for wkhtmltox
-RUN curl -SLo wkhtmltox.tar.xz https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox-${WKHTMLTOPDF_VERSION}_linux-generic-amd64.tar.xz \
-    && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.tar.xz" | sha256sum -c - \
-    && tar --strip-components 1 -C /usr/local/ -xf wkhtmltox.tar.xz \
-    && rm wkhtmltox.tar.xz \
-    && wkhtmltopdf --version
 
 # Other facilities
 WORKDIR /opt/odoo
