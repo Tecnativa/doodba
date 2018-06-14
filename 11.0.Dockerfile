@@ -100,7 +100,7 @@ RUN apt-get -qq update \
     && apt-get install -yqq nodejs \
     && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.stretch_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
-    && apt-get install ./wkhtmltox.deb \
+    && apt-get install -yqq --no-install-recommends ./wkhtmltox.deb \
     && rm wkhtmltox.deb \
     && wkhtmltopdf --version \
     && apt-get -yqq purge python2.7 \

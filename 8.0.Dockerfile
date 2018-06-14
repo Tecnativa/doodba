@@ -101,7 +101,7 @@ RUN apt-get update \
     && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.jessie_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
     && (dpkg --install wkhtmltox.deb || true) \
-    && apt-get install --fix-broken \
+    && apt-get install -yqq --no-install-recommends --fix-broken \
     && rm wkhtmltox.deb \
     && wkhtmltopdf --version \
     && rm -Rf /var/lib/apt/lists/*
