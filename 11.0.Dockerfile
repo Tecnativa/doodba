@@ -93,7 +93,7 @@ RUN apt-get -qq update \
         libfreetype6 liblcms2-2 libtiff5 tk tcl libpq5 \
         libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 \
         locales-all zlibc \
-        bzip2 ca-certificates curl gettext-base git gnupg2 nano \
+        bzip2 ca-certificates curl gettext-base git gnupg2 nano vim \
         openssh-client postgresql-client telnet xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
