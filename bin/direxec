@@ -35,7 +35,8 @@ if extra_command:
     if extra_command[0] == 'shell' or extra_command[0].startswith("-"):
         extra_command.insert(0, "odoo")
     # Set the DB creation language, if needed
-    if extra_command[0] == "odoo" and os.environ.get("INITIAL_LANG"):
+    if (extra_command[0] in {"odoo", "/usr/local/bin/odoo"} and
+            os.environ.get("INITIAL_LANG")):
         try:
             connection = connect(dbname=os.environ.get("PGDATABASE"))
             connection.close()
