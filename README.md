@@ -245,7 +245,7 @@ ONLY:
   PGDATABASE: # This environment variable must exist and be in the list
     - devel
     - test
-server-tools:
+web:
   - web_environment_ribbon
 ---
 # Enable special authentication methods only in production environment
