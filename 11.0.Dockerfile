@@ -95,7 +95,7 @@ RUN apt-get -qq update \
         locales-all zlibc \
         bzip2 ca-certificates curl gettext-base git gnupg2 nano vim \
         openssh-client telnet xz-utils \
-    && echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
+    && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
