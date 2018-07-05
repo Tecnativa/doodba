@@ -27,6 +27,7 @@ services:
         environment:
             POSTGRES_USER: "$DB_USER"
             POSTGRES_PASSWORD: "$DB_PASSWORD"
+            POSTGRES_INITDB_ARGS: "--data-checksums --locale=C --encoding=UTF8"
         volumes:
             - db:/var/lib/postgresql/data:z
 
