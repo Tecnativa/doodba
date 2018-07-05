@@ -1,11 +1,18 @@
 #!/bin/bash
+
+#  Install to database if it exists, else to the template used for creation
 if [ "$UNACCENT" == true ]; then
-    result="$(psql -qc 'CREATE EXTENSION IF NOT EXISTS unaccent' 2>&1)"
+    if psql -lqt | cut -d \| -f 1 | grep -qw $PGDATABASE; then
+        dbname=$PGDATABASE
+    else
+        dbname=$PGTEMPLATE
+    fi
+    result="$(psql --dbname $dbname -qc 'CREATE EXTENSION IF NOT EXISTS unaccent' 2>&1)"
     ok=$?
     if [ $ok -eq 0 -a -z "$result" ]; then
         log INFO Unaccent extension installed
     elif [ $ok -ne 0 ]; then
         log WARNING Attempt to install unaccent in \
-            $PGDATABASE@$PGHOST failed with this message: $result
+            $dbname@$PGHOST failed with this message: $result
     fi
 fi
