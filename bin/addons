@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 from subprocess import check_call
 from odoobaselib import (
     addons_config,
+    AddonsConfigError,
     CORE,
     logging,
     MANIFESTS,
@@ -56,34 +57,37 @@ addons = set(args.with_)
 without = set(args.without)
 if addons & without:
     sys.exit("Cannot include and exclude the same addon!")
-for addon, repo in addons_config(strict=args.explicit):
-    if addon in without:
-        continue
-    core_ok = args.core and repo == CORE
-    extra_ok = args.extra and repo not in {CORE, PRIVATE}
-    private_ok = args.private and repo == PRIVATE
-    if private_ok or core_ok or extra_ok:
-        addon_path = os.path.join(SRC_DIR, repo, addon)
-        if args.installable:
-            installable = False
-            manifests = list(MANIFESTS)
-            while True:
-                try:
-                    manifest = os.path.join(addon_path, manifests.pop())
-                    with open(manifest, "r") as code:
-                        manifest = ast.literal_eval(code.read())
-                except IndexError:
-                    break
-                except IOError:
+try:
+    for addon, repo in addons_config(strict=args.explicit):
+        if addon in without:
+            continue
+        core_ok = args.core and repo == CORE
+        extra_ok = args.extra and repo not in {CORE, PRIVATE}
+        private_ok = args.private and repo == PRIVATE
+        if private_ok or core_ok or extra_ok:
+            addon_path = os.path.join(SRC_DIR, repo, addon)
+            if args.installable:
+                installable = False
+                manifests = list(MANIFESTS)
+                while True:
+                    try:
+                        manifest = os.path.join(addon_path, manifests.pop())
+                        with open(manifest, "r") as code:
+                            manifest = ast.literal_eval(code.read())
+                    except IndexError:
+                        break
+                    except IOError:
+                        continue
+                    else:
+                        installable = manifest.get("installable", True)
+                        break
+                if not installable:
                     continue
-                else:
-                    installable = manifest.get("installable", True)
-                    break
-            if not installable:
-                continue
-        if args.fullpath and args.action == "list":
-            addon = addon_path
-        addons.add(addon)
+            if args.fullpath and args.action == "list":
+                addon = addon_path
+            addons.add(addon)
+except AddonsConfigError as error:
+    sys.exit(error.message)
 
 # Do the required action
 if not addons:

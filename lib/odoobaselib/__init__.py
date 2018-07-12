@@ -45,6 +45,12 @@ else:
 logging.root.setLevel(_log_level)
 
 
+class AddonsConfigError(Exception):
+    def __init__(self, message, *args):
+        super(AddonsConfigError, self).__init__(message, *args)
+        self.message = message
+
+
 def addons_config(filtered=True, strict=False):
     """Yield addon name and path from ``ADDONS_YAML``.
 
@@ -113,7 +119,11 @@ def addons_config(filtered=True, strict=False):
         if missing_manifest:
             error += ["Addons without manifest:", pformat(missing_manifest)]
         if error:
-            raise Exception("\n".join(error), missing_glob, missing_manifest)
+            raise AddonsConfigError(
+                "\n".join(error),
+                missing_glob,
+                missing_manifest,
+            )
     # By default, all private and core addons are enabled
     for repo in special_missing:
         logging.debug("Auto-adding all addons from %s", repo)
@@ -134,6 +144,7 @@ def addons_config(filtered=True, strict=False):
         repos.discard(CORE)
         # Other addons fall in between
         if len(repos) != 1:
-            logging.error("Addon %s defined in several repos %s", addon, repos)
-            raise Exception
+            raise AddonsConfigError(
+                u"Addon {} defined in several repos {}".format(addon, repos),
+            )
         yield addon, repos.pop()
