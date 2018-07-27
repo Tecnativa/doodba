@@ -1,6 +1,7 @@
 version: "2.1"
 services:
     odoo:
+        image: $ODOO_IMAGE:$ODOO_MINOR
         build:
             context: ./odoo
             args:
