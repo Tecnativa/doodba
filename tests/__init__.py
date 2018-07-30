@@ -286,15 +286,15 @@ class ScaffoldingCase(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdirname:
             # Clone main scaffolding
             self.popen(
-                ("git", "clone", "-b", "scaffolding", "--depth", "1",
-                 "https://github.com/Tecnativa/docker-odoo-base.git"),
+                ("git", "clone", "--depth", "1",
+                 "https://github.com/Tecnativa/doodba-scaffolding.git"),
                 cwd=tmpdirname,
             )
             # Create inverseproxy_shared network
             self.popen(
                 ("docker", "network", "create", "inverseproxy_shared")
             )
-            tmpdirname = join(tmpdirname, "docker-odoo-base")
+            tmpdirname = join(tmpdirname, "doodba")
             # Special env keys for setup-devel
             pwdata = getpwnam(environ["USER"])
             setup_env = {

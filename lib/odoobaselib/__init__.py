@@ -32,7 +32,7 @@ if ODOO_VERSION < 10:
     MANIFESTS = MANIFESTS[1:]
 
 # Customize logging for build
-logging.root.name = "docker-odoo-base"
+logging.root.name = "doodba"
 _log_level = os.environ.get("LOG_LEVEL", "")
 if _log_level.isdigit():
     _log_level = int(_log_level)

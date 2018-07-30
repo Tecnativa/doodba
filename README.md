@@ -1,25 +1,14 @@
-# Doodba ([Dockerized Odoo Base Image](https://hub.docker.com/r/tecnativa/odoo-base))
+# [Doodba](https://hub.docker.com/r/tecnativa/doodba)
 
-[![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own commit badge on microbadger.com")
-[![](https://images.microbadger.com/badges/license/tecnativa/odoo-base.svg)](https://microbadger.com/images/tecnativa/odoo-base "Get your own license badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/tecnativa/doodba:latest.svg)](https://microbadger.com/images/tecnativa/doodba:latest "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/tecnativa/doodba:latest.svg)](https://microbadger.com/images/tecnativa/doodba:latest "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/tecnativa/doodba:latest.svg)](https://microbadger.com/images/tecnativa/doodba:latest "Get your own commit badge on microbadger.com")
+[![](https://images.microbadger.com/badges/license/tecnativa/doodba.svg)](https://microbadger.com/images/tecnativa/doodba "Get your own license badge on microbadger.com")
 
-[![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:8.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:8.0 "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:8.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:8.0 "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:8.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:8.0 "Get your own commit badge on microbadger.com")
+[![](https://api.travis-ci.org/Tecnativa/doodba.svg)](https://travis-ci.org/Tecnativa/doodba)
 
-[![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:9.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:9.0 "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:9.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:9.0 "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:9.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:9.0 "Get your own commit badge on microbadger.com")
-
-[![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:10.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:10.0 "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:10.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:10.0 "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:10.0.svg)](https://microbadger.com/images/tecnativa/odoo-base:10.0 "Get your own commit badge on microbadger.com")
-
-[![](https://api.travis-ci.org/Tecnativa/docker-odoo-base.svg)](https://travis-ci.org/Tecnativa/docker-odoo-base)
-
-Highly opinionated image ready to put [Odoo](https://www.odoo.com) inside it,
+**Doodba** stands for **Do**cker **Od**oo **Ba**se, and it is a
+highly opinionated image ready to put [Odoo](https://www.odoo.com) inside it,
 but **without Odoo**.
 
 ## What?
@@ -305,7 +294,7 @@ now keep this in mind:
   subimage** from this one, even if your project's `Dockerfile` only contains
   these 2 lines:
 
-      FROM tecnativa/odoo-base
+      FROM tecnativa/doodba
       MAINTAINER Me <me@example.com>
 
 - The above sentence becomes true because we have a lot of `ONBUILD` sentences
@@ -491,13 +480,13 @@ Note that version 9.0 has an `odoo` binary to provide forward compatibility
 ## Scaffolding
 
 Get up and running quickly with the provided
-[scaffolding](https://github.com/Tecnativa/docker-odoo-base/tree/scaffolding).
+[scaffolding](https://github.com/Tecnativa/doodba-scaffolding).
 
 ### Skip the boring parts
 
 I will assume you know how to use Git, Docker and Docker Compose.
 
-    git clone -b scaffolding https://github.com/Tecnativa/docker-odoo-base.git myproject
+    git clone https://github.com/Tecnativa/doodba-scaffolding.git myproject
     cd myproject
     ln -s devel.yaml docker-compose.yml
     chown -R $USER:1000 odoo/auto
@@ -929,7 +918,7 @@ You can do it through **its sha256 code**.
 Get any image's code through inspect, running from a computer where the correct
 image version is downloaded:
 
-    docker image inspect --format='{{.RepoDigests}}' tecnativa/odoo-base:10.0
+    docker image inspect --format='{{.RepoDigests}}' tecnativa/doodba:10.0-onbuild
 
 Alternatively, you can browse [this image's builds][builds], click on the one
 you know it works fine for you, and search for the `digest` word using your
@@ -949,8 +938,8 @@ Once you find them, you can use that pinned version in your builds, using a
 Dockerfile similar to this one:
 
 ```Dockerfile
-# Hash-pinned version of tecnativa/odoo-base:10.0
-FROM tecnativa/odoo-base@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c98d5d3817699e1
+# Hash-pinned version of tecnativa/doodba:10.0-onbuild
+FROM tecnativa/doodba@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c98d5d3817699e1
 ```
 
 ### How to get proper assets when printing reports?
@@ -972,7 +961,7 @@ Read its docs there.
 
 ### How can I help?
 
-Just [head to our project](https://github.com/Tecnativa/docker-odoo-base) and
+Just [head to our project](https://github.com/Tecnativa/doodba) and
 open an issue or pull request.
 
 If you plan to open a pull request, remember that you will usually have to open
@@ -991,6 +980,7 @@ scaffolding versions is preserved.
 
 - [QA tools for Doodba-based projects](https://github.com/Tecnativa/doodba-qa)
 - [Ansible role for automated deployment / update from Le Filament](https://github.com/remi-filament/ansible_role_odoo_docker)
+- Find others by searching [GitHub projects tagged with `#doodba`](https://github.com/topics/doodba)
 
 
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
@@ -1002,7 +992,7 @@ scaffolding versions is preserved.
 [`private`]: #optodoocustomsrcprivate
 [`PYTHONOPTIMIZE=1`]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONOPTIMIZE
 [`repos.yaml`]: #optodoocustomsrcreposyaml
-[builds]: https://hub.docker.com/r/tecnativa/odoo-base/builds/
+[builds]: https://hub.docker.com/r/tecnativa/doodba/builds/
 [development]: #development
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
 [Fish]: http://fishshell.com/
@@ -1017,7 +1007,7 @@ scaffolding versions is preserved.
 [pip `requirements.txt`]: https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
 [Postgres client applications]: https://www.postgresql.org/docs/current/static/reference-client.html
 [production]: #production
-[retrobreak]: https://github.com/Tecnativa/docker-odoo-base/issues/67
+[retrobreak]: https://github.com/Tecnativa/doodba/issues/67
 [scaffolding]: #scaffolding
 [several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
 [ssh-conf]: https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client
