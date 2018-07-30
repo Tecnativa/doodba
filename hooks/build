@@ -15,14 +15,14 @@ fi
 for target in base onbuild; do
     suffix=''
     if [ "$target" == onbuild ]; then
-        suffix="$target"
+        suffix="-$target"
     fi
     time docker image build \
         --build-arg VCS_REF="$GIT_SHA1" \
         --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
         --build-arg ODOO_VERSION="$version" \
         --file "$version.Dockerfile" \
-        --tag "$IMAGE_NAME-$suffix" \
-        --target $target
+        --tag "$IMAGE_NAME$suffix" \
+        --target $target \
         .
 done
