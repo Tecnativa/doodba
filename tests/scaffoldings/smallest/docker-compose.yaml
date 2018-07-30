@@ -3,9 +3,9 @@ services:
   odoo:
     build:
       context: ./
-      dockerfile: ${ODOO_MINOR}.Dockerfile
       args:
         COMPILE: "false"
+        ODOO_VERSION: $ODOO_MINOR
         WITHOUT_DEMO: "false"
     tty: true
     depends_on:

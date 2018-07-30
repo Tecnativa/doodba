@@ -3,11 +3,10 @@ services:
   odoo:
     build:
       context: ./
-      dockerfile: ${ODOO_MINOR}.Dockerfile
       args:
         AUTO_REQUIREMENTS: "true"
-        CONFIG_BUILD: 'false'
         LOG_LEVEL: DEBUG
+        ODOO_VERSION: $ODOO_MINOR
     tty: true
     environment:
       EMAIL_FROM: test@example.com
