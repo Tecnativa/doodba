@@ -979,6 +979,7 @@ scaffolding versions is preserved.
 
 - [QA tools for Doodba-based projects](https://github.com/Tecnativa/doodba-qa)
 - [Ansible role for automated deployment / update from Le Filament](https://github.com/remi-filament/ansible_role_odoo_docker)
+- Find others by searching [GitHub projects tagged with `#doodba`](https://github.com/topics/doodba)
 
 
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
