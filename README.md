@@ -1,9 +1,9 @@
-# Doodba ([Dockerized Odoo Base Image](https://hub.docker.com/r/tecnativa/odoo-base))
+# Doodba ([Dockerized Odoo Base Image](https://hub.docker.com/r/tecnativa/doodba))
 
-[![](https://images.microbadger.com/badges/version/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own version badge on microbadger.com")
-[![](https://images.microbadger.com/badges/image/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own image badge on microbadger.com")
-[![](https://images.microbadger.com/badges/commit/tecnativa/odoo-base:latest.svg)](https://microbadger.com/images/tecnativa/odoo-base:latest "Get your own commit badge on microbadger.com")
-[![](https://images.microbadger.com/badges/license/tecnativa/odoo-base.svg)](https://microbadger.com/images/tecnativa/odoo-base "Get your own license badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/tecnativa/doodba:latest.svg)](https://microbadger.com/images/tecnativa/doodba:latest "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/tecnativa/doodba:latest.svg)](https://microbadger.com/images/tecnativa/doodba:latest "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/tecnativa/doodba:latest.svg)](https://microbadger.com/images/tecnativa/doodba:latest "Get your own commit badge on microbadger.com")
+[![](https://images.microbadger.com/badges/license/tecnativa/doodba.svg)](https://microbadger.com/images/tecnativa/doodba "Get your own license badge on microbadger.com")
 
 [![](https://api.travis-ci.org/Tecnativa/doodba.svg)](https://travis-ci.org/Tecnativa/doodba)
 
@@ -293,7 +293,7 @@ now keep this in mind:
   subimage** from this one, even if your project's `Dockerfile` only contains
   these 2 lines:
 
-      FROM tecnativa/odoo-base
+      FROM tecnativa/doodba
       MAINTAINER Me <me@example.com>
 
 - The above sentence becomes true because we have a lot of `ONBUILD` sentences
@@ -938,7 +938,7 @@ Dockerfile similar to this one:
 
 ```Dockerfile
 # Hash-pinned version of tecnativa/doodba:10.0-onbuild
-FROM tecnativa/odoo-base@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c98d5d3817699e1
+FROM tecnativa/doodba@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c98d5d3817699e1
 ```
 
 ### How to get proper assets when printing reports?
@@ -990,7 +990,7 @@ scaffolding versions is preserved.
 [`private`]: #optodoocustomsrcprivate
 [`PYTHONOPTIMIZE=1`]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONOPTIMIZE
 [`repos.yaml`]: #optodoocustomsrcreposyaml
-[builds]: https://hub.docker.com/r/tecnativa/odoo-base/builds/
+[builds]: https://hub.docker.com/r/tecnativa/doodba/builds/
 [development]: #development
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
 [Fish]: http://fishshell.com/
