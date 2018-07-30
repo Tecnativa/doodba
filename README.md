@@ -1,4 +1,4 @@
-# Doodba ([Dockerized Odoo Base Image](https://hub.docker.com/r/tecnativa/doodba))
+# [Doodba](https://hub.docker.com/r/tecnativa/doodba)
 
 [![](https://images.microbadger.com/badges/version/tecnativa/doodba:latest.svg)](https://microbadger.com/images/tecnativa/doodba:latest "Get your own version badge on microbadger.com")
 [![](https://images.microbadger.com/badges/image/tecnativa/doodba:latest.svg)](https://microbadger.com/images/tecnativa/doodba:latest "Get your own image badge on microbadger.com")
@@ -7,7 +7,8 @@
 
 [![](https://api.travis-ci.org/Tecnativa/doodba.svg)](https://travis-ci.org/Tecnativa/doodba)
 
-Highly opinionated image ready to put [Odoo](https://www.odoo.com) inside it,
+**Doodba** stands for **Do**cker **Od**oo **Ba**se, and it is a
+highly opinionated image ready to put [Odoo](https://www.odoo.com) inside it,
 but **without Odoo**.
 
 ## What?
