@@ -3,7 +3,6 @@
 
 from os.path import basename, join, splitext
 from glob import glob
-import logging
 
 from odoobaselib import (
     AUTO_REQUIREMENTS,
@@ -11,7 +10,7 @@ from odoobaselib import (
     FILE_APT_BUILD,
     SRC_DIR,
 )
-from odoobaselib.installer import install, INSTALLERS
+from odoobaselib.installer import install, INSTALLERS, logger
 
 
 # Build dependencies installed before any others
@@ -34,6 +33,6 @@ for dep_file in dep_files:
     # Get the installer (xxx-installer[-description][.ext])
     installer = root.split('-', 2)[1]
     if installer not in INSTALLERS:
-        logging.error("Unknown installer: %s", installer)
+        logger.error("Unknown installer: %s", installer)
         raise Exception
     install(installer, dep_file)

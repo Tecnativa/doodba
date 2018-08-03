@@ -9,7 +9,7 @@ from odoobaselib import (
     addons_config,
     AddonsConfigError,
     CORE,
-    logging,
+    logger,
     MANIFESTS,
     PRIVATE,
     SRC_DIR,
@@ -100,5 +100,5 @@ else:
     command = ["odoo", "--stop-after-init", "--{}".format(args.action), addons]
     if args.test:
         command += ["--test-enable", "--workers", "0"]
-    logging.info("Executing %s", " ".join(command))
+    logger.info("Executing %s", " ".join(command))
     check_call(command)
