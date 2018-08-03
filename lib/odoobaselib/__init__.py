@@ -41,7 +41,7 @@ elif _log_level in LOG_LEVELS:
 else:
     if _log_level:
         logger.warning("Wrong value in $LOG_LEVEL, falling back to INFO")
-    _log_level = logger.INFO
+    _log_level = logging.INFO
 logger.setLevel(_log_level)
 
 
