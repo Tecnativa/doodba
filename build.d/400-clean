@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import logging
 import os
 import shutil
 import sys
 
-from odoobaselib import addons_config, CORE, CLEAN, PRIVATE, SRC_DIR
+from odoobaselib import addons_config, CORE, CLEAN, logger, PRIVATE, SRC_DIR
 
 if not CLEAN:
-    logging.warning("Not cleaning garbage")
+    logger.warning("Not cleaning garbage")
     sys.exit()
 
 addons = set(addons_config(False))
@@ -25,7 +24,7 @@ for directory in os.listdir(SRC_DIR):
 
     # Remove directories not listed in addons.yaml
     if directory not in repos:
-        logging.info("Removing directory %s", full)
+        logger.info("Removing directory %s", full)
         shutil.rmtree(full)
         continue
 
@@ -37,5 +36,5 @@ for directory in os.listdir(SRC_DIR):
             continue
         # Remove addon if not used
         if (subdirectory, directory) not in addons:
-            logging.info("Removing subdirectory %s", subfull)
+            logger.info("Removing subdirectory %s", subfull)
             shutil.rmtree(subfull)

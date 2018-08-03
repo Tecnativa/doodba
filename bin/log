@@ -4,11 +4,11 @@ from __future__ import unicode_literals
 import argparse
 import logging
 
-import odoobaselib
+from odoobaselib import LOG_LEVELS, logger
 
 parser = argparse.ArgumentParser(description="Easy logging for scripts")
-parser.add_argument("level", choices=odoobaselib.LOG_LEVELS)
+parser.add_argument("level", choices=LOG_LEVELS)
 parser.add_argument("message", nargs="+")
 arguments = parser.parse_args()
 
-logging.log(getattr(logging, arguments.level), " ".join(arguments.message))
+logger.log(getattr(logging, arguments.level), " ".join(arguments.message))

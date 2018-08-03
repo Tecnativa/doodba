@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import logging
 import os
 from glob import iglob
 
@@ -8,10 +7,11 @@ from odoobaselib import (
     addons_config,
     ADDONS_DIR,
     ADDONS_YAML,
+    logger,
     SRC_DIR,
 )
 
-logging.info(
+logger.info(
     "Linking all addons from %s in %s",
     ADDONS_YAML,
     ADDONS_DIR)
@@ -24,4 +24,4 @@ for addon, repo in addons_config():
     src = os.path.relpath(os.path.join(SRC_DIR, repo, addon), ADDONS_DIR)
     dst = os.path.join(ADDONS_DIR, addon)
     os.symlink(src, dst)
-    logging.debug("Linked %s in %s", src, dst)
+    logger.debug("Linked %s in %s", src, dst)

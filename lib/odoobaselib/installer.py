@@ -2,7 +2,7 @@
 from collections import OrderedDict
 from os.path import exists
 from subprocess import check_call
-from odoobaselib import logging
+from odoobaselib import logger
 
 
 class Installer(object):
@@ -16,7 +16,7 @@ class Installer(object):
         self._requirements = self.requirements()
 
     def _run_command(self, command):
-        logging.info("Executing: %s", command)
+        logger.info("Executing: %s", command)
         return check_call(command, shell=isinstance(command, str))
 
     def cleanup(self):
@@ -30,7 +30,7 @@ class Installer(object):
             return not self._run_command(
                 self._install_command + self._requirements)
         else:
-            logging.info("No installable requirements found in %s",
+            logger.info("No installable requirements found in %s",
                          self.file_path)
         return False
 
@@ -41,7 +41,7 @@ class Installer(object):
         if self._requirements:
             self._run_command(self._remove_command + self._requirements)
         else:
-            logging.info("No removable requirements found in %s",
+            logger.info("No removable requirements found in %s",
                          self.file_path)
 
     def requirements(self):
