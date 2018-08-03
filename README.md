@@ -336,6 +336,9 @@ Configure `autoupdate`'s behavior with these environment variables:
   production instances, because sometimes queries from production and
   autoupdate instances conflict and make both hang.
 
+  BTW, the timeout will only be taken into account if the last words of the
+  logs are: `creating or updating database tables`.
+
 - ``$I18N_OVERWRITE`` will update languages when updating addons.
 
 ### [`nano`][]

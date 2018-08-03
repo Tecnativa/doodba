@@ -13,6 +13,7 @@ from select import select
 from odoobaselib import logger
 
 
+HANG_INDICATOR = b"creating or updating database tables\n"
 TIMEOUT = int(os.environ["AUTOUPDATE_TIMEOUT"])
 ODOO_SHELL_CODE = b"""
 import os
@@ -42,6 +43,7 @@ logger.info("Starting autoupdate")
 autoupdate = Popen(["odoo", "shell"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 fds = [autoupdate.stdout, autoupdate.stderr]
 terminating = killing = False
+stdout = stderr = b""
 
 # Send Odoo shell code to perform autoupdate
 autoupdate.stdin.write(ODOO_SHELL_CODE)
@@ -54,10 +56,16 @@ while autoupdate.poll() is None:
     if read_streams:
         # There is some output to read on any FD
         for stream in read_streams:
+            new_char = stream.read(1)
             # I need to know the FD where it comes from
-            target = sys.stdout if stream is autoupdate.stdout else sys.stderr
+            if stream is autoupdate.stdout:
+                target = sys.stdout
+                stdout += new_char
+            else:
+                target = sys.stderr
+                stderr += new_char
             # Forward that byte to system STDOUT/ERR
-            print(stream.read(1), end="", file=target)
+            print(new_char, end="", file=target)
     elif killing:
         logger.error(
             "Process is unresponsive to SIGKILL "
@@ -72,7 +80,7 @@ while autoupdate.poll() is None:
         )
         killing = True
         autoupdate.kill()
-    else:
+    elif stdout.endswith(HANG_INDICATOR) or stderr.endswith(HANG_INDICATOR):
         logger.warning(
             "No logs received after %d seconds! Terminating..."
         )
