@@ -1,11 +1,27 @@
-#!/usr/local/bin/python-odoo-shell
+#!/usr/bin/env python
+"""Autoupdate Odoo.
+
+See https://github.com/Tecnativa/doodba#autoupdate for instructions.
+"""
+
+from __future__ import print_function
+
+import os
+import sys
+from subprocess import PIPE, Popen
+from select import select
+from odoobaselib import logger
+
+
+TIMEOUT = int(os.environ["AUTOUPDATE_TIMEOUT"])
+ODOO_SHELL_CODE = b"""
 import os
 
 
-# Note: ``module_auto_update`` must be installed in Odoo for this to work.
 try:
     env["ir.module.module"].upgrade_changed_checksum
 except AttributeError:
+    # Deprecated addon version, or it is not installed at all
     env["base.module.upgrade"].upgrade_module()
 else:
     # Disable deprecated stuff
@@ -18,3 +34,49 @@ else:
         os.environ.get("I18N_OVERWRITE") == "1",
     )
 env.cr.commit()
+"""
+
+
+# Create the autoupdate process
+logger.info("Starting autoupdate")
+autoupdate = Popen(["odoo", "shell"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+fds = [autoupdate.stdout, autoupdate.stderr]
+terminating = killing = False
+
+# Send Odoo shell code to perform autoupdate
+autoupdate.stdin.write(ODOO_SHELL_CODE)
+autoupdate.stdin.close()
+
+# Poll progress
+while autoupdate.poll() is None:
+    # Read file descriptors with specified timeout
+    read_streams = select(fds, [], [], TIMEOUT)[0]
+    if read_streams:
+        # There is some output to read on any FD
+        for stream in read_streams:
+            # I need to know the FD where it comes from
+            target = sys.stdout if stream is autoupdate.stdout else sys.stderr
+            # Forward that byte to system STDOUT/ERR
+            print(stream.read(1), end="", file=target)
+    elif killing:
+        logger.error(
+            "Process is unresponsive to SIGKILL "
+            "after %d seconds! Kill it manually.",
+            TIMEOUT,
+        )
+        sys.exit(256)
+    elif terminating:
+        logger.warning(
+            "Process is unresponsive to SIGTERM after %d seconds! Killing...",
+            TIMEOUT,
+        )
+        killing = True
+        autoupdate.kill()
+    else:
+        logger.warning(
+            "No logs received after %d seconds! Terminating..."
+        )
+        terminating = True
+        autoupdate.terminate()
+
+sys.exit(autoupdate.poll())

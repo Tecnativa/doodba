@@ -318,6 +318,26 @@ configuration.
 
 Call `addons --help` for usage instructions.
 
+### `autoupdate`
+
+This script updates Odoo addons automatically, according to their directories'
+checksum. Most of the magic happens inside an OCA addon called
+[`module_auto_update`][], so it must be installed in Odoo for this to work
+fine. Check its docs for more info.
+
+Configure `autoupdate`'s behavior with these environment variables:
+
+- ``$AUTOUPDATE_TIMEOUT`` indicates the amount of seconds to wait for logs
+  to be produced by the autoupdate job. If no logs are produced within that
+  time window, the script will fail and be aborted. It will try terminating
+  the process, wait this same amount of seconds, and then kill it.
+
+  This is useful in cases where you update deployments in parallel to running
+  production instances, because sometimes queries from production and
+  autoupdate instances conflict and make both hang.
+
+- ``$I18N_OVERWRITE`` will update languages when updating addons.
+
 ### [`nano`][]
 
 The CLI text editor we all know, just in case you need to inspect some bug in
@@ -811,6 +831,15 @@ Then open `http://localhost:$SomeFreePort`.
 
 ## FAQ
 
+### Why my `python-odoo-shell` scripts do not get executed in Odoo 8.0?
+
+You need to install [OCA][]'s
+[`shell` addon](https://www.odoo.com/apps/modules/8.0/shell/).
+
+### Why does autoupdate not update addons properly?
+
+You need to install [OCA][]'s [`module_auto_update`][] addon.
+
 ### Will there be not retrocompatible changes on the image?
 
 This image is production-ready, but it is constantly evolving too, so some new
@@ -986,6 +1015,7 @@ scaffolding versions is preserved.
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
 [`addons.yaml`]: #optodoocustomsrcaddonstxt
 [`COMPOSE_FILE` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
+[`module_auto_update`]: https://www.odoo.com/apps/modules/11.0/module_auto_update/
 [`nano`]: https://www.nano-editor.org/
 [`odoo.conf`]: #optodooautoodooconf
 [`odoo`]: #optodoocustomsrcodoo
