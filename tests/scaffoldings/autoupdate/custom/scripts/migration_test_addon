@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -x
+
+export AUTOUPDATE_TIMEOUT=10
+log INFO Installing module_auto_update and migration_test_addon 1.0.0
+cd /opt/odoo/custom/src/private
+ln -sf migration_test_addon_1 migration_test_addon
+/opt/odoo/common/entrypoint addons init -ew migration_test_addon
+
+log INFO Running write loop with old addon in the background
+odoo shell <<END &
+import time
+env['ir.module.module']._save_installed_checksums()
+env.cr.commit()
+open("/tmp/write-loop-running", "a").close()
+for n in range(30):
+    for partner in env["res.partner"].search([]):
+        partner.some_field += n
+        time.sleep(1)
+END
+
+write_pid=$!
+log INFO Waiting for write loop to start
+while true; do
+    sleep 1
+    if [ -f /tmp/write-loop-running ]; then
+        break
+    fi
+done
+log INFO Autoupdating
+rm -f migration_test_addon
+ln -sf migration_test_addon_2 migration_test_addon
+autoupdate
+kill $write_pid

@@ -21,7 +21,7 @@ ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 ODOO_VERSIONS = frozenset(environ.get(
     "DOCKER_TAG", "8.0 9.0 10.0 11.0").split())
 PG_VERSIONS = frozenset(environ.get(
-    "PG_VERSIONS", "9.6").split())
+    "PG_VERSIONS", "9.6 10.5").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 
 
@@ -160,6 +160,16 @@ class ScaffoldingCase(unittest.TestCase):
                  'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
                 ("bash", "-c", 'test "$(addons list -cWsale)" == crm'),
+            )
+
+    def test_autoupdate(self):
+        """Autoupdate works as expected"""
+        project_dir = join(SCAFFOLDINGS_DIR, "autoupdate")
+        for sub_env in matrix():
+            self.compose_test(
+                project_dir,
+                sub_env,
+                ("./custom/scripts/migration_test_addon",),
             )
 
     def test_settings(self):

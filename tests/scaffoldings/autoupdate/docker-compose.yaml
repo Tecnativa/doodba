@@ -1,0 +1,22 @@
+version: "2.1"
+services:
+  odoo:
+    build:
+      context: ./
+      args:
+        COMPILE: "false"
+        ODOO_VERSION: $ODOO_MINOR
+        WITHOUT_DEMO: "false"
+    tty: true
+    user: root
+    depends_on:
+      - db
+    environment:
+      PYTHONOPTIMIZE: ""
+      UNACCENT: "false"
+
+  db:
+    image: postgres:${DB_VERSION}-alpine
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoopassword

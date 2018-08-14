@@ -1,0 +1,22 @@
+# Odoo is always required
+./odoo:
+    defaults:
+        # Shallow repositores are faster & thinner
+        depth: $DEPTH_DEFAULT
+    remotes:
+        ocb: https://github.com/OCA/OCB.git
+        odoo: https://github.com/odoo/odoo.git
+    target:
+        ocb $ODOO_VERSION
+    merges:
+        - ocb $ODOO_VERSION
+
+server-tools:
+    defaults:
+        depth: $DEPTH_DEFAULT
+    remotes:
+        oca: https://github.com/OCA/server-tools.git
+    target:
+        oca $ODOO_VERSION
+    merges:
+        - oca $ODOO_VERSION
