@@ -12,10 +12,15 @@ odoo shell <<END &
 import time
 env['ir.module.module']._save_installed_checksums()
 env.cr.commit()
+for n in range(30):
+    env['some.model'].create({
+        "some_field": n,
+    })
+env.cr.commit()
 open("/tmp/write-loop-running", "a").close()
 for n in range(30):
-    for partner in env["res.partner"].search([]):
-        partner.some_field += n
+    for some_model in env["some.model"].search([]):
+        some_model.some_field += n
         time.sleep(1)
 END
 
