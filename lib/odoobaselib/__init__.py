@@ -33,6 +33,10 @@ if ODOO_VERSION < 10:
 
 # Customize logging for build
 logger = logging.getLogger("doodba")
+log_handler = logging.StreamHandler()
+log_formatter = logging.Formatter("%(name)s %(levelname)s: %(message)s")
+log_handler.setFormatter(log_formatter)
+logger.addHandler(log_handler)
 _log_level = os.environ.get("LOG_LEVEL", "")
 if _log_level.isdigit():
     _log_level = int(_log_level)
