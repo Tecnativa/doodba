@@ -13,7 +13,7 @@ from select import select
 from odoobaselib import logger
 
 
-HANG_INDICATOR = b"creating or updating database tables\n"
+HANG_INDICATOR = "creating or updating database tables\n"
 TIMEOUT = int(os.environ["AUTOUPDATE_TIMEOUT"])
 ODOO_SHELL_CODE = b"""
 import os
