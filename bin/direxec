@@ -6,7 +6,7 @@ import sys
 
 from psycopg2 import connect, OperationalError
 
-from odoobaselib import logger
+from odoobaselib import logger, which
 
 # Call this file linked from another file called `build` or `entrypoint`
 mode = os.path.basename(__file__)
@@ -35,13 +35,21 @@ if extra_command:
     if extra_command[0] == 'shell' or extra_command[0].startswith("-"):
         extra_command.insert(0, "odoo")
     # Set the DB creation language, if needed
-    if (extra_command[0] in {"odoo", "/usr/local/bin/odoo"} and
-            os.environ.get("INITIAL_LANG")):
-        try:
-            connection = connect(dbname=os.environ.get("PGDATABASE"))
-            connection.close()
-        except OperationalError:
-            # No DB exists, set initial language
-            extra_command += ["--load-language", os.environ["INITIAL_LANG"]]
+    if extra_command[0] in {"odoo", "/usr/local/bin/odoo"}:
+        if os.environ.get("INITIAL_LANG"):
+            try:
+                connection = connect(dbname=os.environ.get("PGDATABASE"))
+                connection.close()
+            except OperationalError:
+                # No DB exists, set initial language
+                extra_command += ["--load-language", os.environ["INITIAL_LANG"]]
+        if os.environ["PTVSD_ENABLE"] == "1":
+            # See `python -m ptvsd -h` to understand this
+            extra_command[0] = os.path.realpath(which(extra_command[0]))
+            extra_command = (
+                ["python", "-m", "ptvsd"] +
+                os.environ["PTVSD_ARGS"].split() +
+                extra_command[0] + ["-"] + extra_command[1:]
+            )
     logger.info("Executing %s", " ".join(extra_command))
     os.execvp(extra_command[0], extra_command)
