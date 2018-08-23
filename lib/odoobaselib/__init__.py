@@ -4,6 +4,7 @@ import os
 
 from glob import glob
 from pprint import pformat
+from subprocess import check_output
 
 import yaml
 
@@ -152,3 +153,11 @@ def addons_config(filtered=True, strict=False):
                 u"Addon {} defined in several repos {}".format(addon, repos),
             )
         yield addon, repos.pop()
+
+
+try:
+    from shutil import which
+except ImportError:
+    # Custom which implementation for Python 2
+    def which(binary):
+        return check_output(["which", binary]).strip()

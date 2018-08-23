@@ -385,13 +385,24 @@ The same is true for any other [Postgres client applications][].
 [VSCode][] debugger. If you use this editor with its python module, you will
 find it useful.
 
-To debug, add this Python code somewhere:
+To debug at a certain point of the code, add this Python code somewhere:
 
 ```python
 import ptvsd
-ptvsd.enable_attach("my_secret", address=("0.0.0.0", 6899))
+ptvsd.enable_attach("doodba-rocks", address=("0.0.0.0", 6899))
 print("ptvsd waiting...")
 ptvsd.wait_for_attach()
+```
+
+To start Odoo within a ptvsd environment, which will obey the breakpoints
+established in your IDE (but will work slowly), just add `-e PTVSD_ENABLE=1`
+to your odoo container.
+
+If you use the official [scaffolding][], you can boot it in ptvsd mode with:
+
+```bash
+export DOODBA_PTVSD_ENABLE=1
+docker-compose -f devel.yaml up -d
 ```
 
 Of course, you need to have properly configured your [VSCode][]. To do so, make
@@ -409,7 +420,7 @@ contents:
             "localRoot": "${workspaceRoot}/odoo",
             "remoteRoot": "/opt/odoo",
             "port": 6899,
-            "secret": "my_secret",
+            "secret": "doodba-rocks",
             "host": "localhost"
         }
     ]
