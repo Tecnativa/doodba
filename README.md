@@ -728,6 +728,95 @@ Test it in your machine with:
 
 This environment also needs a [global inverse proxy](#global-inverse-proxy).
 
+###### Global whitelist
+
+Since the testing environment is [network-isolated](#network-isolation),
+this can change some deadlocks or big timeouts in code chunks that are not
+ready for such situation. Odoo happens to have some of them.
+
+The [development][] environment includes the default recommended whitelist
+proxies, but for [testing][], it is recommended to have a separate docker
+compose project running along in the same server that provides a
+`globalwhitelist_default` network where all whitelist proxies exist. This is
+a better practice for a testing environment where many services might coexist,
+because it will let you save lots of processing power and IP addresses.
+
+The recommended `globalwhitelist/docker-compose.yaml` file should contain:
+
+```yaml
+version: "2.1"
+
+networks:
+    public:
+        driver_opts:
+            encrypted: 1
+    shared:
+        internal: true
+        driver_opts:
+            encrypted: 1
+
+services:
+    cdnjs_cloudflare_com:
+        image: tecnativa/whitelist
+        restart: unless-stopped
+        networks:
+            public:
+            shared:
+                aliases:
+                    - "cdnjs.cloudflare.com"
+        environment:
+            TARGET: "cdnjs.cloudflare.com"
+            PRE_RESOLVE: 1
+
+    fonts_googleapis_com:
+        image: tecnativa/whitelist
+        restart: unless-stopped
+        networks:
+            public:
+            shared:
+                aliases:
+                    - "fonts.googleapis.com"
+        environment:
+            TARGET: "fonts.googleapis.com"
+            PRE_RESOLVE: 1
+
+    fonts_gstatic_com:
+        image: tecnativa/whitelist
+        restart: unless-stopped
+        networks:
+            public:
+            shared:
+                aliases:
+                    - "fonts.gstatic.com"
+        environment:
+            TARGET: "fonts.gstatic.com"
+            PRE_RESOLVE: 1
+
+    www_google_com:
+        image: tecnativa/whitelist
+        restart: unless-stopped
+        networks:
+            public:
+            shared:
+                aliases:
+                    - "www.google.com"
+        environment:
+            TARGET: "www.google.com"
+            PRE_RESOLVE: 1
+
+    www_gravatar_com:
+        image: tecnativa/whitelist
+        restart: unless-stopped
+        networks:
+            public:
+            shared:
+                aliases:
+                    - "www.gravatar.com"
+        environment:
+            TARGET: "www.gravatar.com"
+            PRE_RESOLVE: 1
+```
+
 #### Other usage scenarios
 
 In examples below I will skip the `-f <environment>.yaml` part and assume you
