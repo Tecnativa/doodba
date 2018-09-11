@@ -21,7 +21,7 @@ ENV DB_FILTER=.* \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
     PIP_NO_CACHE_DIR=0 \
-    PTVSD_ARGS="-s doodba-rocks -p 6899" \
+    PTVSD_ARGS="--server-host 0.0.0.0 --port 6899" \
     PTVSD_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
@@ -72,7 +72,7 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
-    astor git-aggregator openupgradelib ptvsd==3.0.0 pudb wdb
+    astor git-aggregator openupgradelib ptvsd pudb wdb
 COPY bin/* /usr/local/bin/
 COPY lib/odoobaselib /usr/local/lib/python3.5/dist-packages/odoobaselib
 COPY build.d common/build.d

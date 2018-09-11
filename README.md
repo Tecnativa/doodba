@@ -417,10 +417,13 @@ contents:
             "name": "Attach to debug in devel.yaml",
             "type": "python",
             "request": "attach",
-            "localRoot": "${workspaceRoot}/odoo",
-            "remoteRoot": "/opt/odoo",
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceRoot}/odoo",
+                    "remoteRoot": "/opt/odoo"
+                }
+            ],
             "port": 6899,
-            "secret": "doodba-rocks",
             "host": "localhost"
         }
     ]
