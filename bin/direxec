@@ -49,7 +49,7 @@ if extra_command:
             extra_command = (
                 ["python", "-m", "ptvsd"] +
                 os.environ["PTVSD_ARGS"].split() +
-                extra_command[0] + ["-"] + extra_command[1:]
+                extra_command
             )
     logger.info("Executing %s", " ".join(extra_command))
     os.execvp(extra_command[0], extra_command)
