@@ -26,17 +26,11 @@ if os.path.isfile('%s.yaml' % REPOS_YAML):
 else:
     REPOS_YAML = '%s.yml' % REPOS_YAML
 
-AUTO_ADDONS_YAML = os.path.join(AUTO_DIR, 'addons')
-if os.path.isfile('%s.yaml' % AUTO_ADDONS_YAML):
-    AUTO_ADDONS_YAML = '%s.yaml' % AUTO_ADDONS_YAML
-else:
-    AUTO_ADDONS_YAML = '%s.yml' % AUTO_ADDONS_YAML
-
 AUTO_REPOS_YAML = os.path.join(AUTO_DIR, 'repos')
-if os.path.isfile('%s.yaml' % AUTO_REPOS_YAML):
-    AUTO_REPOS_YAML = '%s.yaml' % AUTO_REPOS_YAML
-else:
+if os.path.isfile('%s.yml' % AUTO_REPOS_YAML):
     AUTO_REPOS_YAML = '%s.yml' % AUTO_REPOS_YAML
+else:
+    AUTO_REPOS_YAML = '%s.yaml' % AUTO_REPOS_YAML
 
 CLEAN = os.environ.get("CLEAN") == "true"
 AUTO_REQUIREMENTS = os.environ.get("AUTO_REQUIREMENTS") == "true"
@@ -86,6 +80,9 @@ def addons_config(filtered=True, strict=False):
 
     :param bool strict:
         Use ``True`` to raise an exception if any declared addon is not found.
+
+    :return Iterator[str, str]:
+        A generator that yields ``(addon, repo)`` pairs.
     """
     config = dict()
     missing_glob = set()
