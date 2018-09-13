@@ -253,6 +253,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-f", "custom/dependencies/gem.txt"),
                 ("test", "!", "-f", "custom/dependencies/npm.txt"),
                 ("test", "!", "-f", "custom/dependencies/pip.txt"),
+                # It should have module_auto_update available
+                ("test", "-d", "custom/src/server-tools/module_auto_update"),
                 # Patched Werkzeug version
                 ("bash", "-c", ('test "$(python -c "import werkzeug; '
                                 'print(werkzeug.__version__)")" == 0.14.1')),

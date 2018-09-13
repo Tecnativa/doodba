@@ -1,37 +1,130 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+import sys
+import yaml
+from multiprocessing import cpu_count
+from subprocess import check_call
 
-conf=/opt/odoo/custom/src/repos
+from odoobaselib import (
+    ADDONS_YAML,
+    AUTO_REPOS_YAML,
+    CORE,
+    logger,
+    PRIVATE,
+    REPOS_YAML,
+    SRC_DIR,
+)
 
-if [ -f "${conf}.yaml" ]; then
-    conf="${conf}.yaml"
-elif [ -f "${conf}.yml" ]; then
-    conf="${conf}.yml"
-fi
+UMASK = os.environ.get("UMASK")
+UID = int(os.environ.get("UID") or -1)
+GID = int(os.environ.get("GID") or -1)
+DEFAULT_REPO_PATTERN = os.environ.get("DEFAULT_REPO_PATTERN")
+DEFAULT_REPO_PATTERN_ODOO = os.environ.get("DEFAULT_REPO_PATTERN_ODOO")
 
-# Update linked repositories, if the `repos.yaml` file is found
-if [ -f $conf ]; then
-    log INFO Aggregating repositories from $conf
-    cd $(dirname $conf)
 
-    # Avoid wrong umask in aggregated files
-    if [ -n "$UMASK" ]; then
-        umask "$UMASK"
-    fi
+def aggregate(config):
+    """Execute git aggregator to pull git code.
 
-    # Perform aggregation with environment variables expansion
-    set +e
-    gitaggregate --expand-env -c $conf
-    code=$?
-    set -e
+    :param str config:
+        Path where to find the ``repos.yaml`` file.
+    """
+    logger.info("Running gitaggregate with %s", config)
+    old_umask = None
+    try:
+        # Download git code with the specified umask, if any
+        if UMASK:
+            old_umask = os.umask(int(UMASK))
+        check_call(
+            ["gitaggregate", "--expand-env", "--config", config,
+             "--jobs", str(cpu_count() or 1)],
+            cwd=SRC_DIR,
+            stderr=sys.stderr,
+            stdout=sys.stdout,
+        )
+    finally:
+        # Restore umask, if changed
+        if old_umask is not None:
+            os.umask(old_umask)
+        # Chown recursively, if UID or GID are specified
+        if ~UID or ~GID:
+            for root, dirs, files in os.walk(SRC_DIR):
+                for target in dirs + files:
+                    os.chown(os.path.join(root, target), UID, GID)
 
-    # Avoid wrong user/group in aggregated files
-    if [ -n "$GID" -a -n "$UID" ]; then
-        chown -R "$UID:$GID" .
-    fi
 
-    [ $code -eq 0 ] || exit $code
-else
-    log ERROR Cannot aggregate repositories: $conf not found
-    exit 1
-fi
+def origin_for(folder):
+    """Guess the default git origin for that folder.
+
+    :param str folder:
+        Normally an absolute path to an expected git repo, whose name should
+        match the git repository where it comes from, using the env-supplied
+        pattern.
+    """
+    base = os.path.basename(folder)
+    pattern = DEFAULT_REPO_PATTERN
+    if base == "odoo":
+        pattern = DEFAULT_REPO_PATTERN_ODOO
+    return pattern.format(base)
+
+
+def missing_repos_config():
+    """Find the undefined repositories and return their default configuration.
+
+    :return dict:
+        git-aggregator-ready configuration dict for undefined repositories.
+    """
+    defined, expected = set(), {os.path.join(SRC_DIR, "odoo")}
+    # Find the repositories defined by hand
+    try:
+        with open(REPOS_YAML) as yaml_file:
+            for doc in yaml.load_all(yaml_file):
+                for repo in doc:
+                    defined.add(os.path.abspath(os.path.join(SRC_DIR, repo)))
+    except (IOError, AttributeError):
+        logger.debug("No repositories defined by hand")
+    # Find the repositories that should be present
+    try:
+        with open(ADDONS_YAML) as yaml_file:
+            for doc in yaml.load_all(yaml_file):
+                for repo in doc:
+                    if repo in {PRIVATE, CORE, "ONLY"}:
+                        continue
+                    repo_path = os.path.abspath(os.path.join(SRC_DIR, repo))
+                    if not os.path.exists(repo_path) or os.path.isdir(
+                            os.path.join(repo_path, ".git")):
+                        expected.add(repo_path)
+    except (IOError, AttributeError):
+        logger.debug("No addons are expected to be present")
+    # Find the undefined repositories and generate a config for them
+    missing = expected - defined
+    config = {
+        repo_path: {
+            'defaults': {'depth': '$DEPTH_DEFAULT'},
+            'merges': ['origin $ODOO_VERSION'],
+            'remotes': {
+                'origin': origin_for(repo_path),
+            },
+            'target': 'origin $ODOO_VERSION',
+        }
+        for repo_path in missing
+    }
+    logger.debug("Generated missing repos config %r", config)
+    return config
+
+
+# Aggregate user-specified repos
+if os.path.isfile(REPOS_YAML):
+    # HACK https://github.com/acsone/git-aggregator/pull/23
+    has_contents = True
+    with open(REPOS_YAML) as repos_file:
+        has_contents = yaml.load(repos_file)
+    if has_contents:
+        aggregate(REPOS_YAML)
+
+# Aggregate unspecified repos
+missing_config = missing_repos_config()
+if missing_config:
+    with open(AUTO_REPOS_YAML, "w") as autorepos:
+        yaml.dump(missing_config, autorepos)
+    aggregate(AUTO_REPOS_YAML)
