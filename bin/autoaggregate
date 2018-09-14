@@ -50,7 +50,13 @@ def aggregate(config):
         if ~UID or ~GID:
             for root, dirs, files in os.walk(SRC_DIR):
                 for target in dirs + files:
-                    os.chown(os.path.join(root, target), UID, GID)
+                    try:
+                        os.chown(os.path.join(root, target), UID, GID)
+                    except:
+                        logger.debug(
+                            "Error trying to chown on file. Skipping...",
+                            exc_info=True,
+                        )
 
 
 def origin_for(folder):
