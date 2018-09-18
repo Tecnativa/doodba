@@ -173,6 +173,106 @@ You can choose your Odoo version, and even merge PRs from many of them using
 
 A [git-aggregator](#git-aggregator) configuration file.
 
+It should look similar to this:
+
+```yaml
+# Odoo must be in the `odoo` folder for Doodba to work
+odoo:
+  defaults:
+    # This will use git shallow clones.
+    # $DEPTH_DEFAULT is 1 in test and prod, but 100 in devel.
+    # $DEPTH_MERGE is always 100.
+    # You can use any integer value, OTOH.
+    depth: $DEPTH_MERGE
+  remotes:
+    origin: https://github.com/OCA/OCB.git
+    odoo: https://github.com/odoo/odoo.git
+    openupgrade: https://github.com/OCA/OpenUpgrade.git
+  # $ODOO_VERSION is... the Odoo version! "11.0" or similar
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+    - odoo refs/pull/25594/head # Expose `Field` from search_filters.js
+
+web:
+  defaults:
+    depth: $DEPTH_MERGE
+  remotes:
+    origin: https://github.com/OCA/web.git
+    tecnativa: https://github.com/Tecnativa/partner-contact.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+    - origin refs/pull/1007/head # web_responsive search
+    - tecnativa 11.0-some_addon-custom # Branch for this customer only
+```
+
+###### Automatic download of repos
+
+Doodba is smart enough to download automatically git repositories even if they
+are missing in `repos.yaml`. It will happen if it is used in [`addons.yaml`][],
+except for the special [`private`][] repo. This will help you keep your
+deployment definitions DRY.
+
+You can configure this behavior with these environment variables (default
+values shown):
+
+- `DEFAULT_REPO_PATTERN="https://github.com/OCA/{}.git"`
+- `DEFAULT_REPO_PATTERN_ODOO="https://github.com/OCA/OCB.git"`
+
+As you probably guessed, we use something like `str.format(repo_basename)`
+on top of those variables to compute the default remote origin. If, i.e.,
+you want to use your own repositories as default remotes, just add these
+build arguments to your `docker-compose.yaml` file:
+
+```yaml
+# [...]
+services:
+  odoo:
+    build:
+      args:
+        DEFAULT_REPO_PATTERN: &origin "https://github.com/Tecnativa/{}.git"
+        DEFAULT_REPO_PATTERN_ODOO: *origin
+# [...]
+```
+
+So, for example, if your [`repos.yaml`][] file is empty and
+your [`addons.yaml`][] contains this:
+
+```yaml
+server-tools:
+- module_auto_update
+```
+
+A `/opt/odoo/auto/repos.yaml` file with this will be generated and used to
+download git code:
+
+```yaml
+/opt/odoo/custom/src/odoo:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OCA/OCB.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+/opt/odoo/custom/src/server-tools:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OCA/server-tools.git
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
+```
+
+All of this means that, you only need to define the git aggregator
+spec in [`repos.yaml`][] if anything diverges from the standard:
+
+- You need special merges.
+- You need a special origin.
+- The folder name does not match the origin pattern.
+- The branch name does not match `$ODOO_VERSION`.
+- Etc.
+
 ##### `/opt/odoo/custom/src/addons.yaml`
 
 One entry per repo and addon you want to activate in your project. Like this:
