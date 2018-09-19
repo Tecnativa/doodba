@@ -19,9 +19,9 @@ MAIN_SCAFFOLDING_VERSION = "11.0"
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 ODOO_VERSIONS = frozenset(environ.get(
-    "DOCKER_TAG", "8.0 9.0 10.0 11.0").split())
+    "DOCKER_TAG", "8.0 9.0 10.0 11.0 12.0").split())
 PG_VERSIONS = frozenset(environ.get(
-    "PG_VERSIONS", "9.6").split())
+    "PG_VERSIONS", "10").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 
 

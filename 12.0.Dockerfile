@@ -1,4 +1,4 @@
-FROM debian:9 AS base
+FROM python:3.7-stretch AS base
 
 # Enable Odoo user and filestore
 RUN useradd -md /home/odoo -s /bin/false odoo \
@@ -38,17 +38,41 @@ ENV DB_FILTER=.* \
 RUN apt-get -qq update \
     && apt-get -yqq upgrade \
     && apt-get install -yqq --no-install-recommends \
-        python3 ruby-compass \
-        fontconfig libfreetype6 libxml2 libxslt1.1 libjpeg62-turbo zlib1g \
-        libfreetype6 liblcms2-2 libtiff5 tk tcl libpq5 \
-        libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 \
-        locales-all zlibc \
-        bzip2 ca-certificates curl gettext-base git gnupg2 nano vim \
-        openssh-client telnet xz-utils \
+        bzip2 \
+        ca-certificates \
+        curl \
+        fontconfig \
+        gettext-base \
+        git \
+        gnupg2 \
+        libfreetype6 \
+        libfreetype6 \
+        libjpeg62-turbo \
+        liblcms2-2 \
+        libldap-2.4-2 \
+        libpq5 \
+        libsasl2-2 \
+        libtiff5 \
+        libx11-6 \
+        libxext6 \
+        libxml2 \
+        libxrender1 \
+        libxslt1.1 \
+        locales-all \
+        nano \
+        openssh-client \
+        ruby-compass \
+        tcl \
+        telnet \
+        tk \
+        vim \
+        xz-utils \
+        zlib1g \
+        zlibc \
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin \
-    && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends nodejs postgresql-client \
     && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.stretch_amd64.deb \
@@ -56,27 +80,20 @@ RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends ./wkhtmltox.deb \
     && rm wkhtmltox.deb \
     && wkhtmltopdf --version \
-    && apt-get -yqq purge python2.7 \
     && apt-get -yqq autoremove \
-    && rm -Rf /var/lib/apt/lists/*
+    && rm -Rf /var/lib/apt/lists/* /tmp/*
 
-# Special case to get latest Less and PhantomJS
+# Special case to get latest Less
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
-    && npm install -g less@2 less-plugin-clean-css@1 phantomjs-prebuilt@2 \
+    && npm install -g less \
     && rm -Rf ~/.npm /tmp/*
-
-# Special case to get bootstrap-sass, required by Odoo for Sass assets
-RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<4' \
-    && rm -Rf ~/.gem /var/lib/gems/*/cache/
 
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
     astor git-aggregator openupgradelib ptvsd pudb wdb
 COPY bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.5/dist-packages/doodbalib
-RUN ln -s /usr/local/lib/python3.5/dist-packages/doodbalib \
-    /usr/local/lib/python3.5/dist-packages/odoobaselib
+COPY lib/odoobaselib /usr/local/lib/python3.7/dist-packages/odoobaselib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
@@ -84,34 +101,18 @@ RUN mkdir -p auto/addons custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.5/dist-packages/doodbalib \
-    && ln -s $(which python3) /usr/local/bin/python \
+    && chmod -R a+rX /usr/local/lib/python3.7/dist-packages/odoobaselib \
     && sync
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
 ARG ODOO_SOURCE=OCA/OCB
-ARG ODOO_VERSION=11.0
+ARG ODOO_VERSION=12.0
 ENV ODOO_VERSION="$ODOO_VERSION"
-RUN apt-get update \
-    && apt-get install -y \
-        build-essential \
-        libevent-dev \
-        libjpeg-dev \
-        libldap2-dev \
-        libsasl2-dev \
-        libssl-dev \
-        libxml2-dev \
-        libxslt1-dev \
-        python3-dev \
-        zlib1g-dev \
-    && pip install -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+RUN pip install -r https://raw.githubusercontent.com/odoo/odoo/saas-11.5/requirements.txt \
     && pip install pg_activity \
-    && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
-    && apt-get purge -yqq build-essential '*-dev' \
-    && apt-mark -qq manual '*' \
-    && rm -Rf /var/lib/apt/lists/*
+    && (python3 -m compileall -q /usr/local/lib/python3.7/ || true)
 
 # HACK Special case for Werkzeug
 USER odoo
