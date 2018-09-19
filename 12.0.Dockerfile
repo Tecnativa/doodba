@@ -67,7 +67,14 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
-    astor git-aggregator openupgradelib ptvsd pudb wdb
+        astor \
+        git-aggregator \
+        openupgradelib \
+        pg_activity \
+        ptvsd \
+        pudb \
+        wdb \
+    && sync
 COPY bin/* /usr/local/bin/
 COPY lib/odoobaselib /usr/local/lib/python3.7/dist-packages/odoobaselib
 COPY build.d common/build.d
@@ -86,9 +93,14 @@ RUN mkdir -p auto/addons custom/src/private \
 ARG ODOO_SOURCE=OCA/OCB
 ARG ODOO_VERSION=12.0
 ENV ODOO_VERSION="$ODOO_VERSION"
-RUN pip install -r https://raw.githubusercontent.com/odoo/odoo/saas-11.5/requirements.txt \
-    && pip install pg_activity \
-    && (python3 -m compileall -q /usr/local/lib/python3.7/ || true)
+# TODO Use $ODOO_SOURCE and $ODOO_VERSON when OCB 12.0 is released
+RUN debs="libldap2-dev libsasl2-dev" \
+    && apt-get update \
+    && apt-get install -yqq --no-install-recommends $debs \
+    && pip install -r https://raw.githubusercontent.com/odoo/odoo/saas-11.5/requirements.txt \
+    && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
+    && apt-get purge -yqq $debs \
+    && rm -Rf /var/lib/apt/lists/* /tmp/*
 
 # HACK Special case for Werkzeug
 USER odoo
