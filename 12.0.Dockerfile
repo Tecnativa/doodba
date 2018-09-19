@@ -76,7 +76,7 @@ RUN pip install \
         wdb \
     && sync
 COPY bin/* /usr/local/bin/
-COPY lib/odoobaselib /usr/local/lib/python3.7/site-packages/odoobaselib
+COPY lib/doodbalib /usr/local/lib/python3.7/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
@@ -84,20 +84,21 @@ RUN mkdir -p auto/addons custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.7/site-packages/odoobaselib \
+    && chmod -R a+rX /usr/local/lib/python3.7/site-packages/doodbalib \
     && sync
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
-ARG ODOO_SOURCE=OCA/OCB
+# TODO Use OCA/OCB when OCB 12.0 is released
+ARG ODOO_SOURCE=odoo/odoo
 ARG ODOO_VERSION=12.0
-ENV ODOO_VERSION="$ODOO_VERSION"
-# TODO Use $ODOO_SOURCE and $ODOO_VERSON when OCB 12.0 is released
+# TODO Use "$ODOO_VERSION" when OCB or Odoo 12.0 is released
+ENV ODOO_VERSION="saas-11.5"
 RUN debs="libldap2-dev libsasl2-dev" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $debs \
-    && pip install -r https://raw.githubusercontent.com/odoo/odoo/saas-11.5/requirements.txt \
+    && pip install -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
     && apt-get purge -yqq $debs \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
