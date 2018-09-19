@@ -1,4 +1,4 @@
-FROM python:3.7-stretch AS base
+FROM python:3.5-stretch AS base
 
 # Enable Odoo user and filestore
 RUN useradd -md /home/odoo -s /bin/false odoo \
@@ -76,7 +76,7 @@ RUN pip install \
         wdb \
     && sync
 COPY bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.7/site-packages/doodbalib
+COPY lib/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
@@ -84,7 +84,7 @@ RUN mkdir -p auto/addons custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.7/site-packages/doodbalib \
+    && chmod -R a+rX /usr/local/lib/python3.5/site-packages/doodbalib \
     && sync
 
 # Execute installation script by Odoo version
@@ -99,7 +99,7 @@ RUN debs="libldap2-dev libsasl2-dev" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $debs \
     && pip install -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
-    && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
+    && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
     && apt-get purge -yqq $debs \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
