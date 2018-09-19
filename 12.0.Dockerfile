@@ -38,36 +38,13 @@ ENV DB_FILTER=.* \
 RUN apt-get -qq update \
     && apt-get -yqq upgrade \
     && apt-get install -yqq --no-install-recommends \
-        bzip2 \
-        ca-certificates \
-        curl \
-        fontconfig \
+        chromium \
         gettext-base \
-        git \
         gnupg2 \
-        libfreetype6 \
-        libfreetype6 \
-        libjpeg62-turbo \
-        liblcms2-2 \
-        libldap-2.4-2 \
-        libpq5 \
-        libsasl2-2 \
-        libtiff5 \
-        libx11-6 \
-        libxext6 \
-        libxml2 \
-        libxrender1 \
-        libxslt1.1 \
         locales-all \
         nano \
-        openssh-client \
-        ruby-compass \
-        tcl \
         telnet \
-        tk \
         vim \
-        xz-utils \
-        zlib1g \
         zlibc \
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
@@ -80,7 +57,6 @@ RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends ./wkhtmltox.deb \
     && rm wkhtmltox.deb \
     && wkhtmltopdf --version \
-    && apt-get -yqq autoremove \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
 # Special case to get latest Less
