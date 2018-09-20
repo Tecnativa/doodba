@@ -4,13 +4,13 @@
 from os.path import basename, join, splitext
 from glob import glob
 
-from odoobaselib import (
+from doodbalib import (
     AUTO_REQUIREMENTS,
     CUSTOM_DIR,
     FILE_APT_BUILD,
     SRC_DIR,
 )
-from odoobaselib.installer import install, INSTALLERS, logger
+from doodbalib.installer import install, INSTALLERS, logger
 
 
 # Build dependencies installed before any others

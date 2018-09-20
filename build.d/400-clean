@@ -4,7 +4,7 @@ import os
 import shutil
 import sys
 
-from odoobaselib import addons_config, CORE, CLEAN, logger, PRIVATE, SRC_DIR
+from doodbalib import addons_config, CORE, CLEAN, logger, PRIVATE, SRC_DIR
 
 if not CLEAN:
     logger.warning("Not cleaning garbage")

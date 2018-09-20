@@ -3,7 +3,7 @@
 import os
 from glob import iglob
 
-from odoobaselib import (
+from doodbalib import (
     addons_config,
     ADDONS_DIR,
     ADDONS_YAML,

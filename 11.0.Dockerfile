@@ -74,7 +74,9 @@ WORKDIR /opt/odoo
 RUN pip install \
     astor git-aggregator openupgradelib ptvsd pudb wdb
 COPY bin/* /usr/local/bin/
-COPY lib/odoobaselib /usr/local/lib/python3.5/dist-packages/odoobaselib
+COPY lib/doodbalib /usr/local/lib/python3.5/dist-packages/doodbalib
+RUN ln -s /usr/local/lib/python3.5/dist-packages/doodbalib \
+    /usr/local/lib/python3.5/dist-packages/odoobaselib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
@@ -82,7 +84,7 @@ RUN mkdir -p auto/addons custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.5/dist-packages/odoobaselib \
+    && chmod -R a+rX /usr/local/lib/python3.5/dist-packages/doodbalib \
     && ln -s $(which python3) /usr/local/bin/python \
     && sync
 

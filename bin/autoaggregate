@@ -6,7 +6,7 @@ import yaml
 from multiprocessing import cpu_count
 from subprocess import check_call
 
-from odoobaselib import (
+from doodbalib import (
     ADDONS_YAML,
     AUTO_REPOS_YAML,
     CORE,
