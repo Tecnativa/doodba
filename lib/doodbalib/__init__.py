@@ -42,9 +42,9 @@ PRIVATE = "private"
 CORE = "odoo/addons"
 PRIVATE_DIR = os.path.join(SRC_DIR, PRIVATE)
 CORE_DIR = os.path.join(SRC_DIR, CORE)
-ODOO_VERSION = float(os.environ["ODOO_VERSION"])
+ODOO_VERSION = os.environ["ODOO_VERSION"]
 MANIFESTS = ("__manifest__.py", "__openerp__.py")
-if ODOO_VERSION < 10:
+if ODOO_VERSION in {"8.0", "9.0"}:
     MANIFESTS = MANIFESTS[1:]
 
 # Customize logging for build
