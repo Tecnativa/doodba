@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import argparse
 import logging
 
-from odoobaselib import LOG_LEVELS, logger
+from doodbalib import LOG_LEVELS, logger
 
 parser = argparse.ArgumentParser(description="Easy logging for scripts")
 parser.add_argument("level", choices=LOG_LEVELS)

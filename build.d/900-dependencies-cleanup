@@ -3,8 +3,8 @@
 
 import os
 
-from odoobaselib import CUSTOM_DIR, FILE_APT_BUILD
-from odoobaselib.installer import INSTALLERS
+from doodbalib import CUSTOM_DIR, FILE_APT_BUILD
+from doodbalib.installer import INSTALLERS
 
 
 # Build-time dependencies must be removed when finishing build

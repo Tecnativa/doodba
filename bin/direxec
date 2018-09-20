@@ -6,7 +6,7 @@ import sys
 
 from psycopg2 import connect, OperationalError
 
-from odoobaselib import logger, which
+from doodbalib import logger, which
 
 # Call this file linked from another file called `build` or `entrypoint`
 mode = os.path.basename(__file__)

@@ -2,7 +2,7 @@
 from collections import OrderedDict
 from os.path import exists
 from subprocess import check_call
-from odoobaselib import logger
+from doodbalib import logger
 
 
 class Installer(object):
