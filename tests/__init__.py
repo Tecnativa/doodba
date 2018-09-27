@@ -24,7 +24,7 @@ PG_VERSIONS = frozenset(environ.get(
     "PG_VERSIONS", "10").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 
-# TODO Remove when OCB 12.0 gets released, and fix errors raised
+# TODO Remove when required OCA addons for 12.0 are released, and fix errors
 skip_12 = unittest.skipIf(
     ODOO_VERSIONS == {"12.0"},
     "Test not ready for OCB 12.0")
@@ -168,7 +168,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c", 'test "$(addons list -cWsale)" == crm'),
             )
 
-    @skip_12
     def test_settings(self):
         """Test settings are filled OK"""
         folder = join(SCAFFOLDINGS_DIR, "settings")
@@ -216,7 +215,6 @@ class ScaffoldingCase(unittest.TestCase):
                 *commands
             )
 
-    @skip_12
     def test_dotd(self):
         """Test environment with common ``*.d`` directories."""
         for sub_env in matrix():
