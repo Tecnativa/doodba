@@ -43,6 +43,7 @@ RUN apt-get -qq update \
         gnupg2 \
         locales-all \
         nano \
+        ruby \
         telnet \
         vim \
         zlibc \
