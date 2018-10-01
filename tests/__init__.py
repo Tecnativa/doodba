@@ -24,7 +24,7 @@ PG_VERSIONS = frozenset(environ.get(
     "PG_VERSIONS", "10").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 
-# TODO Remove when OCB 12.0 gets released, and fix errors raised
+# TODO Remove when required OCA addons for 12.0 are released, and fix errors
 skip_12 = unittest.skipIf(
     ODOO_VERSIONS == {"12.0"},
     "Test not ready for OCB 12.0")
@@ -168,7 +168,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c", 'test "$(addons list -cWsale)" == crm'),
             )
 
-    @skip_12
     def test_settings(self):
         """Test settings are filled OK"""
         folder = join(SCAFFOLDINGS_DIR, "settings")
@@ -216,7 +215,6 @@ class ScaffoldingCase(unittest.TestCase):
                 *commands
             )
 
-    @skip_12
     def test_dotd(self):
         """Test environment with common ``*.d`` directories."""
         for sub_env in matrix():
@@ -229,7 +227,7 @@ class ScaffoldingCase(unittest.TestCase):
                 # ``custom/conf.d`` was properly concatenated
                 ("grep", "test-conf", "auto/odoo.conf"),
                 # ``custom/dependencies`` were installed
-                ("test", "!", "-e", "/usr/bin/gcc"),
+                ("test", "!", "-e", "/usr/sbin/sshd"),
                 ("test", "!", "-e", "/var/lib/apt/lists/lock"),
                 ("busybox", "whoami"),
                 ("bash", "-c", "echo $NODE_PATH"),
@@ -269,7 +267,7 @@ class ScaffoldingCase(unittest.TestCase):
                                 'print(werkzeug.__version__)")" == 0.14.1')),
                 # apt_build.txt
                 ("test", "-f", "custom/dependencies/apt_build.txt"),
-                ("test", "!", "-e", "/usr/bin/gcc"),
+                ("test", "!", "-e", "/usr/sbin/sshd"),
                 # apt-without-sequence.txt
                 ("test", "-f", "custom/dependencies/apt-without-sequence.txt"),
                 ("test", "!", "-e", "/bin/busybox"),
