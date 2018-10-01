@@ -227,7 +227,7 @@ class ScaffoldingCase(unittest.TestCase):
                 # ``custom/conf.d`` was properly concatenated
                 ("grep", "test-conf", "auto/odoo.conf"),
                 # ``custom/dependencies`` were installed
-                ("test", "!", "-e", "/usr/bin/gcc"),
+                ("test", "!", "-e", "/usr/sbin/sshd"),
                 ("test", "!", "-e", "/var/lib/apt/lists/lock"),
                 ("busybox", "whoami"),
                 ("bash", "-c", "echo $NODE_PATH"),
@@ -267,7 +267,7 @@ class ScaffoldingCase(unittest.TestCase):
                                 'print(werkzeug.__version__)")" == 0.14.1')),
                 # apt_build.txt
                 ("test", "-f", "custom/dependencies/apt_build.txt"),
-                ("test", "!", "-e", "/usr/bin/gcc"),
+                ("test", "!", "-e", "/usr/sbin/sshd"),
                 # apt-without-sequence.txt
                 ("test", "-f", "custom/dependencies/apt-without-sequence.txt"),
                 ("test", "!", "-e", "/bin/busybox"),
