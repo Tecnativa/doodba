@@ -97,7 +97,9 @@ ENV ODOO_VERSION="$ODOO_VERSION"
 RUN debs="libldap2-dev libsasl2-dev" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $debs \
-    && pip install -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    && pip install \
+        -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+        'websocket-client~=0.53' \
     && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
     && apt-get purge -yqq $debs \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
