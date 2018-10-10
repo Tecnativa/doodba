@@ -41,6 +41,7 @@ PRIVATE = "private"
 CORE = "odoo/addons"
 PRIVATE_DIR = os.path.join(SRC_DIR, PRIVATE)
 CORE_DIR = os.path.join(SRC_DIR, CORE)
+ODOO_DIR = os.path.join(SRC_DIR, "odoo")
 ODOO_VERSION = os.environ["ODOO_VERSION"]
 MANIFESTS = ("__manifest__.py", "__openerp__.py")
 if ODOO_VERSION in {"8.0", "9.0"}:
