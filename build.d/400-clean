@@ -4,43 +4,55 @@ import os
 import shutil
 import sys
 
-from doodbalib import addons_config, CORE, CLEAN, logger, PRIVATE, SRC_DIR
+from doodbalib import (
+    addons_config,
+    CLEAN,
+    logger,
+    ODOO_DIR,
+    PRIVATE_DIR,
+    SRC_DIR,
+)
 
 if not CLEAN:
     logger.warning("Not cleaning garbage")
     sys.exit()
 
-addons = set(addons_config(filtered=False))
-repos = {addon[1] for addon in addons} | {CORE, PRIVATE}
-for directory in os.listdir(SRC_DIR):
-    # Special directories must be preserved
-    if directory == "odoo":
-        directory = CORE
+# Get the enabled paths
+repos_addons = {}
+for addon, repo in addons_config(filtered=False):
+    repo_path = os.path.realpath(os.path.join(SRC_DIR, repo))
+    repos_addons.setdefault(repo_path, set())
+    repos_addons[repo_path].add(addon)
+logger.debug("Addon paths enabled: %s", repos_addons)
 
-    # Skip regular files
-    full = os.path.join(SRC_DIR, directory)
-    if not os.path.isdir(full):
+# Traverse src dir and remove anything not explicitly enabled
+for directory, subdirectories, subfiles in os.walk(SRC_DIR):
+    logger.debug("Checking for cleanup directory %s", directory)
+    # Skip main src directory
+    if directory == SRC_DIR:
         continue
-
-    # Remove directories not listed in addons.yaml
-    if directory not in repos:
-        logger.info("Removing directory %s", full)
-        try:
-          shutil.rmtree(full)
-        except OSError:
-          os.unlink(full)
+    # Always skip private/*
+    if directory == PRIVATE_DIR:
+        subdirectories[:] = []
         continue
-
-    # Traverse addons
-    for subdirectory in os.listdir(full):
-        subfull = os.path.join(full, subdirectory)
-        # Skip regular files
-        if not os.path.isdir(subfull):
+    # Inside the odoo dir, skip all but addons dir
+    if directory == ODOO_DIR:
+        subdirectories[:] = ["addons"]
+        continue
+    try:
+        # Get addons enalbed in current directory
+        enabled_addons = repos_addons[directory]
+    except KeyError:
+        # This isn't a repo; is there anything inside to preserve?
+        directory += os.path.sep
+        if any(repo.startswith(directory) for repo in repos_addons):
+            # Then, let's walk in; we'll remove later if needed
             continue
-        # Remove addon if not used
-        if (subdirectory, directory) not in addons:
-            logger.info("Removing subdirectory %s", subfull)
-            try:
-              shutil.rmtree(subfull)
-            except OSError:
-              os.unlink(subfull)
+    else:
+        # This is an addons repo; do not walk into the enabled ones
+        for addon in enabled_addons:
+            subdirectories.remove(addon)
+        continue
+    # Remove every other directory
+    logger.info("Removing directory %s", directory)
+    shutil.rmtree(directory)

@@ -1,4 +1,4 @@
-dummy_repo:
+other-doodba/odoo/src/private:
   - absent_addon
   - dummy_addon
   - product

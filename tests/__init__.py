@@ -147,7 +147,7 @@ class ScaffoldingCase(unittest.TestCase):
                 # Addon from extra repo takes higher priority than core version
                 ("realpath", "auto/addons/product"),
                 ("bash", "-c", 'test "$(realpath auto/addons/product)" == '
-                               '/opt/odoo/custom/src/dummy_repo/product'),
+                 '/opt/odoo/custom/src/other-doodba/odoo/src/private/product'),
                 ("bash", "-c",
                  'test "$(addons list -e)" == dummy_addon,product'),
             )
