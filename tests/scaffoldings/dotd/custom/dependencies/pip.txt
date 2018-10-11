@@ -2,3 +2,5 @@
 pycrypto==2.6.1 --no-binary :all:
 # Odoo pins docutils==0.12, so let's check it gets upgraded
 docutils==0.14
+# External dependency files can be included too; example: cfssl
+-r https://raw.githubusercontent.com/Tecnativa/doodba/f1d5b4e65d463eb25b1bece981bc806e9237310f/tests/scaffoldings/dotd/custom/src/dummy_repo/requirements.txt

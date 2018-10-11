@@ -127,7 +127,6 @@ FROM base AS onbuild
 ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint"]
 ONBUILD CMD ["/usr/local/bin/odoo"]
 ONBUILD ARG AGGREGATE=true
-ONBUILD ARG AUTO_REQUIREMENTS=false
 ONBUILD ARG DEFAULT_REPO_PATTERN="https://github.com/OCA/{}.git"
 ONBUILD ARG DEFAULT_REPO_PATTERN_ODOO="https://github.com/OCA/OCB.git"
 ONBUILD ARG DEPTH_DEFAULT=1
