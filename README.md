@@ -598,23 +598,35 @@ Get up and running quickly with the provided
 
 ### Skip the boring parts
 
-I will assume you know how to use Git, Docker and Docker Compose.
+You will need these tools, so install them locally (and learn how to use them,
+check their docs, Doodba is not the place to learn them 😉):
 
-    git clone https://github.com/Tecnativa/doodba-scaffolding.git myproject
-    cd myproject
-    ln -s devel.yaml docker-compose.yml
-    chown -R $USER:1000 odoo/auto
-    chmod -R ug+rwX odoo/auto
-    export UID GID="$(id -g $USER)" UMASK="$(umask)"
-    docker-compose build --pull
-    docker-compose -f setup-devel.yaml run --rm odoo
-    docker-compose up
+- [Git](https://git-scm.com/do)
+- [Docker Engine](https://www.docker.com/products/docker-engine)
+  (running locally)
+- [Docker Compose](https://docs.docker.com/compose/overview/)
 
-And if you don't want to have a chance to do a `git merge` and get possible
+Then run these Bash commands:
+
+```bash
+git clone https://github.com/Tecnativa/doodba-scaffolding.git myproject
+cd myproject
+ln -s devel.yaml docker-compose.yml
+chown -R $USER:1000 odoo/auto
+chmod -R ug+rwX odoo/auto
+export UID GID="$(id -g $USER)" UMASK="$(umask)"
+docker-compose build --pull
+docker-compose -f setup-devel.yaml run --rm odoo
+docker-compose up
+```
+
+And if you don't want to have a chance to do a `git pull` and get possible
 future scaffolding updates merged in your project's `git log`:
 
-    rm -Rf .git
-    git init
+```bash
+rm -Rf .git
+git init
+```
 
 ### Tell me the boring parts
 
