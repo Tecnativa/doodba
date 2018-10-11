@@ -4,7 +4,6 @@ services:
     build:
       context: ./
       args:
-        AUTO_REQUIREMENTS: "true"
         LOG_LEVEL: DEBUG
         ODOO_VERSION: $ODOO_MINOR
     tty: true

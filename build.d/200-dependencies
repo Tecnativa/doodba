@@ -5,7 +5,6 @@ from os.path import basename, join, splitext
 from glob import glob
 
 from doodbalib import (
-    AUTO_REQUIREMENTS,
     CUSTOM_DIR,
     FILE_APT_BUILD,
     SRC_DIR,
@@ -18,9 +17,6 @@ install("apt", FILE_APT_BUILD)
 
 for name in INSTALLERS:
     req_files = []
-    # pip `requirements.txt` files found in repositories
-    if name == "pip" and AUTO_REQUIREMENTS:
-        req_files += glob(join(SRC_DIR, "*", "requirements.txt"))
     # Normal dependency installation
     req_files.append(join(CUSTOM_DIR, 'dependencies', '%s.txt' % name))
     for req_file in req_files:
