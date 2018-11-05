@@ -110,8 +110,6 @@ class ScaffoldingCase(unittest.TestCase):
                  'test "$(addons list -p)" == disabled_addon,private_addon'),
                 ("bash", "-c", 'test "$(addons list -ip)" == private_addon'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
-                ("bash", "-c",
-                 'test "$(addons list -ped)" == base,web,website'),
                 # absent_addon is missing and should fail
                 ("bash", "-c", "! addons list -px"),
             )
@@ -139,6 +137,8 @@ class ScaffoldingCase(unittest.TestCase):
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
+                ("bash", "-c",
+                 'test "$(addons list -ped)" == base,web,website'),
                 # ``dummy_addon`` and ``private_addon`` exist
                 ("test", "-d", "auto/addons/dummy_addon"),
                 ("test", "-h", "auto/addons/dummy_addon"),
