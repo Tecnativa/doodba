@@ -110,6 +110,8 @@ class ScaffoldingCase(unittest.TestCase):
                  'test "$(addons list -p)" == disabled_addon,private_addon'),
                 ("bash", "-c", 'test "$(addons list -ip)" == private_addon'),
                 ("bash", "-c", 'addons list -c | grep ,crm,'),
+                ("bash", "-c",
+                 'test "$(addons list -ped)" == base,web,website'),
                 # absent_addon is missing and should fail
                 ("bash", "-c", "! addons list -px"),
             )

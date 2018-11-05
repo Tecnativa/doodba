@@ -24,6 +24,9 @@ parser.add_argument(
     "-c", "--core", action="store_true",
     help="Use all Odoo core addons")
 parser.add_argument(
+    "-d", "--dependencies", action="store_true",
+    help="Use only dependencies of selected addons")
+parser.add_argument(
     "-e", "--extra", action="store_true",
     help="Use all extra addons")
 parser.add_argument(
@@ -53,6 +56,7 @@ parser.add_argument(
 
 # Generate the matching addons set
 args = parser.parse_args()
+dependencies = {"base"}
 addons = set(args.with_)
 without = set(args.without)
 if addons & without:
@@ -80,6 +84,7 @@ try:
                         continue
                     else:
                         installable = manifest.get("installable", True)
+                        dependencies += set(manifest.get("depends", set()))
                         break
                 if not installable:
                     continue
@@ -88,6 +93,9 @@ try:
             addons.add(addon)
 except AddonsConfigError as error:
     sys.exit(error.message)
+# Use dependencies instead, if requested
+if args.dependencies:
+    addons = dependencies - addons
 
 # Do the required action
 if not addons:
