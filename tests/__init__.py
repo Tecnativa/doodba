@@ -137,6 +137,8 @@ class ScaffoldingCase(unittest.TestCase):
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
+                ("bash", "-c",
+                 'test "$(addons list -ped)" == base,web,website'),
                 # ``dummy_addon`` and ``private_addon`` exist
                 ("test", "-d", "auto/addons/dummy_addon"),
                 ("test", "-h", "auto/addons/dummy_addon"),
