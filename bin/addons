@@ -84,7 +84,7 @@ try:
                         continue
                     else:
                         installable = manifest.get("installable", True)
-                        dependencies += set(manifest.get("depends", set()))
+                        dependencies.update(manifest.get("depends", []))
                         break
                 if not installable:
                     continue
