@@ -352,7 +352,10 @@ package managers:
 
 - `apt_build.txt`: build-time dependencies, installed before any others and
   removed after all the others too. Usually these would include Debian packages
-  such as `build-essential` or `python-dev`.
+  such as `build-essential` or `python-dev`. From Doodba 11.0, this is most
+  likely not needed, as build dependencies are shipped with the image, and
+  local python develpment headers should be used instead of those downloaded
+  from apt.
 - `apt.txt`: run-time dependencies installed by apt.
 - `gem.txt`: run-time dependencies installed by gem.
 - `npm.txt`: run-time dependencies installed by npm.
