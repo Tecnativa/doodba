@@ -61,6 +61,8 @@ addons = set(args.with_)
 without = set(args.without)
 if addons & without:
     sys.exit("Cannot include and exclude the same addon!")
+if args.dependencies and args.fullpath:
+    sys.exit("Unsupported combination of --dependencies and --fullpath")
 try:
     for addon, repo in addons_config(strict=args.explicit):
         if addon in without:
@@ -70,24 +72,18 @@ try:
         private_ok = args.private and repo == PRIVATE
         if private_ok or core_ok or extra_ok:
             addon_path = os.path.join(SRC_DIR, repo, addon)
-            if args.installable:
-                installable = False
-                manifests = list(MANIFESTS)
-                while True:
-                    try:
-                        manifest = os.path.join(addon_path, manifests.pop())
-                        with open(manifest, "r") as code:
-                            manifest = ast.literal_eval(code.read())
-                    except IndexError:
+            manifest = {}
+            for manifest_name in MANIFESTS:
+                try:
+                    manifest_path = os.path.join(addon_path, manifest_name)
+                    with open(manifest_path, "r") as code:
+                        manifest = ast.literal_eval(code.read())
                         break
-                    except IOError:
-                        continue
-                    else:
-                        installable = manifest.get("installable", True)
-                        dependencies.update(manifest.get("depends", []))
-                        break
-                if not installable:
+                except IOError:
                     continue
+            if args.installable and not manifest.get("installable", True):
+                continue
+            dependencies.update(manifest.get("depends", []))
             if args.fullpath and args.action == "list":
                 addon = addon_path
             addons.add(addon)
