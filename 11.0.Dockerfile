@@ -39,6 +39,7 @@ RUN apt-get -qq update \
     && apt-get -yqq upgrade \
     && apt-get install -yqq --no-install-recommends \
         chromium \
+        fonts-liberation2 \
         gettext-base \
         gnupg2 \
         locales-all \
