@@ -70,12 +70,8 @@ class AddonsConfigError(Exception):
         self.message = message
 
 
-def addons_config(filtered=True, strict=False):
+def addons_config(strict=False):
     """Yield addon name and path from ``ADDONS_YAML``.
-
-    :param bool filtered:
-        Use ``False`` to include all addon definitions. Use ``True`` (default)
-        to include only those matched by ``ONLY`` clauses, if any.
 
     :param bool strict:
         Use ``True`` to raise an exception if any declared addon is not found.
@@ -86,53 +82,53 @@ def addons_config(filtered=True, strict=False):
     config = dict()
     missing_glob = set()
     missing_manifest = set()
-    special_missing = {PRIVATE, CORE}
+    all_globs = {}
     try:
         with open(ADDONS_YAML) as addons_file:
             for doc in yaml.load_all(addons_file):
-                # When not filtering, private and core addons should be either
-                # defined under every doc, or defaulted to `*` in the
-                # ones where it is missing
-                if not filtered:
-                    doc.setdefault(CORE, ["*"])
-                    doc.setdefault(PRIVATE, ["*"])
                 # Skip sections with ONLY and that don't match
-                elif any(os.environ.get(key) not in values
-                         for key, values in doc.get("ONLY", dict()).items()):
-                    logger.debug("Skipping section with ONLY %s", doc["ONLY"])
+                only = doc.pop("ONLY", {})
+                if any(os.environ.get(key) not in values
+                       for key, values in only.items()):
+                    logger.debug("Skipping section with ONLY %s", only)
                     continue
                 # Flatten all sections in a single dict
-                for repo, addons in doc.items():
-                    if repo == "ONLY":
-                        continue
-                    logger.debug("Processing %s repo", repo)
-                    special_missing.discard(repo)
-                    for partial_glob in addons:
-                        logger.debug("Expanding glob %s", partial_glob)
-                        full_glob = os.path.join(SRC_DIR, repo, partial_glob)
-                        found = glob(full_glob)
-                        if not found:
-                            missing_glob.add(full_glob)
-                            logger.debug(
-                                "Skipping unexpandable glob '%s'",
-                                full_glob)
-                            continue
-                        for addon in found:
-                            manifests = (
-                                os.path.join(addon, m) for m in MANIFESTS
-                            )
-                            if not any(os.path.isfile(m) for m in manifests):
-                                missing_manifest.add(addon)
-                                logger.debug(
-                                    "Skipping '%s' as it is not a valid Odoo "
-                                    "module", addon)
-                                continue
-                            logger.debug("Registering addon %s", addon)
-                            addon = os.path.basename(addon)
-                            config.setdefault(addon, set())
-                            config[addon].add(repo)
+                for repo, partial_globs in doc.items():
+                    all_globs.setdefault(repo, set())
+                    all_globs[repo].update(partial_globs)
     except IOError:
         logger.debug('Could not find addons configuration yaml.')
+        logger.debug("Processing %s repo", repo)
+    # Add default values for special sections
+    for repo in (CORE, PRIVATE):
+        all_globs.setdefault(repo, {"*"})
+    logger.debug("Merged addons definition before expanding: %r", all_globs)
+    # Expand all globs and store config
+    for repo, partial_globs in all_globs.items():
+        for partial_glob in partial_globs:
+            logger.debug("Expanding in repo %s glob %s", repo, partial_glob)
+            full_glob = os.path.join(SRC_DIR, repo, partial_glob)
+            found = glob(full_glob)
+            if not found:
+                missing_glob.add(full_glob)
+                logger.debug(
+                    "Skipping unexpandable glob '%s'",
+                    full_glob)
+                continue
+            for addon in found:
+                manifests = (
+                    os.path.join(addon, m) for m in MANIFESTS
+                )
+                if not any(os.path.isfile(m) for m in manifests):
+                    missing_manifest.add(addon)
+                    logger.debug(
+                        "Skipping '%s' as it is not a valid Odoo "
+                        "module", addon)
+                    continue
+                logger.debug("Registering addon %s", addon)
+                addon = os.path.basename(addon)
+                config.setdefault(addon, set())
+                config[addon].add(repo)
     # Fail now if running in strict mode
     if strict:
         error = []
@@ -146,14 +142,7 @@ def addons_config(filtered=True, strict=False):
                 missing_glob,
                 missing_manifest,
             )
-    # By default, all private and core addons are enabled
-    for repo in special_missing:
-        logger.debug("Auto-adding all addons from %s", repo)
-        for addon in glob(os.path.join(SRC_DIR, repo, "*")):
-            addon = os.path.basename(addon)
-            config.setdefault(addon, set())
-            config[addon].add(repo)
-    logger.debug("Resulting configuration: %r", config)
+    logger.debug("Resulting configuration after expanding: %r", config)
     for addon, repos in config.items():
         # Private addons are most important
         if PRIVATE in repos:
