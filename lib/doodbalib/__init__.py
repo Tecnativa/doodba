@@ -110,7 +110,9 @@ def addons_config(strict=False):
             full_glob = os.path.join(SRC_DIR, repo, partial_glob)
             found = glob(full_glob)
             if not found:
-                missing_glob.add(full_glob)
+                # Projects without private addons should never fail
+                if (repo, partial_glob) != (PRIVATE, "*"):
+                    missing_glob.add(full_glob)
                 logger.debug(
                     "Skipping unexpandable glob '%s'",
                     full_glob)
