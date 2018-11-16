@@ -200,6 +200,7 @@ class ScaffoldingCase(unittest.TestCase):
             ("test", "-d", "/opt/odoo/custom/src/private"),
             ("test", "-d", "/opt/odoo/custom/ssh"),
             ("test", "-x", "/usr/local/bin/unittest"),
+            ("addons", "list", "-cpix"),
             ("pg_activity", "--version"),
             # Must be able to install base addon
             ODOO_PREFIX + ("--init", "base"),
