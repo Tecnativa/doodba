@@ -308,7 +308,7 @@ class ScaffoldingCase(unittest.TestCase):
             self.popen(
                 ("docker", "network", "create", "inverseproxy_shared")
             )
-            tmpdirname = join(tmpdirname, "doodba")
+            tmpdirname = join(tmpdirname, "doodba-scaffolding")
             # Special env keys for setup-devel
             pwdata = getpwnam(environ["USER"])
             setup_env = {
