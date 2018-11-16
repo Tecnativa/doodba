@@ -208,7 +208,10 @@ class ScaffoldingCase(unittest.TestCase):
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix(odoo_skip={"8.0"}):
-            self.compose_test(smallest_dir, sub_env, *commands)
+            self.compose_test(
+                smallest_dir, sub_env, *commands,
+                ("python", "-c", "import watchdog"),
+            )
         for sub_env in matrix(odoo={"8.0"}):
             self.compose_test(
                 smallest_dir, sub_env,
@@ -315,7 +318,7 @@ class ScaffoldingCase(unittest.TestCase):
                 "GID": str(pwdata.pw_gid),
             }
             # TODO Test all supported versions
-            for sub_env in matrix(odoo={"10.0"}):
+            for sub_env in matrix(odoo={MAIN_SCAFFOLDING_VERSION}):
                 # Setup the devel environment
                 self.compose_test(tmpdirname, dict(sub_env, **setup_env), ())
                 # Travis seems to have a different UID than 1000

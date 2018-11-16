@@ -1,4 +1,5 @@
 #!/bin/bash
+# Notice that this file is only used in odoo v8-10
 set -ex
 
 reqs=https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt
@@ -36,6 +37,12 @@ fi
 
 # Build and install Odoo dependencies with pip
 pip install --requirement $reqs
+if [ "$ODOO_VERSION" != "8.0" ]; then
+    pip install watchdog
+fi
+if [ "$ODOO_VERSION" == "10.0" ]; then
+    pip install astor
+fi
 
 # Remove all installed garbage
 apt-get -y purge $apt_deps

@@ -76,7 +76,7 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
-    astor git-aggregator openupgradelib ptvsd pudb wdb
+    git-aggregator openupgradelib ptvsd pudb wdb
 COPY bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
 RUN ln -s /usr/local/lib/python2.7/dist-packages/doodbalib \
