@@ -304,10 +304,9 @@ class ScaffoldingCase(unittest.TestCase):
                  "https://github.com/Tecnativa/doodba-scaffolding.git"),
                 cwd=tmpdirname,
             )
-            # Create inverseproxy_shared network
-            self.popen(
-                ("docker", "network", "create", "inverseproxy_shared")
-            )
+            # Create needed external networks
+            for network in ("inverseproxy_shared", "globalwhitelist_shared"):
+                self.popen(("docker", "network", "create", network))
             tmpdirname = join(tmpdirname, "doodba-scaffolding")
             # Special env keys for setup-devel
             pwdata = getpwnam(environ["USER"])
