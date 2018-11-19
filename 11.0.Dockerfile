@@ -80,6 +80,7 @@ RUN pip install \
         pg_activity \
         ptvsd \
         pudb \
+        watchdog \
         wdb \
     && sync
 COPY bin/* /usr/local/bin/
