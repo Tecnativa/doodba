@@ -70,8 +70,12 @@ class AddonsConfigError(Exception):
         self.message = message
 
 
-def addons_config(strict=False):
+def addons_config(filtered=True, strict=False):
     """Yield addon name and path from ``ADDONS_YAML``.
+
+    :param bool filtered:
+        Use ``False`` to include all addon definitions. Use ``True`` (default)
+        to include only those matched by ``ONLY`` clauses, if any.
 
     :param bool strict:
         Use ``True`` to raise an exception if any declared addon is not found.
@@ -88,8 +92,8 @@ def addons_config(strict=False):
             for doc in yaml.load_all(addons_file):
                 # Skip sections with ONLY and that don't match
                 only = doc.pop("ONLY", {})
-                if any(os.environ.get(key) not in values
-                       for key, values in only.items()):
+                if filtered and any(os.environ.get(key) not in values
+                                    for key, values in only.items()):
                     logger.debug("Skipping section with ONLY %s", only)
                     continue
                 # Flatten all sections in a single dict
