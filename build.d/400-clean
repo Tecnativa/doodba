@@ -10,7 +10,7 @@ if not CLEAN:
     logger.warning("Not cleaning garbage")
     sys.exit()
 
-addons = set(addons_config(False))
+addons = set(addons_config(filtered=False))
 repos = {addon[1] for addon in addons} | {CORE, PRIVATE}
 for directory in os.listdir(SRC_DIR):
     # Special directories must be preserved
