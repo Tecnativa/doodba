@@ -92,8 +92,11 @@ def addons_config(filtered=True, strict=False):
             for doc in yaml.load_all(addons_file):
                 # Skip sections with ONLY and that don't match
                 only = doc.pop("ONLY", {})
-                if filtered and any(os.environ.get(key) not in values
-                                    for key, values in only.items()):
+                if not filtered:
+                    doc.setdefault(CORE, ["*"])
+                    doc.setdefault(PRIVATE, ["*"])
+                elif any(os.environ.get(key) not in values
+                         for key, values in only.items()):
                     logger.debug("Skipping section with ONLY %s", only)
                     continue
                 # Flatten all sections in a single dict
