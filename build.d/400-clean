@@ -25,7 +25,10 @@ for directory in os.listdir(SRC_DIR):
     # Remove directories not listed in addons.yaml
     if directory not in repos:
         logger.info("Removing directory %s", full)
-        shutil.rmtree(full)
+        try:
+          shutil.rmtree(full)
+        except OSError:
+          os.unlink(full)
         continue
 
     # Traverse addons
@@ -37,4 +40,7 @@ for directory in os.listdir(SRC_DIR):
         # Remove addon if not used
         if (subdirectory, directory) not in addons:
             logger.info("Removing subdirectory %s", subfull)
-            shutil.rmtree(subfull)
+            try:
+              shutil.rmtree(subfull)
+            except OSError:
+              os.unlink(subfull)
