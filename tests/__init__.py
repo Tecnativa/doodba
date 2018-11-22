@@ -245,7 +245,9 @@ class ScaffoldingCase(unittest.TestCase):
                 ("python", "-c", "import cfssl"),
                 # Local executable binaries found in $PATH
                 ("sh", "-c", "pip install --user -q flake8 && which flake8"),
+                # Addon cleanup works correctly
                 ("test", "!", "-e", "custom/src/private/dummy_addon"),
+                ("test", "!", "-e", "custom/src/dummy_repo/dummy_link"),
                 ("test", "-d", "custom/src/private/private_addon"),
                 ("test", "-f", "custom/src/private/private_addon/__init__.py"),
                 ("test", "-e", "auto/addons/private_addon"),
