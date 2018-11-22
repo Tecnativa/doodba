@@ -55,7 +55,7 @@ RUN apt-get update \
     && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
     && (dpkg --install wkhtmltox.deb || true) \
     && apt-get install -yqq --no-install-recommends --fix-broken \
-    && rm wkhtmltox.deb \
+    && rm fonts-liberation2.deb wkhtmltox.deb \
     && wkhtmltopdf --version \
     && rm -Rf /var/lib/apt/lists/*
 
