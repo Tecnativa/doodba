@@ -1054,6 +1054,16 @@ To **add** the `www.` prefix, it is almost the same:
 Of course, both domains should point to the same machine before booting, or
 Let's Encrypt might ban your server for some time.
 
+### How to run a parallel Odoo container without crashing Traefik?
+
+Just run it in this fashion:
+
+```bash
+docker-compose run --rm -l traefik.enable=false odoo bash
+```
+
+With that label, Traefik will ignore that container.
+
 ### How to allow access from several host names?
 
 In `.env`, set `DOMAIN_PROD` to `host1.com,host2.com,www.host1.com`, etc.
