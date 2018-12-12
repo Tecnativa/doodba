@@ -1099,6 +1099,96 @@ Most likely you are using versions `8.0` or `9.0` of the image. If so:
    - `odoo --workers 0` for Odoo 8.0.
    - `odoo --workers 0 --dev` for Odoo 9.0.
 
+### How can I run a Posbox/IoT box service for development?
+
+Posbox has special needs that are not useful for most projects, and is quite
+tightly related to specific hardware and peripherals, so it makes not much
+sense to ship it by default in Doodba and its [scaffolding][].
+
+However, for testing connection issues, developing, etc., you might want to
+boot a resource-limited posbox instance imitation.
+
+The best you can do is buy a Posbox/IoT box and peripherals and use it, but
+for quick tests that do not involve specific hardware, you can boot it with
+Doodba by:
+
+- Add the `apt` dependency `usbutils` (which contains `lsusb` binary).
+- Add the `pip` dependencies `evdev` and `netifaces`.
+- Add a `posbox` container, which:
+  - Can read usb devices, privileged.
+  - Loads at boot all required `hw_*` addons, except for `hw_posbox_upgrade`.
+  - Exposes a port that doesn't conflict with Odoo, such as `8070` i.e.
+
+<details>
+<summary>Example patch for official scaffolding</summary>
+
+```diff
+diff --git a/devel.yaml b/devel.yaml
+index e029d48..2f800de 100644
+--- a/devel.yaml
++++ b/devel.yaml
+@@ -15,7 +15,7 @@ services:
+             PORT: "6899 8069"
+             TARGET: odoo
+
+-    odoo:
++    odoo: &odoo
+         extends:
+             file: common.yaml
+             service: odoo
+@@ -53,6 +53,21 @@ services:
+             # XXX Odoo v8 has no `--dev` mode; Odoo v9 has no parameters
+             - --dev=reload,qweb,werkzeug,xml
+
++    posbox:
++        <<: *odoo
++        ports:
++            - "127.0.0.1:8070:8069"
++        privileged: true
++        networks: *public
++        volumes:
++            - ./odoo/custom:/opt/odoo/custom:ro,z
++            - ./odoo/auto/addons:/opt/odoo/auto/addons:rw,z
++            - /dev/bus/usb
++        command:
++            - odoo
++            - --workers=0
++            - --load=web,hw_proxy,hw_posbox_homepage,hw_scale,hw_scanner,hw_escpos,hw_blackbox_be,hw_screen
++
+     db:
+         extends:
+             file: common.yaml
+diff --git a/odoo/custom/dependencies/apt.txt b/odoo/custom/dependencies/apt.txt
+index 8b13789..e32891b 100644
+--- a/odoo/custom/dependencies/apt.txt
++++ b/odoo/custom/dependencies/apt.txt
+@@ -1 +1 @@
++usbutils
+diff --git a/odoo/custom/dependencies/pip.txt b/odoo/custom/dependencies/pip.txt
+index e69de29..6eef737 100644
+--- a/odoo/custom/dependencies/pip.txt
++++ b/odoo/custom/dependencies/pip.txt
+@@ -0,0 +1,2 @@
++evdev
++netifaces
+```
+
+</details>
+
+Once you apply those changes, to use it:
+
+1. `docker-compose build` to install the new dependencies.
+1. `docker-compose up -d` to start all services.
+1. Visit `http://localhost:8070` to see the posbox running.
+1. Visit `http://localhost:${ODOO_MAJOR}069` to see Odoo.
+1. Install `point_of_sale` in Odoo.
+1. Configure the POS in Odoo to connect to Posbox in `localhost:8070`.
+
+Of course this won't be fully functional, but it will give you an overview
+on the posbox stuff.
+
+[Beware about possible mixed content errors][mixed-content-posbox].
+
 ### This project is too opinionated, but can I question any of those opinions?
 
 Of course. There's no guarantee that we will like it, but please do it. :wink:
@@ -1227,6 +1317,7 @@ scaffolding versions is preserved.
 [glob]: https://docs.python.org/3/library/glob.html
 [Let's Encrypt]: https://letsencrypt.org/
 [MailHog]: #mailhog
+[mixed-content-posbox]: https://github.com/odoo/odoo/issues/3156#issuecomment-443727760
 [OCA]: https://odoo-community.org/
 [OCB]: https://github.com/OCA/OCB
 [Odoo S.A.]: https://www.odoo.com
