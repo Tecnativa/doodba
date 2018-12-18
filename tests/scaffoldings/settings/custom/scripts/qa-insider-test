@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -ex
+
+# Declare some scripts
+bash_script='#!/usr/bin/env bash
+echo "$@"'
+python_script='#!/usr/bin/env python
+import sys
+with open("/qa/artifacts/python", "w+") as fd:
+    for arg in sys.argv[1:]:
+        fd.write(arg)'
+
+# Test bash script
+bash_result="$(/qa/insider "$bash_script" 1 2 3 2>/dev/stdout >/dev/null)"
+test "$bash_result" == "1 2 3"
+
+# Test python script
+python_result="$(mktemp --suffix .zip)"
+/qa/insider "$python_script" 1 2 > "$python_result"
+python_unzipped="$(mktemp -d)"
+python -m zipfile -e "$python_result" "$python_unzipped"
+ls -lR "$python_unzipped"
+test "$(cat "$python_unzipped/python")" == "12"

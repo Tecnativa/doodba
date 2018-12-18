@@ -8,6 +8,7 @@ RUN useradd -md /home/odoo -s /bin/false odoo \
 VOLUME ["/var/lib/odoo"]
 EXPOSE 8069 8072
 
+ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='2583399a865d7604726da166ee7cec656b87ae0a6016e6bce7571dcd3045f98b'
 ENV DB_FILTER=.* \
@@ -72,13 +73,13 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
     && rm -Rf ~/.npm /tmp/*
 
 # Special case to get bootstrap-sass, required by Odoo for Sass assets
-RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<4' \
+RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<3.4' \
     && rm -Rf ~/.gem /var/lib/gems/*/cache/
 
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
-    git-aggregator openupgradelib ptvsd pudb wdb
+    git-aggregator openupgradelib ptvsd pudb virtualenv wdb
 COPY bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
 RUN ln -s /usr/local/lib/python2.7/dist-packages/doodbalib \
@@ -92,6 +93,23 @@ RUN mkdir -p auto/addons custom/src/private \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
     && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/doodbalib \
     && sync
+
+# Doodba-QA dependencies in a separate virtualenv
+COPY qa /qa
+RUN virtualenv --system-site-packages /qa/venv \
+    && . /qa/venv/bin/activate \
+    && pip install --no-cache-dir \
+        click \
+        coverage \
+        flake8 \
+        pylint-odoo \
+        six \
+    && npm install --loglevel error --prefix /qa eslint \
+    && deactivate \
+    && mkdir -p /qa/artifacts \
+    && chown -R odoo:odoo /qa/artifacts \
+    && chmod a=rwX /qa/artifacts \
+    && git clone --depth 1 $MQT /qa/mqt
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time

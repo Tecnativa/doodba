@@ -170,6 +170,21 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c", 'test "$(addons list -cWsale)" == crm'),
             )
 
+    def test_qa(self):
+        """Test that QA tools are in place and work as expected."""
+        folder = join(SCAFFOLDINGS_DIR, "settings")
+        commands = (
+            ("./custom/scripts/qa-insider-test",),
+            ("/qa/node_modules/.bin/eslint", "--version"),
+            ("/qa/venv/bin/flake8", "--version"),
+            ("/qa/venv/bin/pylint", "--version"),
+            ("/qa/venv/bin/python", "--version"),
+            ("/qa/venv/bin/python", "-c", "import pylint_odoo"),
+            ("test", "-d", "/qa/mqt"),
+        )
+        for sub_env in matrix():
+            self.compose_test(folder, sub_env, *commands)
+
     def test_settings(self):
         """Test settings are filled OK"""
         folder = join(SCAFFOLDINGS_DIR, "settings")
