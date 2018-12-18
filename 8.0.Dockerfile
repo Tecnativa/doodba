@@ -46,7 +46,7 @@ RUN apt-get update \
         libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 \
         locales-all zlibc \
         bzip2 ca-certificates curl gettext-base git nano \
-        openssh-client telnet python-virtualenv xz-utils \
+        openssh-client telnet xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -yqq nodejs \
@@ -76,6 +76,24 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
 RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<3.4' \
     && rm -Rf ~/.gem /var/lib/gems/*/cache/
 
+# Other facilities
+WORKDIR /opt/odoo
+RUN pip install \
+    git-aggregator openupgradelib ptvsd pudb virtualenv wdb
+COPY bin/* /usr/local/bin/
+COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
+RUN ln -s /usr/local/lib/python2.7/dist-packages/doodbalib \
+    /usr/local/lib/python2.7/dist-packages/odoobaselib
+COPY build.d common/build.d
+COPY conf.d common/conf.d
+COPY entrypoint.d common/entrypoint.d
+RUN mkdir -p auto/addons custom/src/private \
+    && ln /usr/local/bin/direxec common/entrypoint \
+    && ln /usr/local/bin/direxec common/build \
+    && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
+    && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/doodbalib \
+    && sync
+
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
 RUN virtualenv --system-site-packages /qa/venv \
@@ -92,24 +110,6 @@ RUN virtualenv --system-site-packages /qa/venv \
     && chown -R odoo:odoo /qa/artifacts \
     && chmod a=rwX /qa/artifacts \
     && git clone --depth 1 $MQT /qa/mqt
-
-# Other facilities
-WORKDIR /opt/odoo
-RUN pip install \
-    git-aggregator openupgradelib ptvsd pudb wdb
-COPY bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
-RUN ln -s /usr/local/lib/python2.7/dist-packages/doodbalib \
-    /usr/local/lib/python2.7/dist-packages/odoobaselib
-COPY build.d common/build.d
-COPY conf.d common/conf.d
-COPY entrypoint.d common/entrypoint.d
-RUN mkdir -p auto/addons custom/src/private \
-    && ln /usr/local/bin/direxec common/entrypoint \
-    && ln /usr/local/bin/direxec common/build \
-    && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/doodbalib \
-    && sync
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time

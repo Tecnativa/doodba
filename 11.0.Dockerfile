@@ -72,23 +72,6 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
 RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<3.4' \
     && rm -Rf ~/.gem /var/lib/gems/*/cache/
 
-# Doodba-QA dependencies in a separate virtualenv
-COPY qa /qa
-RUN python -m venv --system-site-packages /qa/venv \
-    && . /qa/venv/bin/activate \
-    && pip install --no-cache-dir \
-        click \
-        coverage \
-        flake8 \
-        pylint-odoo \
-        six \
-    && npm install --loglevel error --prefix /qa eslint \
-    && deactivate \
-    && mkdir -p /qa/artifacts \
-    && chown -R odoo:odoo /qa/artifacts \
-    && chmod a=rwX /qa/artifacts \
-    && git clone --depth 1 $MQT /qa/mqt
-
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
@@ -114,6 +97,23 @@ RUN mkdir -p auto/addons custom/src/private \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
     && chmod -R a+rX /usr/local/lib/python3.5/site-packages/doodbalib \
     && sync
+
+# Doodba-QA dependencies in a separate virtualenv
+COPY qa /qa
+RUN python -m venv --system-site-packages /qa/venv \
+    && . /qa/venv/bin/activate \
+    && pip install --no-cache-dir \
+        click \
+        coverage \
+        flake8 \
+        pylint-odoo \
+        six \
+    && npm install --loglevel error --prefix /qa eslint \
+    && deactivate \
+    && mkdir -p /qa/artifacts \
+    && chown -R odoo:odoo /qa/artifacts \
+    && chmod a=rwX /qa/artifacts \
+    && git clone --depth 1 $MQT /qa/mqt
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
