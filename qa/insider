@@ -47,11 +47,11 @@ finally:
     logger.debug("Deleting %s", executable.name)
     os.unlink(executable.name)
 
-    artifacts_zip = mkstemp(".zip")
-    logger.debug("Zipping /qa/artifacts in %s", artifacts_zip)
-    shutil.make_archive(artifacts_zip, "zip", "/qa/artifacts")
-    with open(artifacts_zip) as zip_fd:
+    artifacts_zip_path = mkstemp(".zip")[1]
+    logger.debug("Zipping /qa/artifacts in %s", artifacts_zip_path)
+    shutil.make_archive(artifacts_zip_path, "zip", "/qa/artifacts")
+    with open(artifacts_zip_path) as zip_fd:
         print(zip_fd.read())
 
-    logger.debug("Deleting %s", artifacts_zip)
-    os.unlink(artifacts_zip)
+    logger.debug("Deleting %s", artifacts_zip_path)
+    os.unlink(artifacts_zip_path)
