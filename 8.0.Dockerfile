@@ -8,6 +8,7 @@ RUN useradd -md /home/odoo -s /bin/false odoo \
 VOLUME ["/var/lib/odoo"]
 EXPOSE 8069 8072
 
+ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='2583399a865d7604726da166ee7cec656b87ae0a6016e6bce7571dcd3045f98b'
 ENV DB_FILTER=.* \
@@ -45,7 +46,7 @@ RUN apt-get update \
         libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 \
         locales-all zlibc \
         bzip2 ca-certificates curl gettext-base git nano \
-        openssh-client telnet xz-utils \
+        openssh-client telnet python-virtualenv xz-utils \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -yqq nodejs \
@@ -72,8 +73,25 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
     && rm -Rf ~/.npm /tmp/*
 
 # Special case to get bootstrap-sass, required by Odoo for Sass assets
-RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<4' \
+RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '<3.4' \
     && rm -Rf ~/.gem /var/lib/gems/*/cache/
+
+# Doodba-QA dependencies in a separate virtualenv
+COPY qa /qa
+RUN virtualenv --system-site-packages /qa/venv \
+    && . /qa/venv/bin/activate \
+    && pip install --no-cache-dir \
+        click \
+        coverage \/
+        flake8 \
+        pylint-odoo \
+        six \
+    && npm install --loglevel error --prefix /qa eslint \
+    && deactivate \
+    && mkdir -p /qa/artifacts \
+    && chown -R odoo:odoo /qa/artifacts \
+    && chmod a=rwX /qa/artifacts \
+    && git clone --depth 1 $MQT /qa/mqt
 
 # Other facilities
 WORKDIR /opt/odoo

@@ -1038,6 +1038,14 @@ might get deprecated and removed at some point.
 The best you can do is to [subscribe to the compatibility breakage
 announcements issue][retrobreak].
 
+### How to have good QA and test in my CI with Doodba?
+
+Inside this image, there's the `/qa` folder, which provides some necessary
+plumbing to perform quality assurance and continous integration if you use
+[doodba-qa][], which is a separate (but related) project with that purpose.
+
+Go there to get more instructions.
+
 ### I need to force addition or removal of `www.` prefix in production
 
 These instructions assume you use the official [scaffolding][].
@@ -1296,7 +1304,7 @@ scaffolding versions is preserved.
 
 ## Related Projects
 
-- [QA tools for Doodba-based projects](https://github.com/Tecnativa/doodba-qa)
+- [QA tools for Doodba-based projects][doodba-qa]
 - [Ansible role for automated deployment / update from Le Filament](https://github.com/remi-filament/ansible_role_odoo_docker)
 - Find others by searching [GitHub projects tagged with `#doodba`](https://github.com/topics/doodba)
 
@@ -1313,6 +1321,7 @@ scaffolding versions is preserved.
 [builds]: https://hub.docker.com/r/tecnativa/doodba/builds/
 [development]: #development
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
+[doodba-qa]: https://github.com/Tecnativa/doodba-qa
 [Fish]: http://fishshell.com/
 [glob]: https://docs.python.org/3/library/glob.html
 [Let's Encrypt]: https://letsencrypt.org/

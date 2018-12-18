@@ -8,6 +8,7 @@ RUN useradd -md /home/odoo -s /bin/false odoo \
 VOLUME ["/var/lib/odoo"]
 EXPOSE 8069 8072
 
+ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
 ENV DB_FILTER=.* \
@@ -65,6 +66,23 @@ RUN apt-get -qq update \
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
     && npm install -g less \
     && rm -Rf ~/.npm /tmp/*
+
+# Doodba-QA dependencies in a separate virtualenv
+COPY qa /qa
+RUN python -m venv --system-site-packages /qa/venv \
+    && . /qa/venv/bin/activate \
+    && pip install --no-cache-dir \
+        click \
+        coverage \
+        flake8 \
+        pylint-odoo \
+        six \
+    && npm install --loglevel error --prefix /qa eslint \
+    && deactivate \
+    && mkdir -p /qa/artifacts \
+    && chown -R odoo:odoo /qa/artifacts \
+    && chmod a=rwX /qa/artifacts \
+    && git clone --depth 1 $MQT /qa/mqt
 
 # Other facilities
 WORKDIR /opt/odoo
