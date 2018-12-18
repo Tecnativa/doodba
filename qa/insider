@@ -3,10 +3,12 @@ from __future__ import print_function
 
 import os
 import stat
+import subprocess
+import sys
+import shutil
 
 from argparse import ArgumentParser
-from subprocess import check_call
-from tempfile import NamedTemporaryFile
+from tempfile import mkstemp, NamedTemporaryFile
 
 from doodbalib import logger
 
@@ -14,7 +16,7 @@ from doodbalib import logger
 parser = ArgumentParser(
     description="Execute some code in this container's QA environment.")
 parser.add_argument(
-    "script", type=bytes,
+    "script",
     help="The source code that will be executed. "
          "It should start with a shebang.")
 parser.add_argument(
@@ -23,17 +25,30 @@ parser.add_argument(
 args = parser.parse_args()
 
 # Copy the source code to an executable file
-executable = NamedTemporaryFile(delete=False)
-with executable as fp:
+executable = NamedTemporaryFile(mode="w+", delete=False)
+with executable as tmp:
     logger.debug("Insider script source code:\n%s", args.script)
-    fp.write(args.script)
+    tmp.write(args.script)
 os.chmod(executable.name, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
 
 # Execute the script
 cmd = [executable.name] + args.arguments
 try:
     logger.debug("Executing %r", cmd)
-    check_call(cmd)
+    subprocess.check_call(
+        cmd,
+        stderr=subprocess.STDOUT,
+        stdout=sys.stderr,
+    )
 finally:
     logger.debug("Deleting %s", executable.name)
     os.unlink(executable.name)
+
+    artifacts_zip = mkstemp(".zip")
+    logger.debug("Zipping /qa/artifacts in %s", artifacts_zip)
+    shutil.make_archive(artifacts_zip, "zip", "/qa/artifacts")
+    with open(artifacts_zip) as zip_fd:
+        print(zip_fd.read())
+
+    logger.debug("Deleting %s", artifacts_zip)
+    os.unlink(artifacts_zip)

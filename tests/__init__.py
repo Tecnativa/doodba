@@ -223,9 +223,6 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_dotd(self):
         """Test environment with common ``*.d`` directories."""
-        bash_script = """#!/usr/bin/env bash
-        echo "$@"
-        """
         for sub_env in matrix():
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "dotd"), sub_env,
@@ -264,12 +261,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("/qa/venv/bin/pylint", "--version"),
                 ("/qa/venv/bin/python", "--version"),
                 ("/qa/venv/bin/python", "-c", "import pylint_odoo"),
-                ("sh", "-c",
-                 "test -z \"$(/qa/insider '{}')\"".format(bash_script)),
-                ("sh", "-c",
-                 "test \"$(/qa/insider '{}' 1 2)\" == '1 2'".format(bash_script)),
-                ("test", "-d", "/qa/artifacts"),
                 ("test", "-d", "/qa/mqt"),
+                ("./custom/scripts/qa-insider-test"),
             )
 
     @skip_12

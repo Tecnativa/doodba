@@ -82,7 +82,7 @@ RUN virtualenv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
     && pip install --no-cache-dir \
         click \
-        coverage \/
+        coverage \
         flake8 \
         pylint-odoo \
         six \
