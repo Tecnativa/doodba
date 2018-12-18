@@ -10,7 +10,7 @@ import shutil
 from argparse import ArgumentParser
 from tempfile import mkstemp, NamedTemporaryFile
 
-from doodbalib import logger
+from logging import root as logger
 
 # Define CLI options
 parser = ArgumentParser(
@@ -47,9 +47,10 @@ finally:
     logger.debug("Deleting %s", executable.name)
     os.unlink(executable.name)
 
-    artifacts_zip_path = mkstemp(".zip")[1]
-    logger.debug("Zipping /qa/artifacts in %s", artifacts_zip_path)
+    artifacts_zip_path = mkstemp()[1]
+    logger.debug("Zipping /qa/artifacts in %s.zip", artifacts_zip_path)
     shutil.make_archive(artifacts_zip_path, "zip", "/qa/artifacts")
+    artifacts_zip_path += ".zip"
     with open(artifacts_zip_path) as zip_fd:
         print(zip_fd.read())
 
