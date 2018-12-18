@@ -178,6 +178,14 @@ class ScaffoldingCase(unittest.TestCase):
             ("--stop-after-init",),
             # Odoo settings work
             ("./custom/scripts/test_settings.py",),
+            # QA tools installed
+            ("/qa/node_modules/.bin/eslint", "--version"),
+            ("/qa/venv/bin/flake8", "--version"),
+            ("/qa/venv/bin/pylint", "--version"),
+            ("/qa/venv/bin/python", "--version"),
+            ("/qa/venv/bin/python", "-c", "import pylint_odoo"),
+            ("test", "-d", "/qa/mqt"),
+            ("./custom/scripts/qa-insider-test",),
         )
         # Odoo 8.0 has no shell, and --load-language doesn't work fine in 9.0
         for sub_env in matrix(odoo={"9.0"}):
@@ -255,14 +263,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("odoo", "--version"),
                 # Implicit ``odoo`` command also works
                 ("--version",),
-                # QA tools installed
-                ("/qa/node_modules/.bin/eslint", "--version"),
-                ("/qa/venv/bin/flake8", "--version"),
-                ("/qa/venv/bin/pylint", "--version"),
-                ("/qa/venv/bin/python", "--version"),
-                ("/qa/venv/bin/python", "-c", "import pylint_odoo"),
-                ("test", "-d", "/qa/mqt"),
-                ("./custom/scripts/qa-insider-test"),
             )
 
     @skip_12
