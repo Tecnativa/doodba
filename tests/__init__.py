@@ -170,35 +170,42 @@ class ScaffoldingCase(unittest.TestCase):
     #             ("bash", "-c", 'test "$(addons list -cWsale)" == crm'),
     #         )
 
-    def test_settings(self):
-        """Test settings are filled OK"""
+    def test_qa(self):
+        """Test that QA tools are in place and work as expected."""
         folder = join(SCAFFOLDINGS_DIR, "settings")
         commands = (
-            # Odoo should install
-            ("--stop-after-init",),
-            # Odoo settings work
-            ("./custom/scripts/test_settings.py",),
-            # QA tools installed
+            ("./custom/scripts/qa-insider-test",),
             ("/qa/node_modules/.bin/eslint", "--version"),
             ("/qa/venv/bin/flake8", "--version"),
             ("/qa/venv/bin/pylint", "--version"),
             ("/qa/venv/bin/python", "--version"),
             ("/qa/venv/bin/python", "-c", "import pylint_odoo"),
             ("test", "-d", "/qa/mqt"),
-            ("./custom/scripts/qa-insider-test",),
         )
-        # Odoo 8.0 has no shell, and --load-language doesn't work fine in 9.0
-        for sub_env in matrix(odoo={"9.0"}):
+        for sub_env in matrix():
             self.compose_test(folder, sub_env, *commands)
-        # Extra tests for versions >= 10.0, that support --load-language fine
-        commands += (
-            # DB was created with the correct language
-            ("bash", "-c",
-             """test "$(psql -Atqc "SELECT code FROM res_lang
-                                    WHERE active = TRUE")" == es_ES"""),
-        )
-        for sub_env in matrix(odoo_skip={"8.0", "9.0"}):
-            self.compose_test(folder, sub_env, *commands)
+
+    # def test_settings(self):
+    #     """Test settings are filled OK"""
+    #     folder = join(SCAFFOLDINGS_DIR, "settings")
+    #     commands = (
+    #         # Odoo should install
+    #         ("--stop-after-init",),
+    #         # Odoo settings work
+    #         ("./custom/scripts/test_settings.py",),
+    #     )
+    #     # Odoo 8.0 has no shell, and --load-language doesn't work fine in 9.0
+    #     for sub_env in matrix(odoo={"9.0"}):
+    #         self.compose_test(folder, sub_env, *commands)
+    #     # Extra tests for versions >= 10.0, that support --load-language fine
+    #     commands += (
+    #         # DB was created with the correct language
+    #         ("bash", "-c",
+    #          """test "$(psql -Atqc "SELECT code FROM res_lang
+    #                                 WHERE active = TRUE")" == es_ES"""),
+    #     )
+    #     for sub_env in matrix(odoo_skip={"8.0", "9.0"}):
+    #         self.compose_test(folder, sub_env, *commands)
 
     # def test_smallest(self):
     #     """Tests for the smallest possible environment."""
