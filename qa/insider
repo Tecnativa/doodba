@@ -29,7 +29,10 @@ executable = NamedTemporaryFile(mode="w+", delete=False)
 with executable as tmp:
     logger.debug("Insider script source code:\n%s", args.script)
     tmp.write(args.script)
-os.chmod(executable.name, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
+os.chmod(
+    executable.name,
+    stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH,
+)
 
 # Execute the script
 cmd = [executable.name] + args.arguments
