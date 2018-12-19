@@ -36,13 +36,17 @@ os.chmod(
 
 # Execute the script
 cmd = [executable.name] + args.arguments
+returncode = 0
 try:
     logger.debug("Executing %r", cmd)
     subprocess.check_call(
         cmd,
-        stderr=subprocess.STDOUT,
         stdout=sys.stderr,
+        **({"text": True} if sys.version_info.major > 2 else {}),
     )
+except subprocess.CalledProcessError as error:
+    logger.debug("Subcommand exception:", exc_info=True)
+    returncode = error.returncode
 finally:
     logger.debug("Deleting %s", executable.name)
     os.unlink(executable.name)
@@ -52,9 +56,11 @@ finally:
     shutil.make_archive(artifacts_zip_path, "zip", "/qa/artifacts")
     artifacts_zip_path += ".zip"
     with open(artifacts_zip_path, "rb") as zip_fd, \
-            os.fdopen(sys.stdout.fileno(), "wb") as stdout_bytes:
-        stdout_bytes.write(zip_fd.read())
-        stdout_bytes.flush()
+            os.fdopen(sys.stdout.fileno(), "wb", closefd=False) as stdout:
+        stdout.write(zip_fd.read())
+        stdout.flush()
 
     logger.debug("Deleting %s", artifacts_zip_path)
     os.unlink(artifacts_zip_path)
+
+sys.exit(returncode)
