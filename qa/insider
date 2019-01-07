@@ -42,7 +42,8 @@ try:
     subprocess.check_call(
         cmd,
         stdout=sys.stderr,
-        **({"text": True} if sys.version_info.major > 2 else {}),
+        # TODO Change to text=True when we support Python 3.7+ only
+        universal_newlines=True,
     )
 except subprocess.CalledProcessError as error:
     logger.debug("Subcommand exception:", exc_info=True)
@@ -55,10 +56,15 @@ finally:
     logger.debug("Zipping /qa/artifacts in %s.zip", artifacts_zip_path)
     shutil.make_archive(artifacts_zip_path, "zip", "/qa/artifacts")
     artifacts_zip_path += ".zip"
-    with open(artifacts_zip_path, "rb") as zip_fd, \
-            os.fdopen(sys.stdout.fileno(), "wb", closefd=False) as stdout:
-        stdout.write(zip_fd.read())
-        stdout.flush()
+    with open(artifacts_zip_path, "rb") as zip_fd:
+        if sys.version_info >= (3,):
+            with os.fdopen(sys.stdout.fileno(), "wb", closefd=False) as stdout:
+                stdout.write(zip_fd.read())
+                stdout.flush()
+        # TODO Delete when dropping Python 2 (Odoo 10.0 and lower) support,
+        # as this is a less safe and idiomatic way of doing the same as above
+        else:
+            os.write(sys.stdout.fileno(), zip_fd.read())
 
     logger.debug("Deleting %s", artifacts_zip_path)
     os.unlink(artifacts_zip_path)
