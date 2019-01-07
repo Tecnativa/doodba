@@ -4,6 +4,8 @@ import os
 import subprocess
 import sys
 
+from logging import DEBUG, INFO
+
 from psycopg2 import connect, OperationalError
 
 from doodbalib import logger, which
@@ -51,5 +53,9 @@ if extra_command:
                 os.environ["PTVSD_ARGS"].split() +
                 extra_command
             )
-    logger.info("Executing %s", " ".join(extra_command))
+    logger.log(
+        DEBUG if extra_command[0] == "/qa/insider" else INFO,
+        "Executing %s",
+        " ".join(extra_command),
+    )
     os.execvp(extra_command[0], extra_command)
