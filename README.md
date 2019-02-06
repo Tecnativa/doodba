@@ -421,6 +421,12 @@ configuration.
 
 Call `addons --help` for usage instructions.
 
+### `click-odoo` and related scripts
+
+The great [`click-odoo`][] scripting framework and the collection of scripts
+found in [`click-odoo-contrib`][] are included. Refer to their sites to know
+how to use them.
+
 ### [`nano`][]
 
 The CLI text editor we all know, just in case you need to inspect some bug in
@@ -1318,6 +1324,8 @@ scaffolding versions is preserved.
 [`private`]: #optodoocustomsrcprivate
 [`PYTHONOPTIMIZE=1`]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONOPTIMIZE
 [`repos.yaml`]: #optodoocustomsrcreposyaml
+[`click-odoo`]: https://github.com/acsone/click-odoo
+[`click-odoo-contrib`]: https://github.com/acsone/click-odoo-contrib
 [builds]: https://hub.docker.com/r/tecnativa/doodba/builds/
 [development]: #development
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/

@@ -221,6 +221,7 @@ class ScaffoldingCase(unittest.TestCase):
             ODOO_PREFIX + ("--init", "base"),
             # Auto updater must work
             ("autoupdate",),
+            ("click-odoo-update",),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix(odoo_skip={"8.0"}):

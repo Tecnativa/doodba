@@ -76,6 +76,7 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 WORKDIR /opt/odoo
 RUN pip install \
         astor \
+        click-odoo-contrib \
         git-aggregator \
         openupgradelib \
         pg_activity \
