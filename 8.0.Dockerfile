@@ -79,7 +79,14 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
-    git-aggregator openupgradelib ptvsd pudb virtualenv wdb
+        click-odoo-contrib \
+        git-aggregator \
+        openupgradelib \
+        ptvsd \
+        pudb \
+        virtualenv \
+        wdb \
+    && sync
 COPY bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
 RUN ln -s /usr/local/lib/python2.7/dist-packages/doodbalib \

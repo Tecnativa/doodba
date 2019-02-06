@@ -1,6 +1,11 @@
 #!/usr/local/bin/python-odoo-shell
+import logging
 import os
 
+_logger = logging.getLogger("autoupdate")
+
+# TODO Delete this script at some point
+_logger.warning("`autoupdate` is DEPRECATED. Use click-odoo-update instead.")
 
 # Note: ``module_auto_update`` must be installed in Odoo for this to work.
 try:

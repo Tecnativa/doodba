@@ -71,6 +71,7 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
 WORKDIR /opt/odoo
 RUN pip install \
         astor \
+        click-odoo-contrib \
         git-aggregator \
         openupgradelib \
         pg_activity \
