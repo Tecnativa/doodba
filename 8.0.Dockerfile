@@ -79,7 +79,7 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
-        click-odoo-contrib \
+        git+https://github.com/Tecnativa/click-odoo-contrib.git@update-parallel-db-lock-watcher#egg=click-odoo-contrib \
         git-aggregator \
         openupgradelib \
         ptvsd \

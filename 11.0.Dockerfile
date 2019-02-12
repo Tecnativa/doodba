@@ -76,7 +76,7 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 WORKDIR /opt/odoo
 RUN pip install \
         astor \
-        click-odoo-contrib \
+        git+https://github.com/Tecnativa/click-odoo-contrib.git@update-parallel-db-lock-watcher#egg=click-odoo-contrib \
         git-aggregator \
         openupgradelib \
         pg_activity \
