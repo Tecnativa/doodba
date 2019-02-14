@@ -18,6 +18,7 @@ ENV DB_FILTER=.* \
     GIT_AUTHOR_NAME=docker-odoo \
     INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
+    LIST_DB=false \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
