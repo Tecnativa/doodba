@@ -24,11 +24,6 @@ PG_VERSIONS = frozenset(environ.get(
     "PG_VERSIONS", "10").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 
-# TODO Remove when required OCA addons for 12.0 are released, and fix errors
-skip_12 = unittest.skipIf(
-    ODOO_VERSIONS == {"12.0"},
-    "Test not ready for OCB 12.0")
-
 
 def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
            odoo_skip=frozenset(), pg_skip=frozenset()):
@@ -96,7 +91,6 @@ class ScaffoldingCase(unittest.TestCase):
                     env=full_env,
                 )
 
-    @skip_12
     def test_addons_filtered(self):
         """Test addons filtering with ``ONLY`` keyword in ``addons.yaml``."""
         project_dir = join(SCAFFOLDINGS_DIR, "dotd")
@@ -273,7 +267,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("--version",),
             )
 
-    @skip_12
     def test_dependencies(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies")
