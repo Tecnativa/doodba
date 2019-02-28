@@ -11,8 +11,7 @@ EXPOSE 8069 8072
 ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
-ENV DB_FILTER=.* \
-    DEPTH_DEFAULT=1 \
+ENV DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
     GIT_AUTHOR_NAME=docker-odoo \
@@ -171,6 +170,7 @@ ONBUILD ARG PGPASSWORD=odoopassword
 ONBUILD ARG PGHOST=db
 ONBUILD ARG PGPORT=5432
 ONBUILD ARG PGDATABASE=prod
+ONBUILD ARG DB_FILTER=.*
 # Config variables
 ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
             DEFAULT_REPO_PATTERN="$DEFAULT_REPO_PATTERN" \
@@ -188,7 +188,8 @@ ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
             SMTP_PASSWORD="$SMTP_PASSWORD" \
             SMTP_SSL="$SMTP_SSL" \
             EMAIL_FROM="$EMAIL_FROM" \
-            WITHOUT_DEMO="$WITHOUT_DEMO"
+            WITHOUT_DEMO="$WITHOUT_DEMO" \
+            DB_FILTER="$DB_FILTER"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 # https://docs.python.org/3/library/logging.html#levels
