@@ -92,7 +92,7 @@ and then subsequently run.
 #### `/opt/odoo/custom/conf.d`
 
 Files here will be environment-variable-expanded and concatenated in
-`/opt/odoo/auto/odoo.conf` at build time.
+`/opt/odoo/auto/odoo.conf` in the entrypoint.
 
 #### `/opt/odoo/custom/ssh`
 
