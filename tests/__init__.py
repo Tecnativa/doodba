@@ -4,18 +4,15 @@
 Each test must be a valid docker-compose.yaml file with a ``odoo`` service.
 """
 import logging
-import tempfile
 import unittest
 
 from itertools import product
-from os import environ, getlogin
+from os import environ
 from os.path import dirname, join
-from pwd import getpwnam
 from subprocess import Popen
 
 logging.basicConfig(level=logging.DEBUG)
 
-MAIN_SCAFFOLDING_VERSION = "11.0"
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 ODOO_VERSIONS = frozenset(environ.get(
@@ -303,55 +300,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-f", "custom/dependencies/270-gem.txt"),
                 ("aloha_world",),
             )
-
-    @unittest.skipUnless(
-        MAIN_SCAFFOLDING_VERSION in ODOO_VERSIONS,
-        "Main scaffolding version is not being tested")
-    def test_main_scaffolding(self):
-        """Test the official scaffolding."""
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            # Clone main scaffolding
-            self.popen(
-                ("git", "clone", "--depth", "1",
-                 "https://github.com/Tecnativa/doodba-scaffolding.git"),
-                cwd=tmpdirname,
-            )
-            # Create needed external networks
-            for network in ("inverseproxy_shared", "globalwhitelist_shared"):
-                self.popen(("docker", "network", "create", network))
-            tmpdirname = join(tmpdirname, "doodba-scaffolding")
-            # Special env keys for setup-devel
-            pwdata = getpwnam(environ["USER"])
-            setup_env = {
-                "COMPOSE_FILE": "setup-devel.yaml",
-                # Avoid unlink permission errors
-                "UID": str(pwdata.pw_uid),
-                "GID": str(pwdata.pw_gid),
-            }
-            # TODO Test all supported versions
-            for sub_env in matrix(odoo={MAIN_SCAFFOLDING_VERSION}):
-                # Setup the devel environment
-                self.compose_test(tmpdirname, dict(sub_env, **setup_env), ())
-                # Travis seems to have a different UID than 1000
-                if environ.get("TRAVIS"):
-                    self.popen(
-                        ("sudo", "chown", "1000:1000",
-                         join(tmpdirname, "odoo", "auto", "addons")),
-                    )
-                # Test all 3 official environments
-                for dcfile in ("devel", "test", "prod"):
-                    sub_env["COMPOSE_FILE"] = "{}.yaml".format(dcfile)
-                    self.compose_test(
-                        tmpdirname, sub_env,
-                        # ``odoo`` command works
-                        ("odoo", "--version"),
-                    )
-                # Restore owner in Travis so directory can be removed
-                if environ.get("TRAVIS"):
-                    self.popen(
-                        ("sudo", "chown", "-R", "{0}:{0}".format(getlogin()),
-                         join(tmpdirname, "odoo", "auto", "addons")),
-                    )
 
 
 if __name__ == "__main__":

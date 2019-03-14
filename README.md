@@ -745,11 +745,23 @@ change many things inside it, it's just a guideline.
 
 It includes pluggable `smtp` and `backup` services.
 
+###### Adding secrets
+
+Before booting this environment, you need to create a few files, which are
+excluded in Git and contain some secrets, needed to make this environment
+safe:
+
+- `./.docker/odoo.env` must define `ADMIN_PASSWORD`.
+- `./.docker/db-access.env` must define `PGPASSWORD`.
+- `./.docker/db-creation.env` must define `POSTGRES_PASSWORD` (must be equal to `PGPASSWORD` above).
+- `./.docker/smtp.env` must define `MAIL_RELAY_PASS` (password to access the real SMTP relay).
+- `./.docker/backup.env` must define `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (obtained from S3 provider) and `PASSPHRASE` (to encrypt backup archives).
+
+###### Booting production
+
 Once you fixed everything needed, run it with:
 
     docker-compose -f prod.yaml up --build --remove-orphans
-
-Remember that you will want to backup the filestore in `/var/lib/odoo` volume.
 
 ###### Global inverse proxy
 
@@ -856,6 +868,8 @@ but *removing possible pollution points*:
 - It has no `backup` service.
 
 - It is [isolated](#network-isolation).
+
+To use it, you need to [add secrets files just like for production](#adding-secrets), although secrets for smtp and backup containers are not needed because those don't exist here.
 
 Test it in your machine with:
 
