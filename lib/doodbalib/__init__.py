@@ -90,7 +90,7 @@ def addons_config(filtered=True, strict=False):
     all_globs = {}
     try:
         with open(ADDONS_YAML) as addons_file:
-            for doc in yaml.load_all(addons_file):
+            for doc in yaml.safe_load_all(addons_file):
                 # Skip sections with ONLY and that don't match
                 only = doc.pop("ONLY", {})
                 if not filtered:
