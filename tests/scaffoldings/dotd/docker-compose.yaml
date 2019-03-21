@@ -18,7 +18,7 @@ services:
       - filestore:/var/lib/odoo:z
 
   postgresql:
-    image: postgres:${DB_VERSION}-alpine
+    image: tecnativa/postgres-autoconf:${DB_VERSION}-alpine
     environment:
       POSTGRES_USER: another_odoo
       POSTGRES_PASSWORD: anotherodoopassword
