@@ -4,8 +4,8 @@ other-doodba/odoo/src/private:
   - product
 
 odoo/addons:
-  - *
-  - !hr_payroll
+  - "*"
+  - "!hr_payroll"
 
 ---
 ONLY:
