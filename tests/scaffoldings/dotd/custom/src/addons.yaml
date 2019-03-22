@@ -3,6 +3,10 @@ other-doodba/odoo/src/private:
   - dummy_addon
   - product
 
+odoo/addons:
+  - *
+  - !hr_payroll
+
 ---
 ONLY:
   PGDATABASE:

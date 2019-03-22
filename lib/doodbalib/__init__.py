@@ -113,6 +113,8 @@ def addons_config(filtered=True, strict=False):
     logger.debug("Merged addons definition before expanding: %r", all_globs)
     # Expand all globs and store config
     for repo, partial_globs in all_globs.items():
+        to_exclude = [x[1:] for x in
+                      filter(lambda g: g.startswith('!'), partial_globs)]
         for partial_glob in partial_globs:
             logger.debug("Expanding in repo %s glob %s", repo, partial_glob)
             full_glob = os.path.join(SRC_DIR, repo, partial_glob)
@@ -134,6 +136,9 @@ def addons_config(filtered=True, strict=False):
                     logger.debug(
                         "Skipping '%s' as it is not a valid Odoo "
                         "module", addon)
+                    continue
+                if addon in to_exclude:
+                    logger.debug("Excluded '%s'", addon)
                     continue
                 logger.debug("Registering addon %s", addon)
                 addon = os.path.basename(addon)
