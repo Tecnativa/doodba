@@ -37,7 +37,8 @@ ENV DB_FILTER=.* \
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
-RUN apt-get update \
+RUN sed -Ei 's@(^deb http://deb.debian.org/debian jessie-updates main$)@#\1@' /etc/apt/sources.list \
+    && apt-get update \
     && apt-get -y upgrade \
     && apt-get install -y --no-install-recommends \
         python ruby-compass \
