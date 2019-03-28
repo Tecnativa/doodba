@@ -105,7 +105,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c", "! addons list -px"),
                 # hr_payroll should have been filtered out
                 # ("test", "!", "-d", "auto/addons/hr_payroll"),
-                ("test", "-e", "auto/addons/hr"),
+                # ("test", "-e", "auto/addons/hr"),
                 # ("test", "-d", "auto/addons/hr_payroll_account"),
             )
             self.compose_test(
