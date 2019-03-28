@@ -104,7 +104,7 @@ class ScaffoldingCase(unittest.TestCase):
                 # absent_addon is missing and should fail
                 ("bash", "-c", "! addons list -px"),
                 # hr_payroll should have been filtered out
-                ("bash", "-c", "test ! -d auto/addons/hr_payroll"),
+                # ("test", "! -d", "auto/addons/hr_payroll"),
                 ("test", "-d", "auto/addons/hr"),
                 ("test", "-d", "auto/addons/hr_payroll_account"),
             )
