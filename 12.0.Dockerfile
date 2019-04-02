@@ -74,7 +74,6 @@ RUN pip install \
         astor \
         git+https://github.com/Tecnativa/click-odoo-contrib.git@update-parallel-db-lock-watcher#egg=click-odoo-contrib \
         git-aggregator \
-        openupgradelib \
         pg_activity \
         ptvsd \
         pudb \
