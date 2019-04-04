@@ -84,7 +84,7 @@ def missing_repos_config():
     # Find the repositories defined by hand
     try:
         with open(REPOS_YAML) as yaml_file:
-            for doc in yaml.load_all(yaml_file):
+            for doc in yaml.safe_load_all(yaml_file):
                 for repo in doc:
                     defined.add(os.path.abspath(os.path.join(SRC_DIR, repo)))
     except (IOError, AttributeError):
@@ -92,7 +92,7 @@ def missing_repos_config():
     # Find the repositories that should be present
     try:
         with open(ADDONS_YAML) as yaml_file:
-            for doc in yaml.load_all(yaml_file):
+            for doc in yaml.safe_load_all(yaml_file):
                 for repo in doc:
                     if repo in {PRIVATE, CORE, "ONLY"}:
                         continue
