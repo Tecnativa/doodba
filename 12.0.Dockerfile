@@ -41,6 +41,7 @@ RUN apt-get -qq update \
     && apt-get -yqq upgrade \
     && apt-get install -yqq --no-install-recommends \
         chromium \
+        ffmpeg \
         fonts-liberation2 \
         gettext-base \
         gnupg2 \
