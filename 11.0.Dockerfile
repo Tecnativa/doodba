@@ -195,6 +195,13 @@ ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
             WITHOUT_DEMO="$WITHOUT_DEMO"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
+
+# enable setting custom uids for odoo user during build of scaffolds
+ONBUILD ARG ODOO_UID=1000
+ONBUILD ARG ODOO_GID=1000
+ONBUILD ENV ODOO_UID="$ODOO_UID" \
+            ODOO_GID="$ODOO_GID"
+
 # https://docs.python.org/3/library/logging.html#levels
 ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \

@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+# we enable the odoo user to get permissions for /var/lib/odoo with sudo (in case odoo is run under a different uid than
+# the image odoo-docker-base is built (1000:1000))
+apt update
+apt install -y sudo
+apt clean
+
+echo -e "odoo\tALL=(ALL:ALL) NOPASSWD:/bin/chown -R odoo.odoo /var/lib/odoo" > /etc/sudoers.d/odoo-fix-volume-permissions
+chmod 0440 /etc/sudoers.d/odoo-fix-volume-permissions

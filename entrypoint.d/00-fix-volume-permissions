@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# when starting we make sure odo user has permissions to the data dir
+sudo chown -R odoo.odoo /var/lib/odoo

@@ -1,5 +1,16 @@
 #!/bin/bash
 set -e
+
+ODOO_UID=${ODOO_UID:-1000}
+ODOO_GID=${ODOO_GID:-1000}
+if [[ "${ODOO_UID}" != "$(id -u odoo)" || "${ODOO_GID}" != "$(id -g odoo)" ]] ; then
+    echo "odoo uid/gid not matching recreating odoo user"
+    deluser odoo
+    delgroup odoo || echo 'Group odoo already deleted'
+    groupadd --gid ${ODOO_GID} odoo
+    useradd -md /home/odoo -s /bin/false --uid ${ODOO_UID} --gid ${ODOO_GID} odoo
+fi
+
 chown -R root:odoo /opt/odoo
 chmod -R u+rwX,g+rX-w,o= /opt/odoo
 chmod -R g+w /opt/odoo/auto
