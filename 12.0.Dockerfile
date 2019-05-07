@@ -1,11 +1,5 @@
 FROM python:3.5-stretch AS base
 
-# Enable Odoo user and filestore
-RUN useradd -md /home/odoo -s /bin/false odoo \
-    && mkdir -p /var/lib/odoo \
-    && chown -R odoo:odoo /var/lib/odoo \
-    && sync
-VOLUME ["/var/lib/odoo"]
 EXPOSE 8069 8072
 
 ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
@@ -106,8 +100,6 @@ RUN python -m venv --system-site-packages /qa/venv \
     && npm install --loglevel error --prefix /qa eslint \
     && deactivate \
     && mkdir -p /qa/artifacts \
-    && chown -R odoo:odoo /qa/artifacts \
-    && chmod a=rwX /qa/artifacts \
     && git clone --depth 1 $MQT /qa/mqt
 
 # Execute installation script by Odoo version
@@ -126,11 +118,6 @@ RUN debs="libldap2-dev libsasl2-dev" \
     && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
     && apt-get purge -yqq $debs \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
-
-# HACK Special case for Werkzeug
-USER odoo
-RUN pip install --user Werkzeug==0.14.1
-USER root
 
 # Metadata
 ARG VCS_REF
@@ -191,6 +178,19 @@ ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
             WITHOUT_DEMO="$WITHOUT_DEMO"
 ONBUILD ARG LOCAL_CUSTOM_DIR=./custom
 ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
+
+# Enable setting custom uids for odoo user during build of scaffolds
+ONBUILD ARG UID=1000
+ONBUILD ARG GID=1000
+
+# Enable Odoo user and filestore
+ONBUILD RUN groupadd -g $GID odoo \
+    && useradd -md /home/odoo -s /bin/false -u $UID -g $GID odoo \
+    && mkdir -p /var/lib/odoo \
+    && chown -R odoo:odoo /var/lib/odoo /qa/artifacts \
+    && chmod a=rwX /qa/artifacts \
+    && sync
+
 # https://docs.python.org/3/library/logging.html#levels
 ONBUILD ARG LOG_LEVEL=INFO
 ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
@@ -198,4 +198,7 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
 ONBUILD RUN /opt/odoo/common/build && sync
+ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo
+# HACK Special case for Werkzeug
+ONBUILD RUN pip install --user Werkzeug==0.14.1
