@@ -301,6 +301,37 @@ class ScaffoldingCase(unittest.TestCase):
                 ("aloha_world",),
             )
 
+    def test_modified_uids(self):
+        """tests if we can build an image with a custom uid and gid of odoo"""
+        uids_dir = join(SCAFFOLDINGS_DIR, "uids_1001")
+        for sub_env in matrix():
+            self.compose_test(
+                uids_dir, sub_env,
+                # verify that odoo user has the given ids
+                ("bash", "-c", 'test "$(id -u)" == "1001"'),
+                ("bash", "-c", 'test "$(id -g)" == "1002"'),
+                ("bash", "-c", 'test "$(id -u -n)" == "odoo"'),
+                # all those directories need to belong to odoo (user or group odoo)
+                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"'),
+                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"'),
+                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"'),
+            )
+
+    def test_default_uids(self):
+        uids_dir = join(SCAFFOLDINGS_DIR, "uids_default")
+        for sub_env in matrix():
+            self.compose_test(
+                uids_dir, sub_env,
+                # verify that odoo user has the given ids
+                ("bash", "-c", 'test "$(id -u)" == "1000"'),
+                ("bash", "-c", 'test "$(id -g)" == "1000"'),
+                ("bash", "-c", 'test "$(id -u -n)" == "odoo"'),
+                # all those directories need to belong to odoo (user or group odoo)
+                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"'),
+                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"'),
+                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"'),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

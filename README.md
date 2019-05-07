@@ -621,7 +621,6 @@ Then run these Bash commands:
 git clone https://github.com/Tecnativa/doodba-scaffolding.git myproject
 cd myproject
 ln -s devel.yaml docker-compose.yml
-chown -R $USER:1000 odoo/auto
 chmod -R ug+rwX odoo/auto
 export UID GID="$(id -g $USER)" UMASK="$(umask)"
 docker-compose build --pull
