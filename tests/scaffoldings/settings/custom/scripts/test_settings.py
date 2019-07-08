@@ -6,6 +6,7 @@ except ImportError:
 
 
 assert config.get("email_from") == "test@example.com"
+assert config.get("limit_memory_soft") == 2097152000
 assert config.get("smtp_password") is False
 assert config.get("smtp_port") == 1025
 assert config.get("smtp_server") == "mailhog"
