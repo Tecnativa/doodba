@@ -1,9 +1,51 @@
-#!/bin/bash
-# Generate Odoo server configuration from templates
-set -e
-src="/opt/odoo/common/conf.d/* /opt/odoo/custom/conf.d/*"
-log INFO Merging $(ls $src | wc -l) configuration files in $OPENERP_SERVER
-conf=$(cat $src | envsubst)
-log DEBUG "Resulting configuration:
-$conf"
-echo "$conf" > $OPENERP_SERVER
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Generate Odoo server configuration from templates"""
+
+import os
+from contextlib import closing
+from doodbalib import logger
+from string import Template
+
+try:
+    # Python 2, where io.StringIO fails because it is unicode-only
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+try:
+    from configparser import RawConfigParser
+    parser = RawConfigParser(strict=False)
+except ImportError:
+    # Python 2, where strict=True doesn't exist
+    from ConfigParser import RawConfigParser
+    parser = RawConfigParser()
+
+ODOO_VERSION = os.environ.get("ODOO_VERSION")
+TARGET_FILE = os.environ.get("OPENERP_SERVER", "/opt/odoo/auto/odoo.conf")
+if ODOO_VERSION not in {"8.0", "9.0"}:
+    TARGET_FILE = os.environ.get("ODOO_RC", TARGET_FILE)
+CONFIG_DIRS = ("/opt/odoo/common/conf.d", "/opt/odoo/custom/conf.d")
+CONFIG_FILES = []
+
+# Read all configuraiton files found in those folders
+logger.info("Merging found configuration files in %s", TARGET_FILE)
+for dir_ in CONFIG_DIRS:
+    try:
+        for file_ in os.listdir(dir_):
+            parser.read(os.path.join(dir_, file_))
+    except OSError:  # TODO Use FileNotFoundError when we drop python 2
+        continue
+
+# Write it to a memory string object
+with closing(StringIO()) as resultfp:
+    parser.write(resultfp)
+    resultfp.seek(0)
+    # Obtain the config string
+    result = resultfp.read()
+    # Expand environment variables found within
+    result = Template(result).substitute(os.environ)
+    logger.debug("Resulting configuration:\n%s", result)
+    # Write it to destination
+    with open(TARGET_FILE, "w") as targetfp:
+        targetfp.write(result)
