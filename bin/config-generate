@@ -32,7 +32,7 @@ CONFIG_FILES = []
 logger.info("Merging found configuration files in %s", TARGET_FILE)
 for dir_ in CONFIG_DIRS:
     try:
-        for file_ in os.listdir(dir_):
+        for file_ in sorted(os.listdir(dir_)):
             parser.read(os.path.join(dir_, file_))
     except OSError:  # TODO Use FileNotFoundError when we drop python 2
         continue
