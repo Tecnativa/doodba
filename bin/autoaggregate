@@ -121,12 +121,7 @@ def missing_repos_config():
 
 # Aggregate user-specified repos
 if os.path.isfile(REPOS_YAML):
-    # HACK https://github.com/acsone/git-aggregator/pull/23
-    has_contents = True
-    with open(REPOS_YAML) as repos_file:
-        has_contents = yaml.load(repos_file)
-    if has_contents:
-        aggregate(REPOS_YAML)
+    aggregate(REPOS_YAML)
 
 # Aggregate unspecified repos
 missing_config = missing_repos_config()
