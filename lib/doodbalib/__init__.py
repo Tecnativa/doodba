@@ -102,11 +102,11 @@ def addons_config(filtered=True, strict=False):
                     continue
                 # Flatten all sections in a single dict
                 for repo, partial_globs in doc.items():
+                    logger.debug("Processing %s repo", repo)
                     all_globs.setdefault(repo, set())
                     all_globs[repo].update(partial_globs)
     except IOError:
         logger.debug('Could not find addons configuration yaml.')
-        logger.debug("Processing %s repo", repo)
     # Add default values for special sections
     for repo in (CORE, PRIVATE):
         all_globs.setdefault(repo, {"*"})
