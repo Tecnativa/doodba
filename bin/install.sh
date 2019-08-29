@@ -1,8 +1,14 @@
 #!/bin/bash
-# Notice that this file is only used in odoo v8-10
+# Notice that this file is only used in odoo v7-10
 set -ex
 
 reqs=https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt
+if [ "$ODOO_VERSION" == "7.0" ]; then
+    # V7 has no requirements file, but almost matches v8
+    reqs=https://raw.githubusercontent.com/$ODOO_SOURCE/8.0/requirements.txt
+    # These are the only differences
+    pip install 'pywebdav<0.9.8'
+fi
 apt_deps="python-dev build-essential"
 apt-get update
 
@@ -37,7 +43,7 @@ fi
 
 # Build and install Odoo dependencies with pip
 pip install --requirement $reqs
-if [ "$ODOO_VERSION" != "8.0" ]; then
+if [ "$ODOO_VERSION" == "9.0" -o "$ODOO_VERSION" == "10.0" ]; then
     pip install watchdog
 fi
 if [ "$ODOO_VERSION" == "10.0" ]; then
