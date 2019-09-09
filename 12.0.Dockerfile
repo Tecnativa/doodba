@@ -75,7 +75,7 @@ RUN pip install \
         watchdog \
         wdb \
     && sync
-COPY bin/* /usr/local/bin/
+COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
