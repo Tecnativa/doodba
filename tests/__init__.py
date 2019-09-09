@@ -16,10 +16,19 @@ logging.basicConfig(level=logging.DEBUG)
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 ODOO_VERSIONS = frozenset(environ.get(
-    "DOCKER_TAG", "7.0 8.0 9.0 10.0 11.0 12.0").split())
+    "DOCKER_TAG", "7.0 8.0 9.0 10.0 11.0 12.0 13.0").split())
 PG_VERSIONS = frozenset(environ.get(
     "PG_VERSIONS", "11").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
+
+# This decorator skips tests that will fail until some branches and/or addons
+# are migrated to the next release. It is used in situations where Doodba is
+# preparing the pre-release for the next version of Odoo, which hasn't been
+# released yet.
+prerelease_skip = unittest.skipIf(
+    ODOO_VERSIONS == {"13.0"},
+    "Tests not supported in pre-release",
+)
 
 
 def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
@@ -161,6 +170,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c", 'test "$(addons list -cWsale)" == crm'),
             )
 
+    @prerelease_skip
     def test_qa(self):
         """Test that QA tools are in place and work as expected."""
         folder = join(SCAFFOLDINGS_DIR, "settings")
@@ -176,6 +186,7 @@ class ScaffoldingCase(unittest.TestCase):
         for sub_env in matrix():
             self.compose_test(folder, sub_env, *commands)
 
+    @prerelease_skip
     def test_settings(self):
         """Test settings are filled OK"""
         folder = join(SCAFFOLDINGS_DIR, "settings")
@@ -198,6 +209,10 @@ class ScaffoldingCase(unittest.TestCase):
         for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
             self.compose_test(folder, sub_env, *commands)
 
+    # It could work in prerelease, without a bug in click-odoo
+    # HACK https://github.com/acsone/click-odoo-contrib/pull/56
+    # TODO Remove decorator when OCB 13.0 is released
+    @prerelease_skip
     def test_smallest(self):
         """Tests for the smallest possible environment."""
         commands = (
@@ -205,7 +220,6 @@ class ScaffoldingCase(unittest.TestCase):
             ("test", "-f", "/opt/odoo/auto/odoo.conf"),
             ("test", "-d", "/opt/odoo/custom/src/private"),
             ("test", "-d", "/opt/odoo/custom/ssh"),
-            ("test", "-x", "/usr/local/bin/unittest"),
             ("addons", "list", "-cpix"),
             ("pg_activity", "--version"),
             # Default fonts must be liberation
@@ -215,7 +229,6 @@ class ScaffoldingCase(unittest.TestCase):
             # Must be able to install base addon
             ODOO_PREFIX + ("--init", "base"),
             # Auto updater must work
-            ("autoupdate",),
             ("click-odoo-update",),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
@@ -268,6 +281,9 @@ class ScaffoldingCase(unittest.TestCase):
                 ("--version",),
             )
 
+    # TODO Remove decorator when OCB 13.0 is released and server-tools 13.0
+    # has a valid module to test
+    @prerelease_skip
     def test_dependencies(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies")
