@@ -26,6 +26,7 @@ env:
     - DOCKER_TAG=10.0
     - DOCKER_TAG=11.0
     - DOCKER_TAG=12.0
+    - DOCKER_TAG=13.0
 
 before_install:
   - sudo apt-get update
