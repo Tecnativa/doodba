@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 export PYTHONOPTIMIZE=""  # You'll want to `assert` in your scripts
+log WARNING python-odoo-shell is deprecated and will be removed in \
+    Doodba 13.0, use instead: click-odoo
 exec odoo shell < "$1"

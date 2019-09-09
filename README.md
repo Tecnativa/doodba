@@ -317,7 +317,7 @@ l10n-spain:
   - l10n_es # Overrides built-in l10n_es under odoo/addons
 server-tools:
   - "*date*" # All modules that contain "date" in their name
-  - module_auto_update # Makes `autoupdate` script actually autoupdate addons
+  - auditlog
 web:
   - "*" # All web addons
 ---
@@ -427,6 +427,8 @@ The great [`click-odoo`][] scripting framework and the collection of scripts
 found in [`click-odoo-contrib`][] are included. Refer to their sites to know
 how to use them.
 
+\* Note: This replaces the deprecated `python-odoo-shell` binary.
+
 ### [`nano`][]
 
 The CLI text editor we all know, just in case you need to inspect some bug in
@@ -446,41 +448,7 @@ Usage:
 
     pot my_addon,my_other_addon
 
-### `python-odoo-shell`
-
-Little shortcut to make your `odoo shell` scripts executable.
-
-For example, create this file in your scaffolding-based project:
-`odoo/custom/shell-scripts/whoami.py`. Fill it with:
-
-```python
-#!/usr/local/bin/python-odoo-shell
-from __future__ import print_function
-print(env.user.name)
-print(env.context)
-```
-
-Now run it:
-
-```bash
-$ chmod a+x odoo/custom/shell-scripts/whoami.py  # Make it executable
-$ docker-compose build --pull  # Rebuild the image, unless in devel
-$ docker-compose run --rm odoo custom/shell-scripts/whoami.py
-```
-
-### `unittest`
-
-Another little shell script, useful for debugging. Just run it like this and
-Odoo will execute unit tests in its default database:
-
-    unittest my_addon,my_other_addon
-
-Note that the addon must be installed for it to work. Otherwise, you should run
-it as:
-
-    unittest my_addon,my_other_addon -i my_addon,my_other_addon
-
-### [`psql`](https://www.postgresql.org/docs/9.5/static/app-psql.html)
+### [`psql`](https://www.postgresql.org/docs/current/app-psql.html)
 
 Environment variables are there so that if you need to connect with the
 database, you just need to execute:
@@ -990,8 +958,17 @@ In production:
 
 ##### Run unit tests for some addon
 
-    docker-compose run --rm odoo odoo --stop-after-init --init addon1,addon2
-    docker-compose run --rm odoo unittest addon1,addon2
+```bash
+modules=addon1,addon2
+# Install their dependencies first
+docker-compose run --rm odoo addons init --dependencies $modules
+# Test them at install
+docker-compose run --rm odoo addons init --test $modules
+# Test them again at update
+docker-compose run --rm odoo addons update --test $modules
+```
+
+\* Note: This replaces the old deprecated `unittest` script.
 
 ##### Reading the logs
 
@@ -1013,22 +990,19 @@ Only Odoo's:
 
 ##### Update changed addons only
 
-Add `module_auto_update` from https://github.com/OCA/server-tools to your
-installation following the standard methods of `repos.yaml` + `addons.yaml`.
+Just run:
 
-Now we will install the addon:
+```bash
+docker-compose run --rm odoo click-odoo-update --watcher-max-seconds 30
+```
 
-    docker-compose up -d
-    docker-compose run --rm odoo --stop-after-init -u base
-    docker-compose run --rm odoo --stop-after-init -i module_auto_update
-    docker-compose restart odoo
+This script is part of [`click-odoo-contrib`][]; check it for more details.
 
-It will automatically update addons that got updated every night.
-To force that automatic update now in a separate container:
+\* Note: `--watcher-max-seconds` is available because we ship a
+[patched](https://github.com/acsone/click-odoo-contrib/pull/38)
+version. Check that PR for docs.
 
-    docker-compose up -d
-    docker-compose run --rm odoo autoupdate
-    docker-compose restart odoo
+\* Note: This replaces the old deprecated `autoupdate` script.
 
 ##### Export some addon's translations to stdout
 

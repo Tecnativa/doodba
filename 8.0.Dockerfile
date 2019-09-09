@@ -82,7 +82,7 @@ RUN pip install \
         virtualenv \
         wdb \
     && sync
-COPY bin/* /usr/local/bin/
+COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
 RUN ln -s /usr/local/lib/python2.7/dist-packages/doodbalib \
     /usr/local/lib/python2.7/dist-packages/odoobaselib
