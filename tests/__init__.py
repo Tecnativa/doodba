@@ -208,6 +208,10 @@ class ScaffoldingCase(unittest.TestCase):
             ("test", "-x", "/usr/local/bin/unittest"),
             ("addons", "list", "-cpix"),
             ("pg_activity", "--version"),
+            # Default fonts must be liberation
+            ("bash", "-c", """test "$(fc-match monospace)" == 'LiberationMono-Regular.ttf: "Liberation Mono" "Regular"'"""),
+            ("bash", "-c", """test "$(fc-match sans-serif)" == 'LiberationSans-Regular.ttf: "Liberation Sans" "Regular"'"""),
+            ("bash", "-c", """test "$(fc-match serif)" == 'LiberationSerif-Regular.ttf: "Liberation Serif" "Regular"'"""),
             # Must be able to install base addon
             ODOO_PREFIX + ("--init", "base"),
             # Auto updater must work

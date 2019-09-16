@@ -1266,6 +1266,23 @@ FROM tecnativa/doodba@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c9
 Make sure there's a `ir.config_parameter` called `report.url` with the value
 `http://localhost:8069`.
 
+### How to change report fonts?
+
+Doodba ships [Liberation fonts](https://wikipedia.org/wiki/Liberation_fonts)
+as defaults.
+
+If you want to make another font package _available_, just add it to
+[`apt.txt`][dependencies] (if it's a normal Debian package) or install it in
+a [custom build script][build.d] called i.e. `build.d/200-custom-fonts`
+(if you need to install it in a more complex way).
+
+If, in addition to that, you want those fonts to be the _defaults_, then add
+one (or more) of these build arguments:
+
+- `FONT_MONO`
+- `FONT_SANS`
+- `FONT_SERIF`
+
 ### How can I whitelist a service and allow external access to it?
 
 This can become useful when you have isolated environments
@@ -1313,7 +1330,9 @@ scaffolding versions is preserved.
 [`repos.yaml`]: #optodoocustomsrcreposyaml
 [`click-odoo`]: https://github.com/acsone/click-odoo
 [`click-odoo-contrib`]: https://github.com/acsone/click-odoo-contrib
+[build.d]: #optodoocustombuildd
 [builds]: https://hub.docker.com/r/tecnativa/doodba/builds/
+[dependencies]: #optodoocustomdependenciestxt
 [development]: #development
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
 [doodba-qa]: https://github.com/Tecnativa/doodba-qa
