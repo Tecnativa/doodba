@@ -7,7 +7,7 @@ if [ "$ODOO_VERSION" == "7.0" ]; then
     # V7 has no requirements file, but almost matches v8
     reqs=https://raw.githubusercontent.com/$ODOO_SOURCE/8.0/requirements.txt
     # These are the only differences
-    pip install 'pywebdav<0.9.8'
+    pip install python-chart 'pywebdav<0.9.8'
 fi
 apt_deps="python-dev build-essential"
 apt-get update
