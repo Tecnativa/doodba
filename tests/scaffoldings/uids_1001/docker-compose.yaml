@@ -6,6 +6,7 @@ services:
       args:
         COMPILE: "false"
         ODOO_VERSION: $ODOO_MINOR
+        PIP_INSTALL_ODOO: "false"
         WITHOUT_DEMO: "false"
         UID: 1001
         GID: 1002
