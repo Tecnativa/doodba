@@ -22,16 +22,14 @@ if [ "$PIP_INSTALL_ODOO" == true ]; then
 else
     log WARNING Blindly symlinking odoo executable
     bin=$src/odoo-bin
-    if [ -x $src/openerp-server ]; then
+    # Cannot check for scripts existence and link all: they probably do not
+    # exist yet at build time! Just check Odoo version and act properly.
+    if [ "$ODOO_VERSION" == "7.0" ]; then
         bin=$src/openerp-server
-        ln -s $src/openerp-server /usr/local/bin
-    fi
-    if [ -x $src/openerp-gevent ]; then
-        ln -s $src/openerp-gevent /usr/local/bin
-    fi
-    if [ -x $src/odoo.py ]; then
+        ln -s /opt/odoo/custom/src/odoo/openerp-server /usr/local/bin/
+    elif [ "$ODOO_VERSION" == "8.0" -o "$ODOO_VERSION" == "9.0" ]; then
         bin=$src/odoo.py
-        ln -s $src/odoo.py /usr/local/bin
+        ln -s /opt/odoo/custom/src/odoo/openerp-{gevent,server} /usr/local/bin/
     fi
     ln -s $bin $dst
 fi
