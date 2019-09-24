@@ -33,7 +33,7 @@ else:
     AUTO_REPOS_YAML = '%s.yaml' % AUTO_REPOS_YAML
 
 CLEAN = os.environ.get("CLEAN") == "true"
-LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
+LOG_LEVELS = frozenset({"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"})
 FILE_APT_BUILD = os.path.join(
     CUSTOM_DIR, 'dependencies', 'apt_build.txt',
 )

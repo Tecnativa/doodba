@@ -10,6 +10,7 @@ from doodbalib import (
     ADDONS_YAML,
     AUTO_REPOS_YAML,
     CORE,
+    LOG_LEVELS,
     logger,
     PRIVATE,
     REPOS_YAML,
@@ -21,6 +22,7 @@ UID = int(os.environ.get("UID") or -1)
 GID = int(os.environ.get("GID") or -1)
 DEFAULT_REPO_PATTERN = os.environ.get("DEFAULT_REPO_PATTERN")
 DEFAULT_REPO_PATTERN_ODOO = os.environ.get("DEFAULT_REPO_PATTERN_ODOO")
+log_level = os.environ.get("LOG_LEVEL", "INFO")
 
 
 def aggregate(config):
@@ -37,6 +39,7 @@ def aggregate(config):
             old_umask = os.umask(int(UMASK))
         check_call(
             ["gitaggregate", "--expand-env", "--config", config,
+             "--log-level", log_level,
              "--jobs", str(cpu_count() or 1)],
             cwd=SRC_DIR,
             stderr=sys.stderr,
@@ -52,7 +55,7 @@ def aggregate(config):
                 for target in dirs + files:
                     try:
                         os.chown(os.path.join(root, target), UID, GID)
-                    except:
+                    except Exception:
                         logger.debug(
                             "Error trying to chown on file. Skipping...",
                             exc_info=True,
