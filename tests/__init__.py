@@ -209,10 +209,6 @@ class ScaffoldingCase(unittest.TestCase):
         for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
             self.compose_test(folder, sub_env, *commands)
 
-    # It could work in prerelease, without a bug in click-odoo
-    # HACK https://github.com/acsone/click-odoo-contrib/pull/56
-    # TODO Remove decorator when OCB 13.0 is released
-    @prerelease_skip
     def test_smallest(self):
         """Tests for the smallest possible environment."""
         commands = (
