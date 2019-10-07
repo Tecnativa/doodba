@@ -226,6 +226,12 @@ class ScaffoldingCase(unittest.TestCase):
             ODOO_PREFIX + ("--init", "base"),
             # Auto updater must work
             ("click-odoo-update",),
+            # Needed tools exist
+            ("curl", "--version"),
+            ("git", "--version"),
+            ("pg_activity", "--version"),
+            ("psql", "--version"),
+            ("ssh", "-V"),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix(odoo_skip={"7.0", "8.0"}):
