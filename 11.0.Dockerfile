@@ -71,7 +71,7 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 WORKDIR /opt/odoo
 RUN pip install \
         astor \
-        git+https://github.com/acsone/click-odoo-contrib.git@1a8ef8bcbeaf8ecbfdfe9b83936ad9f2dd819fc3 \
+        click-odoo-contrib \
         git-aggregator \
         pg_activity \
         ptvsd \
