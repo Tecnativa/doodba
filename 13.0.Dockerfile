@@ -114,14 +114,13 @@ RUN build_deps=" \
         'websocket-client~=0.56' \
         astor \
         git-aggregator \
-        git+https://github.com/acsone/click-odoo-contrib.git@1a8ef8bcbeaf8ecbfdfe9b83936ad9f2dd819fc3 \
+        click-odoo-contrib \
         pg_activity \
         phonenumbers \
         ptvsd \
         pudb \
         watchdog \
         wdb \
-    &&  pip install -U git+https://github.com/Tecnativa/click-odoo.git@parse-version \
     && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
