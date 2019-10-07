@@ -47,6 +47,7 @@ RUN apt-get -qq update \
         locales-all \
         nano \
         npm \
+        openssh-client \
         postgresql-client \
         postgresql-common \
         telnet \
