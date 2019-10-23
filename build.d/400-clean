@@ -4,14 +4,7 @@ import os
 import shutil
 import sys
 
-from doodbalib import (
-    addons_config,
-    CLEAN,
-    logger,
-    ODOO_DIR,
-    PRIVATE_DIR,
-    SRC_DIR,
-)
+from doodbalib import CLEAN, ODOO_DIR, PRIVATE_DIR, SRC_DIR, addons_config, logger
 
 if not CLEAN:
     logger.warning("Not cleaning garbage")

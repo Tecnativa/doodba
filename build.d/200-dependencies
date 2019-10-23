@@ -1,16 +1,12 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright 2017 LasLabs Inc.
 
-from os.path import basename, join, splitext
 from glob import glob
+from os.path import basename, join, splitext
 
-from doodbalib import (
-    CUSTOM_DIR,
-    FILE_APT_BUILD,
-    SRC_DIR,
-)
-from doodbalib.installer import install, INSTALLERS, logger
-
+from doodbalib import CUSTOM_DIR, FILE_APT_BUILD, SRC_DIR
+from doodbalib.installer import INSTALLERS, install, logger
 
 # Build dependencies installed before any others
 install("apt", FILE_APT_BUILD)
@@ -18,16 +14,16 @@ install("apt", FILE_APT_BUILD)
 for name in INSTALLERS:
     req_files = []
     # Normal dependency installation
-    req_files.append(join(CUSTOM_DIR, 'dependencies', '%s.txt' % name))
+    req_files.append(join(CUSTOM_DIR, "dependencies", "%s.txt" % name))
     for req_file in req_files:
         install(name, req_file)
 
 # Sorted dependencies installation
-dep_files = sorted(glob(join(CUSTOM_DIR, 'dependencies', '[0-9]*-*')))
+dep_files = sorted(glob(join(CUSTOM_DIR, "dependencies", "[0-9]*-*")))
 for dep_file in dep_files:
     root, ext = splitext(basename(dep_file))
     # Get the installer (xxx-installer[-description][.ext])
-    installer = root.split('-', 2)[1]
+    installer = root.split("-", 2)[1]
     if installer not in INSTALLERS:
         logger.error("Unknown installer: %s", installer)
         raise Exception

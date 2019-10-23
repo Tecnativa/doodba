@@ -1,21 +1,21 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
 import subprocess
 import sys
-
 from logging import DEBUG, INFO
 
-from psycopg2 import connect, OperationalError
-
 from doodbalib import logger, which
+
+from psycopg2 import OperationalError, connect
 
 # Call this file linked from another file called `build` or `entrypoint`
 mode = os.path.basename(__file__)
 
-dir_odoo = '/opt/odoo'
-dir_common = os.path.join(dir_odoo, 'common', '%s.d' % mode)
-dir_custom = os.path.join(dir_odoo, 'custom', '%s.d' % mode)
+dir_odoo = "/opt/odoo"
+dir_common = os.path.join(dir_odoo, "common", "%s.d" % mode)
+dir_custom = os.path.join(dir_odoo, "custom", "%s.d" % mode)
 
 # Find scripts
 files = [(d, dir_common) for d in os.listdir(dir_common)]
@@ -34,7 +34,7 @@ for executable, folder in sorted(files):
 # Allow to omit 1st command and default to `odoo`
 extra_command = sys.argv[1:]
 if extra_command:
-    if extra_command[0] == 'shell' or extra_command[0].startswith("-"):
+    if extra_command[0] == "shell" or extra_command[0].startswith("-"):
         extra_command.insert(0, "odoo")
     # Set the DB creation language, if needed
     if extra_command[0] in {"odoo", "/usr/local/bin/odoo"}:
@@ -49,9 +49,9 @@ if extra_command:
             # See `python -m ptvsd -h` to understand this
             extra_command[0] = os.path.realpath(which(extra_command[0]))
             extra_command = (
-                ["python", "-m", "ptvsd"] +
-                os.environ["PTVSD_ARGS"].split() +
-                extra_command
+                ["python", "-m", "ptvsd"]
+                + os.environ["PTVSD_ARGS"].split()
+                + extra_command
             )
     logger.log(
         DEBUG if extra_command[0] == "/qa/insider" else INFO,

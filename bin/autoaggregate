@@ -2,19 +2,19 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-import yaml
 from multiprocessing import cpu_count
 from subprocess import check_call
 
+import yaml
 from doodbalib import (
     ADDONS_YAML,
     AUTO_REPOS_YAML,
     CORE,
     LOG_LEVELS,
-    logger,
     PRIVATE,
     REPOS_YAML,
     SRC_DIR,
+    logger,
 )
 
 UMASK = os.environ.get("UMASK")
@@ -38,9 +38,16 @@ def aggregate(config):
         if UMASK:
             old_umask = os.umask(int(UMASK))
         check_call(
-            ["gitaggregate", "--expand-env", "--config", config,
-             "--log-level", log_level,
-             "--jobs", str(cpu_count() or 1)],
+            [
+                "gitaggregate",
+                "--expand-env",
+                "--config",
+                config,
+                "--log-level",
+                log_level,
+                "--jobs",
+                str(cpu_count() or 1),
+            ],
             cwd=SRC_DIR,
             stderr=sys.stderr,
             stdout=sys.stdout,
@@ -57,8 +64,7 @@ def aggregate(config):
                         os.chown(os.path.join(root, target), UID, GID)
                     except Exception:
                         logger.debug(
-                            "Error trying to chown on file. Skipping...",
-                            exc_info=True,
+                            "Error trying to chown on file. Skipping...", exc_info=True
                         )
 
 
@@ -101,7 +107,8 @@ def missing_repos_config():
                         continue
                     repo_path = os.path.abspath(os.path.join(SRC_DIR, repo))
                     if not os.path.exists(repo_path) or os.path.isdir(
-                            os.path.join(repo_path, ".git")):
+                        os.path.join(repo_path, ".git")
+                    ):
                         expected.add(repo_path)
     except (IOError, AttributeError):
         logger.debug("No addons are expected to be present")
@@ -109,12 +116,10 @@ def missing_repos_config():
     missing = expected - defined
     config = {
         repo_path: {
-            'defaults': {'depth': '$DEPTH_DEFAULT'},
-            'merges': ['origin $ODOO_VERSION'],
-            'remotes': {
-                'origin': origin_for(repo_path),
-            },
-            'target': 'origin $ODOO_VERSION',
+            "defaults": {"depth": "$DEPTH_DEFAULT"},
+            "merges": ["origin $ODOO_VERSION"],
+            "remotes": {"origin": origin_for(repo_path)},
+            "target": "origin $ODOO_VERSION",
         }
         for repo_path in missing
     }

@@ -3,18 +3,9 @@
 import os
 from glob import iglob
 
-from doodbalib import (
-    addons_config,
-    ADDONS_DIR,
-    ADDONS_YAML,
-    logger,
-    SRC_DIR,
-)
+from doodbalib import ADDONS_DIR, ADDONS_YAML, SRC_DIR, addons_config, logger
 
-logger.info(
-    "Linking all addons from %s in %s",
-    ADDONS_YAML,
-    ADDONS_DIR)
+logger.info("Linking all addons from %s in %s", ADDONS_YAML, ADDONS_DIR)
 
 # Remove all links in addons dir
 for link in iglob(os.path.join(ADDONS_DIR, "*")):

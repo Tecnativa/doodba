@@ -1,27 +1,28 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from __future__ import print_function
 
 import os
+import shutil
 import stat
 import subprocess
 import sys
-import shutil
-
 from argparse import ArgumentParser
-from tempfile import mkstemp, NamedTemporaryFile
+from tempfile import NamedTemporaryFile, mkstemp
 
 from doodbalib import logger
 
 # Define CLI options
 parser = ArgumentParser(
-    description="Execute some code in this container's QA environment.")
+    description="Execute some code in this container's QA environment."
+)
 parser.add_argument(
     "script",
-    help="The source code that will be executed. "
-         "It should start with a shebang.")
+    help="The source code that will be executed. It should start with a shebang.",
+)
 parser.add_argument(
-    "arguments", nargs="*",
-    help="Additional arguments passed to the script.")
+    "arguments", nargs="*", help="Additional arguments passed to the script."
+)
 args = parser.parse_args()
 
 # Copy the source code to an executable file

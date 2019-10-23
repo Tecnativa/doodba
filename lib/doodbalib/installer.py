@@ -2,11 +2,13 @@
 from collections import OrderedDict
 from os.path import exists
 from subprocess import check_call
+
 from doodbalib import logger
 
 
 class Installer(object):
     """Base class to install packages with some package system."""
+
     _cleanup_commands = []
     _install_command = None
     _remove_command = None
@@ -27,11 +29,9 @@ class Installer(object):
     def install(self):
         """Install the requirements from the given file."""
         if self._requirements:
-            return not self._run_command(
-                self._install_command + self._requirements)
+            return not self._run_command(self._install_command + self._requirements)
         else:
-            logger.info("No installable requirements found in %s",
-                         self.file_path)
+            logger.info("No installable requirements found in %s", self.file_path)
         return False
 
     def remove(self):
@@ -41,17 +41,16 @@ class Installer(object):
         if self._requirements:
             self._run_command(self._remove_command + self._requirements)
         else:
-            logger.info("No removable requirements found in %s",
-                         self.file_path)
+            logger.info("No removable requirements found in %s", self.file_path)
 
     def requirements(self):
         """Get a list of requirements from the given file."""
         requirements = []
         try:
-            with open(self.file_path, 'r') as fh:
+            with open(self.file_path, "r") as fh:
                 for line in fh:
                     line = line.strip()
-                    if not line or line.startswith('#'):
+                    if not line or line.startswith("#"):
                         continue
                     requirements += line.split()
         except IOError:
@@ -61,15 +60,16 @@ class Installer(object):
 
 
 class AptInstaller(Installer):
-    _cleanup_commands = [
-        ['apt-get', '-y', 'autoremove'],
-        'rm -Rf /var/lib/apt/lists/*',
-    ]
+    _cleanup_commands = [["apt-get", "-y", "autoremove"], "rm -Rf /var/lib/apt/lists/*"]
     _install_command = [
-        'apt-get',
-        '-o', 'Dpkg::Options::=--force-confdef',
-        '-o', 'Dpkg::Options::=--force-confold',
-        '-y', '--no-install-recommends', 'install',
+        "apt-get",
+        "-o",
+        "Dpkg::Options::=--force-confdef",
+        "-o",
+        "Dpkg::Options::=--force-confold",
+        "-y",
+        "--no-install-recommends",
+        "install",
     ]
     _remove_command = ["apt-get", "purge", "-y"]
 
@@ -82,21 +82,17 @@ class AptInstaller(Installer):
 
     def install(self):
         if not self._dirty() and self._requirements:
-            self._run_command(['apt-get', 'update'])
+            self._run_command(["apt-get", "update"])
         return super(AptInstaller, self).install()
 
 
 class GemInstaller(Installer):
-    _cleanup_commands = [
-        'rm -Rf ~/.gem /var/lib/gems/*/cache/',
-    ]
-    _install_command = [
-        "gem", "install", "--no-rdoc", "--no-ri", "--no-update-sources",
-    ]
+    _cleanup_commands = ["rm -Rf ~/.gem /var/lib/gems/*/cache/"]
+    _install_command = ["gem", "install", "--no-rdoc", "--no-ri", "--no-update-sources"]
 
 
 class NpmInstaller(Installer):
-    _cleanup_commands = ['rm -Rf ~/.npm /tmp/*']
+    _cleanup_commands = ["rm -Rf ~/.npm /tmp/*"]
     _install_command = ["npm", "install", "-g"]
 
 
@@ -108,12 +104,14 @@ class PipInstaller(Installer):
         return [self.file_path] if exists(self.file_path) else []
 
 
-INSTALLERS = OrderedDict([
-    ("apt", AptInstaller),
-    ("gem", GemInstaller),
-    ("npm", NpmInstaller),
-    ("pip", PipInstaller),
-])
+INSTALLERS = OrderedDict(
+    [
+        ("apt", AptInstaller),
+        ("gem", GemInstaller),
+        ("npm", NpmInstaller),
+        ("pip", PipInstaller),
+    ]
+)
 
 
 def install(installer, file_path):

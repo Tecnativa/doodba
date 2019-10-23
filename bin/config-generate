@@ -4,8 +4,9 @@
 
 import os
 from contextlib import closing
-from doodbalib import logger
 from string import Template
+
+from doodbalib import logger
 
 try:
     # Python 2, where io.StringIO fails because it is unicode-only
@@ -15,10 +16,12 @@ except ImportError:
 
 try:
     from configparser import RawConfigParser
+
     parser = RawConfigParser(strict=False)
 except ImportError:
     # Python 2, where strict=True doesn't exist
     from ConfigParser import RawConfigParser
+
     parser = RawConfigParser()
 
 ODOO_VERSION = os.environ.get("ODOO_VERSION")
