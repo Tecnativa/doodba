@@ -1,0 +1,15 @@
+{
+    "python.autoComplete.extraPaths": [
+        "./lib",
+        "./tests",
+    ],
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveTimeout": 1000,
+    "python.formatting.provider": "black",
+    "python.linting.flake8Args": [
+        "--max-line-length=88"
+    ],
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.pythonPath": "python3",
+}

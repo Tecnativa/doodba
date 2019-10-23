@@ -1,3 +1,2 @@
-{
-    "name": "other-doodba/product",
-}
+# -*- coding: utf-8 -*-
+{"name": "other-doodba/product"}

@@ -1,4 +1,5 @@
 #!/usr/local/bin/python-odoo-shell
+# -*- coding: utf-8 -*-
 try:
     from odoo.tools import config
 except ImportError:

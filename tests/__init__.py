@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """Run tests for this base image.
 
 Each test must be a valid docker-compose.yaml file with a ``odoo`` service.
 """
 import logging
 import unittest
-
 from itertools import product
 from os import environ
 from os.path import dirname, join
@@ -15,10 +15,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
-ODOO_VERSIONS = frozenset(environ.get(
-    "DOCKER_TAG", "7.0 8.0 9.0 10.0 11.0 12.0 13.0").split())
-PG_VERSIONS = frozenset(environ.get(
-    "PG_VERSIONS", "11").split())
+ODOO_VERSIONS = frozenset(
+    environ.get("DOCKER_TAG", "7.0 8.0 9.0 10.0 11.0 12.0 13.0").split()
+)
+PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "11").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 
 # This decorator skips tests that will fail until some branches and/or addons
@@ -26,13 +26,13 @@ SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 # preparing the pre-release for the next version of Odoo, which hasn't been
 # released yet.
 prerelease_skip = unittest.skipIf(
-    ODOO_VERSIONS == {"13.0"},
-    "Tests not supported in pre-release",
+    ODOO_VERSIONS == {"13.0"}, "Tests not supported in pre-release"
 )
 
 
-def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
-           odoo_skip=frozenset(), pg_skip=frozenset()):
+def matrix(
+    odoo=ODOO_VERSIONS, pg=PG_VERSIONS, odoo_skip=frozenset(), pg_skip=frozenset()
+):
     """All possible combinations.
 
     We compute the variable matrix here instead of in ``.travis.yml`` because
@@ -44,7 +44,7 @@ def matrix(odoo=ODOO_VERSIONS, pg=PG_VERSIONS,
         product(
             product(("ODOO_MINOR",), ODOO_VERSIONS & odoo - odoo_skip),
             product(("DB_VERSION",), PG_VERSIONS & pg - pg_skip),
-        )
+        ),
     )
 
 
@@ -78,24 +78,14 @@ class ScaffoldingCase(unittest.TestCase):
         full_env = dict(environ, **sub_env)
         with self.subTest(PWD=workdir, **sub_env):
             try:
-                self.popen(
-                    ("docker-compose", "build"),
-                    cwd=workdir,
-                    env=full_env,
-                )
+                self.popen(("docker-compose", "build"), cwd=workdir, env=full_env)
                 for command in commands:
                     with self.subTest(command=command):
                         self.popen(
-                            self.compose_run + command,
-                            cwd=workdir,
-                            env=full_env,
+                            self.compose_run + command, cwd=workdir, env=full_env
                         )
             finally:
-                self.popen(
-                    ("docker-compose", "down", "-v"),
-                    cwd=workdir,
-                    env=full_env,
-                )
+                self.popen(("docker-compose", "down", "-v"), cwd=workdir, env=full_env)
 
     def test_addons_filtered(self):
         """Test addons filtering with ``ONLY`` keyword in ``addons.yaml``."""
@@ -106,10 +96,13 @@ class ScaffoldingCase(unittest.TestCase):
                 dict(sub_env, DBNAME="prod"),
                 ("test", "-e", "auto/addons/web"),
                 ("test", "-e", "auto/addons/private_addon"),
-                ("bash", "-c",
-                 'test "$(addons list -p)" == disabled_addon,private_addon'),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(addons list -p)" == disabled_addon,private_addon',
+                ),
                 ("bash", "-c", 'test "$(addons list -ip)" == private_addon'),
-                ("bash", "-c", 'addons list -c | grep ,crm,'),
+                ("bash", "-c", "addons list -c | grep ,crm,"),
                 # absent_addon is missing and should fail
                 ("bash", "-c", "! addons list -px"),
             )
@@ -119,10 +112,13 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/web"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
                 ("bash", "-c", 'test -z "$(addons list -p)"'),
-                ("bash", "-c",
-                 '[ "$(addons list -s. -pwfake1 -wfake2)" == fake1.fake2 ]'),
+                (
+                    "bash",
+                    "-c",
+                    '[ "$(addons list -s. -pwfake1 -wfake2)" == fake1.fake2 ]',
+                ),
                 ("bash", "-c", "! addons list -wrepeat -Wrepeat"),
-                ("bash", "-c", 'addons list -c | grep ,crm,'),
+                ("bash", "-c", "addons list -c | grep ,crm,"),
             )
             self.compose_test(
                 project_dir,
@@ -137,8 +133,7 @@ class ScaffoldingCase(unittest.TestCase):
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
-                ("bash", "-c",
-                 'test "$(addons list -ped)" == base,web,website'),
+                ("bash", "-c", 'test "$(addons list -ped)" == base,web,website'),
                 # ``dummy_addon`` and ``private_addon`` exist
                 ("test", "-d", "auto/addons/dummy_addon"),
                 ("test", "-h", "auto/addons/dummy_addon"),
@@ -146,26 +141,30 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/dummy_addon"),
                 # Addon from extra repo takes higher priority than core version
                 ("realpath", "auto/addons/product"),
-                ("bash", "-c", 'test "$(realpath auto/addons/product)" == '
-                 '/opt/odoo/custom/src/other-doodba/odoo/src/private/product'),
-                ("bash", "-c",
-                 'test "$(addons list -e)" == dummy_addon,product'),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(realpath auto/addons/product)" == '
+                    "/opt/odoo/custom/src/other-doodba/odoo/src/private/product",
+                ),
+                ("bash", "-c", 'test "$(addons list -e)" == dummy_addon,product'),
             )
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="limited_private"),
                 ("test", "-e", "auto/addons/dummy_addon"),
-                ("bash", "-c",
-                 'test "$(addons list -e)" == dummy_addon,product'),
+                ("bash", "-c", 'test "$(addons list -e)" == dummy_addon,product'),
             )
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="limited_core"),
                 ("test", "-e", "auto/addons/dummy_addon"),
-                ("bash", "-c",
-                 '[ "$(addons list -s. -pwfake1 -wfake2)" == fake1.fake2 ]'),
-                ("bash", "-c",
-                 'test "$(addons list -e)" == dummy_addon,product'),
+                (
+                    "bash",
+                    "-c",
+                    '[ "$(addons list -s. -pwfake1 -wfake2)" == fake1.fake2 ]',
+                ),
+                ("bash", "-c", 'test "$(addons list -e)" == dummy_addon,product'),
                 ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
                 ("bash", "-c", 'test "$(addons list -cWsale)" == crm'),
             )
@@ -202,15 +201,19 @@ class ScaffoldingCase(unittest.TestCase):
         # Extra tests for versions >= 10.0, that support --load-language fine
         commands += (
             # DB was created with the correct language
-            ("bash", "-c",
-             """test "$(psql -Atqc "SELECT code FROM res_lang
-                                    WHERE active = TRUE")" == es_ES"""),
+            (
+                "bash",
+                "-c",
+                """test "$(psql -Atqc "SELECT code FROM res_lang
+                                    WHERE active = TRUE")" == es_ES""",
+            ),
         )
         for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
             self.compose_test(folder, sub_env, *commands)
 
     def test_smallest(self):
         """Tests for the smallest possible environment."""
+        liberation = 'Liberation{0}-Regular.ttf: "Liberation {0}" "Regular"'
         commands = (
             # Must generate a configuration file
             ("test", "-f", "/opt/odoo/auto/odoo.conf"),
@@ -219,9 +222,27 @@ class ScaffoldingCase(unittest.TestCase):
             ("addons", "list", "-cpix"),
             ("pg_activity", "--version"),
             # Default fonts must be liberation
-            ("bash", "-c", """test "$(fc-match monospace)" == 'LiberationMono-Regular.ttf: "Liberation Mono" "Regular"'"""),
-            ("bash", "-c", """test "$(fc-match sans-serif)" == 'LiberationSans-Regular.ttf: "Liberation Sans" "Regular"'"""),
-            ("bash", "-c", """test "$(fc-match serif)" == 'LiberationSerif-Regular.ttf: "Liberation Serif" "Regular"'"""),
+            (
+                "bash",
+                "-c",
+                """test "$(fc-match monospace)" == '{}'""".format(
+                    liberation.format("Mono")
+                ),
+            ),
+            (
+                "bash",
+                "-c",
+                """test "$(fc-match sans-serif)" == '{}'""".format(
+                    liberation.format("Sans")
+                ),
+            ),
+            (
+                "bash",
+                "-c",
+                """test "$(fc-match serif)" == '{}'""".format(
+                    liberation.format("Serif")
+                ),
+            ),
             # Must be able to install base addon
             ODOO_PREFIX + ("--init", "base"),
             # Auto updater must work
@@ -236,22 +257,23 @@ class ScaffoldingCase(unittest.TestCase):
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix(odoo_skip={"7.0", "8.0"}):
             self.compose_test(
-                smallest_dir, sub_env, *commands,
-                ("python", "-c", "import watchdog"),
+                smallest_dir, sub_env, *commands, ("python", "-c", "import watchdog")
             )
         for sub_env in matrix(odoo={"8.0"}):
             self.compose_test(
-                smallest_dir, sub_env,
+                smallest_dir,
+                sub_env,
                 # Odoo <= 8.0 does not autocreate the database
                 ("createdb",),
-                *commands
+                *commands,
             )
 
     def test_dotd(self):
         """Test environment with common ``*.d`` directories."""
         for sub_env in matrix():
             self.compose_test(
-                join(SCAFFOLDINGS_DIR, "dotd"), sub_env,
+                join(SCAFFOLDINGS_DIR, "dotd"),
+                sub_env,
                 # ``custom/build.d`` was properly executed
                 ("test", "-f", "/home/odoo/created-at-build"),
                 # ``custom/entrypoint.d`` was properly executed
@@ -291,7 +313,8 @@ class ScaffoldingCase(unittest.TestCase):
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies")
         for sub_env in matrix(odoo_skip={"7.0"}):
             self.compose_test(
-                dependencies_dir, sub_env,
+                dependencies_dir,
+                sub_env,
                 ("test", "!", "-f", "custom/dependencies/apt.txt"),
                 ("test", "!", "-f", "custom/dependencies/gem.txt"),
                 ("test", "!", "-f", "custom/dependencies/npm.txt"),
@@ -299,8 +322,14 @@ class ScaffoldingCase(unittest.TestCase):
                 # It should have module_auto_update available
                 ("test", "-d", "custom/src/server-tools/module_auto_update"),
                 # Patched Werkzeug version
-                ("bash", "-c", ('test "$(python -c "import werkzeug; '
-                                'print(werkzeug.__version__)")" == 0.14.1')),
+                (
+                    "bash",
+                    "-c",
+                    (
+                        'test "$(python -c "import werkzeug; '
+                        'print(werkzeug.__version__)")" == 0.14.1'
+                    ),
+                ),
                 # apt_build.txt
                 ("test", "-f", "custom/dependencies/apt_build.txt"),
                 ("test", "!", "-e", "/usr/sbin/sshd"),
@@ -311,8 +340,11 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-f", "custom/dependencies/070-apt-bc.txt"),
                 ("test", "-e", "/usr/bin/bc"),
                 # 150-npm-aloha_world-install.txt
-                ("test", "-f", ("custom/dependencies/"
-                                "150-npm-aloha_world-install.txt")),
+                (
+                    "test",
+                    "-f",
+                    ("custom/dependencies/" "150-npm-aloha_world-install.txt"),
+                ),
                 ("node", "-e", "require('test-npm-install')"),
                 # 200-pip-without-ext
                 ("test", "-f", "custom/dependencies/200-pip-without-ext"),
@@ -328,30 +360,56 @@ class ScaffoldingCase(unittest.TestCase):
         uids_dir = join(SCAFFOLDINGS_DIR, "uids_1001")
         for sub_env in matrix():
             self.compose_test(
-                uids_dir, sub_env,
+                uids_dir,
+                sub_env,
                 # verify that odoo user has the given ids
                 ("bash", "-c", 'test "$(id -u)" == "1001"'),
                 ("bash", "-c", 'test "$(id -g)" == "1002"'),
                 ("bash", "-c", 'test "$(id -u -n)" == "odoo"'),
                 # all those directories need to belong to odoo (user or group odoo)
-                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"'),
-                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"'),
-                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"'),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"',
+                ),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"',
+                ),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
+                ),
             )
 
     def test_default_uids(self):
         uids_dir = join(SCAFFOLDINGS_DIR, "uids_default")
         for sub_env in matrix():
             self.compose_test(
-                uids_dir, sub_env,
+                uids_dir,
+                sub_env,
                 # verify that odoo user has the given ids
                 ("bash", "-c", 'test "$(id -u)" == "1000"'),
                 ("bash", "-c", 'test "$(id -g)" == "1000"'),
                 ("bash", "-c", 'test "$(id -u -n)" == "odoo"'),
                 # all those directories need to belong to odoo (user or group odoo)
-                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"'),
-                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"'),
-                ("bash", "-c", 'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"'),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"',
+                ),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"',
+                ),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
+                ),
             )
 
 
