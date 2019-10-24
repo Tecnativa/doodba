@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from plumbum import FG, local
+from plumbum.cmd import docker  # noqa pylint: disable=import-error
+
+REPO = local.env["DOCKER_REPO"]
+VERSION = local.env["DOCKER_TAG"]
+
+# Log all locally available images; will help to pin images
+docker["image", "ls", "--digests", REPO] & FG
+
+# Login in Docker Hub
+docker(
+    "login",
+    "--username",
+    local.env["DOCKER_HUB_USERNAME"],
+    "--password",
+    local.env["DOCKER_HUB_TOKEN"],
+)
+
+# Push built images
+for suffix in ("", "-onbuild"):
+    docker["image", "push", "%s:%s%s" % (REPO, VERSION, suffix)] & FG
+    if VERSION == local.env.get("LATEST_RELEASE"):
+        docker["image", "push", "%s:latest%s" % (REPO, suffix)] & FG

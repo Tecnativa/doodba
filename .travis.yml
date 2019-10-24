@@ -1,4 +1,4 @@
-sudo: required
+os: linux
 
 language: python
 
@@ -11,15 +11,26 @@ services:
 git:
   depth: 1
 
+cache:
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/.cache/pre-commit
+
 branches:
   only:
     - master
 
+stages:
+  - name: lint
+  - name: test
+
 env:
   global:
+    # Indicates what's the equivalent to tecnativa/doodba:latest image
+    - LATEST_RELEASE=13.0
     # Variables found by default in Docker Hub builder
     - DOCKER_REPO=tecnativa/doodba
-  matrix:
+  jobs:
     - DOCKER_TAG=7.0 PG_VERSIONS=9.6
     - DOCKER_TAG=8.0 PG_VERSIONS=10
     - DOCKER_TAG=9.0 PG_VERSIONS=11
@@ -28,10 +39,17 @@ env:
     - DOCKER_TAG=12.0
     - DOCKER_TAG=13.0
 
+jobs:
+  include:
+    stage: lint
+    install: []
+    script:
+      - pre-commit run --all --show-diff-on-failure
+
 before_install:
   - sudo apt-get update
   - sudo apt-get -y -o Dpkg::Options::=--force-confnew install docker-ce
-  - pip install -r requirements-ci.txt
+  - ./hooks/pre_build
 
 install:
   - chown -R $USER:$USER .
@@ -40,3 +58,9 @@ install:
 
 script:
   - python -m unittest -v tests
+
+deploy:
+  provider: script
+  script: ./hooks/push
+  on:
+    branch: master

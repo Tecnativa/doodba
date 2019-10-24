@@ -1,5 +1,0 @@
-#!/bin/bash
-set -ex
-
-# Log all locally available images; will help to pin images
-docker image ls --digests "${DOCKER_REPO:-tecnativa/doodba}"
