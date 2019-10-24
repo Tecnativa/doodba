@@ -1,0 +1,3 @@
+#!/bin/bash
+set -ex
+pip install -r "$(dirname $0)/../requirements-ci.txt"
