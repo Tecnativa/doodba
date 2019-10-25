@@ -31,13 +31,13 @@ env:
     # Variables found by default in Docker Hub builder
     - DOCKER_REPO=tecnativa/doodba
   jobs:
-    - DOCKER_TAG=7.0 PG_VERSIONS=9.6
-    - DOCKER_TAG=8.0 PG_VERSIONS=10
-    - DOCKER_TAG=9.0 PG_VERSIONS=11
-    - DOCKER_TAG=10.0
-    - DOCKER_TAG=11.0
-    - DOCKER_TAG=12.0
     - DOCKER_TAG=13.0
+    - DOCKER_TAG=12.0
+    - DOCKER_TAG=11.0
+    - DOCKER_TAG=10.0
+    - DOCKER_TAG=9.0 PG_VERSIONS=11
+    - DOCKER_TAG=8.0 PG_VERSIONS=10
+    - DOCKER_TAG=7.0 PG_VERSIONS=9.6
 
 jobs:
   include:
