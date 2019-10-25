@@ -64,3 +64,5 @@ deploy:
   script: ./hooks/push
   on:
     branch: master
+    condition:
+      - $TRAVIS_BUILD_STAGE_NAME = Test
