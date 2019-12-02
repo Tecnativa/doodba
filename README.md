@@ -1318,7 +1318,7 @@ scaffolding versions is preserved.
 - Find others by searching [GitHub projects tagged with `#doodba`](https://github.com/topics/doodba)
 
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
-[`addons.yaml`]: #optodoocustomsrcaddonstxt
+[`addons.yaml`]: #optodoocustomsrcaddonsyaml
 [`compose_file` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
 [`nano`]: https://www.nano-editor.org/
 [`odoo.conf`]: #optodooautoodooconf
