@@ -2,7 +2,6 @@ other-doodba/odoo/src/private:
   - absent_addon
   - dummy_addon
   - product
-
 ---
 ONLY:
   PGDATABASE:

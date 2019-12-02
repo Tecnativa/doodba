@@ -13,8 +13,8 @@ git:
 
 cache:
   directories:
-  - $HOME/.cache/pip
-  - $HOME/.cache/pre-commit
+    - $HOME/.cache/pip
+    - $HOME/.cache/pre-commit
 
 branches:
   only:

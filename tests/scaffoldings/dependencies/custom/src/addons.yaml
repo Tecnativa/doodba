@@ -1,2 +1,2 @@
 server-tools:
-- module_auto_update
+  - module_auto_update

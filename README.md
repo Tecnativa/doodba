@@ -21,7 +21,7 @@ structure.
 
 BTW, we use [Debian][]. I hope you like that.
 
-  [Debian]: https://debian.org/
+[debian]: https://debian.org/
 
 ## Why?
 
@@ -241,7 +241,7 @@ your [`addons.yaml`][] contains this:
 
 ```yaml
 server-tools:
-- module_auto_update
+  - module_auto_update
 ```
 
 A `/opt/odoo/auto/repos.yaml` file with this will be generated and used to
@@ -279,10 +279,10 @@ One entry per repo and addon you want to activate in your project. Like this:
 
 ```yaml
 website:
-    - website_cookie_notice
-    - website_legal_page
+  - website_cookie_notice
+  - website_legal_page
 web:
-    - web_responsive
+  - web_responsive
 ```
 
 Advanced features:
@@ -325,7 +325,7 @@ web:
 website:
   - website_blog_excertp_img
 server-tools: # Here we repeat server-tools, but no problem because it's a
-              # different document
+  # different document
   - html_image_url_extractor
   - html_text
 ---
@@ -488,22 +488,22 @@ contents:
 
 ```json
 {
-    "version": "0.2.0",
-    "configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to debug in devel.yaml",
+      "type": "python",
+      "request": "attach",
+      "pathMappings": [
         {
-            "name": "Attach to debug in devel.yaml",
-            "type": "python",
-            "request": "attach",
-            "pathMappings": [
-                {
-                    "localRoot": "${workspaceRoot}/odoo",
-                    "remoteRoot": "/opt/odoo"
-                }
-            ],
-            "port": 6899,
-            "host": "localhost"
+          "localRoot": "${workspaceRoot}/odoo",
+          "remoteRoot": "/opt/odoo"
         }
-    ]
+      ],
+      "port": 6899,
+      "host": "localhost"
+    }
+  ]
 }
 ```
 
@@ -545,18 +545,17 @@ This example merges [several sources][`odoo`]:
 
 ```yaml
 ./odoo:
-    defaults:
-        # Shallow repositores are faster & thinner. You better use
-        # $DEPTH_DEFAULT here when you need no merges.
-        depth: $DEPTH_MERGE
-    remotes:
-        ocb: https://github.com/OCA/OCB.git
-        odoo: https://github.com/odoo/odoo.git
-    target:
-        ocb $ODOO_VERSION
-    merges:
-        - ocb $ODOO_VERSION
-        - odoo refs/pull/13635/head
+  defaults:
+    # Shallow repositores are faster & thinner. You better use
+    # $DEPTH_DEFAULT here when you need no merges.
+    depth: $DEPTH_MERGE
+  remotes:
+    ocb: https://github.com/OCA/OCB.git
+    odoo: https://github.com/odoo/odoo.git
+  target: ocb $ODOO_VERSION
+  merges:
+    - ocb $ODOO_VERSION
+    - odoo refs/pull/13635/head
 ```
 
 ### [`odoo`](https://www.odoo.com/documentation/10.0/reference/cmdline.html)
@@ -741,68 +740,68 @@ To have it, use this `inverseproxy.yaml` file:
 version: "2.1"
 
 services:
-    proxy:
-        image: traefik:1.6-alpine
-        networks:
-            shared:
-            private:
-            public:
-        volumes:
-            - acme:/etc/traefik/acme:rw,Z
-        ports:
-            - "80:80"
-            - "443:443"
-        depends_on:
-            - dockersocket
-        restart: unless-stopped
-        privileged: true
-        tty: true
-        command:
-            - --ACME.ACMELogging
-            - --ACME.Email=you@example.com
-            - --ACME.EntryPoint=https
-            - --ACME.HTTPChallenge.entryPoint=http
-            - --ACME.OnHostRule
-            - --ACME.Storage=/etc/traefik/acme/acme.json
-            - --DefaultEntryPoints=http,https
-            - --EntryPoints=Name:http Address::80 Redirect.EntryPoint:https
-            - --EntryPoints=Name:https Address::443 TLS
-            - --LogLevel=INFO
-            - --Docker
-            - --Docker.EndPoint=http://dockersocket:2375
-            - --Docker.ExposedByDefault=false
-            - --Docker.Watch
+  proxy:
+    image: traefik:1.6-alpine
+    networks:
+      shared:
+      private:
+      public:
+    volumes:
+      - acme:/etc/traefik/acme:rw,Z
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - dockersocket
+    restart: unless-stopped
+    privileged: true
+    tty: true
+    command:
+      - --ACME.ACMELogging
+      - --ACME.Email=you@example.com
+      - --ACME.EntryPoint=https
+      - --ACME.HTTPChallenge.entryPoint=http
+      - --ACME.OnHostRule
+      - --ACME.Storage=/etc/traefik/acme/acme.json
+      - --DefaultEntryPoints=http,https
+      - --EntryPoints=Name:http Address::80 Redirect.EntryPoint:https
+      - --EntryPoints=Name:https Address::443 TLS
+      - --LogLevel=INFO
+      - --Docker
+      - --Docker.EndPoint=http://dockersocket:2375
+      - --Docker.ExposedByDefault=false
+      - --Docker.Watch
 
-    dockersocket:
-        image: tecnativa/docker-socket-proxy
-        privileged: true
-        networks:
-            private:
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
-        environment:
-            CONTAINERS: 1
-            NETWORKS: 1
-            SERVICES: 1
-            SWARM: 1
-            TASKS: 1
-        restart: unless-stopped
+  dockersocket:
+    image: tecnativa/docker-socket-proxy
+    privileged: true
+    networks:
+      private:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      CONTAINERS: 1
+      NETWORKS: 1
+      SERVICES: 1
+      SWARM: 1
+      TASKS: 1
+    restart: unless-stopped
 
 networks:
-    shared:
-        internal: true
-        driver_opts:
-            encrypted: 1
+  shared:
+    internal: true
+    driver_opts:
+      encrypted: 1
 
-    private:
-        internal: true
-        driver_opts:
-            encrypted: 1
+  private:
+    internal: true
+    driver_opts:
+      encrypted: 1
 
-    public:
+  public:
 
 volumes:
-    acme:
+  acme:
 ```
 
 Then boot it up with:
@@ -820,15 +819,15 @@ surface when listening to the Docker socket.
 
 This allows you to:
 
-* Have multiple domains for each Odoo instance.
-* Have multiple Odoo instances in each node.
-* Add an SSL layer automatically and for free.
+- Have multiple domains for each Odoo instance.
+- Have multiple Odoo instances in each node.
+- Add an SSL layer automatically and for free.
 
 ##### Testing
 
 A good rule of thumb is test in testing before uploading to production, so this
 environment tries to imitate the [production][] one in everything,
-but *removing possible pollution points*:
+but _removing possible pollution points_:
 
 - It has a fake `smtp` service based on [MailHog][].
 
@@ -863,74 +862,74 @@ The recommended `globalwhitelist/docker-compose.yaml` file should contain:
 version: "2.1"
 
 networks:
-    public:
-        driver_opts:
-            encrypted: 1
-    shared:
-        internal: true
-        driver_opts:
-            encrypted: 1
+  public:
+    driver_opts:
+      encrypted: 1
+  shared:
+    internal: true
+    driver_opts:
+      encrypted: 1
 
 services:
-    cdnjs_cloudflare_com:
-        image: tecnativa/whitelist
-        restart: unless-stopped
-        networks:
-            public:
-            shared:
-                aliases:
-                    - "cdnjs.cloudflare.com"
-        environment:
-            TARGET: "cdnjs.cloudflare.com"
-            PRE_RESOLVE: 1
+  cdnjs_cloudflare_com:
+    image: tecnativa/whitelist
+    restart: unless-stopped
+    networks:
+      public:
+      shared:
+        aliases:
+          - "cdnjs.cloudflare.com"
+    environment:
+      TARGET: "cdnjs.cloudflare.com"
+      PRE_RESOLVE: 1
 
-    fonts_googleapis_com:
-        image: tecnativa/whitelist
-        restart: unless-stopped
-        networks:
-            public:
-            shared:
-                aliases:
-                    - "fonts.googleapis.com"
-        environment:
-            TARGET: "fonts.googleapis.com"
-            PRE_RESOLVE: 1
+  fonts_googleapis_com:
+    image: tecnativa/whitelist
+    restart: unless-stopped
+    networks:
+      public:
+      shared:
+        aliases:
+          - "fonts.googleapis.com"
+    environment:
+      TARGET: "fonts.googleapis.com"
+      PRE_RESOLVE: 1
 
-    fonts_gstatic_com:
-        image: tecnativa/whitelist
-        restart: unless-stopped
-        networks:
-            public:
-            shared:
-                aliases:
-                    - "fonts.gstatic.com"
-        environment:
-            TARGET: "fonts.gstatic.com"
-            PRE_RESOLVE: 1
+  fonts_gstatic_com:
+    image: tecnativa/whitelist
+    restart: unless-stopped
+    networks:
+      public:
+      shared:
+        aliases:
+          - "fonts.gstatic.com"
+    environment:
+      TARGET: "fonts.gstatic.com"
+      PRE_RESOLVE: 1
 
-    www_google_com:
-        image: tecnativa/whitelist
-        restart: unless-stopped
-        networks:
-            public:
-            shared:
-                aliases:
-                    - "www.google.com"
-        environment:
-            TARGET: "www.google.com"
-            PRE_RESOLVE: 1
+  www_google_com:
+    image: tecnativa/whitelist
+    restart: unless-stopped
+    networks:
+      public:
+      shared:
+        aliases:
+          - "www.google.com"
+    environment:
+      TARGET: "www.google.com"
+      PRE_RESOLVE: 1
 
-    www_gravatar_com:
-        image: tecnativa/whitelist
-        restart: unless-stopped
-        networks:
-            public:
-            shared:
-                aliases:
-                    - "www.gravatar.com"
-        environment:
-            TARGET: "www.gravatar.com"
-            PRE_RESOLVE: 1
+  www_gravatar_com:
+    image: tecnativa/whitelist
+    restart: unless-stopped
+    networks:
+      public:
+      shared:
+        aliases:
+          - "www.gravatar.com"
+    environment:
+      TARGET: "www.gravatar.com"
+      PRE_RESOLVE: 1
 ```
 
 #### Other usage scenarios
@@ -1241,7 +1240,7 @@ image version is downloaded:
 
 Alternatively, you can browse [this image's builds][builds], click on the one
 you know it works fine for you, and search for the `digest` word using your
-browser's *search in page* system (Ctrl+F usually).
+browser's _search in page_ system (Ctrl+F usually).
 
 You will find lines similar to:
 
@@ -1318,15 +1317,14 @@ scaffolding versions is preserved.
 - [Ansible role for automated deployment / update from Le Filament](https://github.com/remi-filament/ansible_role_odoo_docker)
 - Find others by searching [GitHub projects tagged with `#doodba`](https://github.com/topics/doodba)
 
-
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
 [`addons.yaml`]: #optodoocustomsrcaddonstxt
-[`COMPOSE_FILE` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
+[`compose_file` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
 [`nano`]: https://www.nano-editor.org/
 [`odoo.conf`]: #optodooautoodooconf
 [`odoo`]: #optodoocustomsrcodoo
 [`private`]: #optodoocustomsrcprivate
-[`PYTHONOPTIMIZE=1`]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONOPTIMIZE
+[`pythonoptimize=1`]: https://docs.python.org/3/using/cmdline.html#envvar-PYTHONOPTIMIZE
 [`repos.yaml`]: #optodoocustomsrcreposyaml
 [`click-odoo`]: https://github.com/acsone/click-odoo
 [`click-odoo-contrib`]: https://github.com/acsone/click-odoo-contrib
@@ -1336,23 +1334,23 @@ scaffolding versions is preserved.
 [development]: #development
 [docker-socket-proxy]: https://hub.docker.com/r/tecnativa/docker-socket-proxy/
 [doodba-qa]: https://github.com/Tecnativa/doodba-qa
-[Fish]: http://fishshell.com/
+[fish]: http://fishshell.com/
 [glob]: https://docs.python.org/3/library/glob.html
-[Let's Encrypt]: https://letsencrypt.org/
-[MailHog]: #mailhog
+[let's encrypt]: https://letsencrypt.org/
+[mailhog]: #mailhog
 [mixed-content-posbox]: https://github.com/odoo/odoo/issues/3156#issuecomment-443727760
-[OCA]: https://odoo-community.org/
-[OCB]: https://github.com/OCA/OCB
-[Odoo S.A.]: https://www.odoo.com
-[OpenUpgrade]: https://github.com/OCA/OpenUpgrade/
-[Original Odoo]: https://github.com/odoo/odoo
+[oca]: https://odoo-community.org/
+[ocb]: https://github.com/OCA/OCB
+[odoo s.a.]: https://www.odoo.com
+[openupgrade]: https://github.com/OCA/OpenUpgrade/
+[original odoo]: https://github.com/odoo/odoo
 [pip `requirements.txt`]: https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
-[Postgres client applications]: https://www.postgresql.org/docs/current/static/reference-client.html
+[postgres client applications]: https://www.postgresql.org/docs/current/static/reference-client.html
 [production]: #production
 [retrobreak]: https://github.com/Tecnativa/doodba/issues/67
 [scaffolding]: #scaffolding
-[several YAML documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
+[several yaml documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
 [ssh-conf]: https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client
 [testing]: #testing
-[Traefik]: https://traefik.io/
-[VSCode]: https://code.visualstudio.com/
+[traefik]: https://traefik.io/
+[vscode]: https://code.visualstudio.com/
