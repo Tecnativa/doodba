@@ -18,7 +18,7 @@ ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 ODOO_VERSIONS = frozenset(
     environ.get("DOCKER_TAG", "7.0 8.0 9.0 10.0 11.0 12.0 13.0").split()
 )
-PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "11").split())
+PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "12").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 
 # This decorator skips tests that will fail until some branches and/or addons
@@ -253,6 +253,8 @@ class ScaffoldingCase(unittest.TestCase):
             ("pg_activity", "--version"),
             ("psql", "--version"),
             ("ssh", "-V"),
+            # We are able to dump
+            ("pg_dump", "-f/var/lib/odoo/prod.sql", "prod"),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix(odoo_skip={"7.0", "8.0"}):
