@@ -122,6 +122,8 @@ def addons_config(filtered=True, strict=False):
                 logger.debug("Skipping unexpandable glob '%s'", full_glob)
                 continue
             for addon in found:
+                if not os.path.isdir(addon):
+                    continue
                 manifests = (os.path.join(addon, m) for m in MANIFESTS)
                 if not any(os.path.isfile(m) for m in manifests):
                     missing_manifest.add(addon)
