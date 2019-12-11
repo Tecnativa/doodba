@@ -171,7 +171,7 @@ You can choose your Odoo version, and even merge PRs from many of them using
 
 ##### `/opt/odoo/custom/src/repos.yaml`
 
-A [git-aggregator](#git-aggregator) configuration file.
+A [git-aggregator](#git-aggregator) configuration file with additional [addons][linking-addons] attribute.
 
 It should look similar to this:
 
@@ -205,14 +205,22 @@ web:
     - origin $ODOO_VERSION
     - origin refs/pull/1007/head # web_responsive search
     - tecnativa 11.0-some_addon-custom # Branch for this customer only
-```
+  addons:
+    - web_responsive
 
+# Simplified version is supported too
+website:
+```
 ###### Automatic download of repos
 
-Doodba is smart enough to download automatically git repositories even if they
-are missing in `repos.yaml`. It will happen if it is used in [`addons.yaml`][],
-except for the special [`private`][] repo. This will help you keep your
-deployment definitions DRY.
+Doodba is smart enough to download automatically git repositories even if
+[`repos.yaml`][] doesn't provide full information about them. It will happen in
+following cases:
+
+* repository is used in [`addons.yaml`][], except for the special [`private`][] repo
+* repository is not used in [`addons.yaml`][], but it's specifed in [`repos.yaml`][] without `remotes` node
+
+It will help you keep your deployment definitions DRY.
 
 You can configure this behavior with these environment variables (default
 values shown):
@@ -273,6 +281,39 @@ spec in [`repos.yaml`][] if anything diverges from the standard:
 - The branch name does not match `$ODOO_VERSION`.
 - Etc.
 
+###### Linking addons from the repos
+
+You may specify which modules from the [repositories][`repos.yaml`] will be
+available in odoo. It's implemented by linking required modules to ``/opt/odoo/auto/addons`` folder.
+
+- `addons` attribute in [`repos.yaml`][]:
+
+  - [Wildcards][glob] are supported
+  - Contains list of addons
+  - Has no default value if `remotes` node is specified, otherwise it links all addons by default
+
+- [`addons.yaml`]:
+
+  - [Wildcards][glob] are supported
+  - Allows to specify in which environment use specific set of modules
+  - Can be used without [`repos.yaml`][] as described in the [previous section][auto-repos]
+
+- Addons under `private` and `odoo/addons` are linked automatically unless you
+  specify them.
+
+- Values from [`addons.yaml`] have higher priority than ones in [`repos.yaml`][].
+
+- If an addon is found in several places at the same time, it will get linked
+  according to this priority table:
+
+  1. Addons in [`private`][].
+  2. Addons in other repositories (in case one is matched in several, it will
+     be random, BEWARE!). Better have no duplicated names if possible.
+  3. Core Odoo addons from [`odoo/addons`][`odoo`].
+
+- If an addon is specified but not available at runtime, it will fail silently.
+
+
 ##### `/opt/odoo/custom/src/addons.yaml`
 
 One entry per repo and addon you want to activate in your project. Like this:
@@ -291,25 +332,10 @@ Advanced features:
   addons and some repos are repeated among groups, by separating each document
   with `---`.
 
-- Addons under `private` and `odoo/addons` are linked automatically unless you
-  specify them.
-
 - You can use `ONLY` to supply a dictionary of environment variables and a
   list of possible values to enable that document in the matching environments.
 
-- If an addon is found in several places at the same time, it will get linked
-  according to this priority table:
-
-  1. Addons in [`private`][].
-  2. Addons in other repositories (in case one is matched in several, it will
-     be random, BEWARE!). Better have no duplicated names if possible.
-  3. Core Odoo addons from [`odoo/addons`][`odoo`].
-
-- If an addon is specified but not available at runtime, it will fail silently.
-
-- You can use any wildcards supported by [Python's glob module][glob].
-
-This example shows these advanced features:
+Example:
 
 ```yaml
 # Spanish Localization
@@ -1318,6 +1344,8 @@ scaffolding versions is preserved.
 - Find others by searching [GitHub projects tagged with `#doodba`](https://github.com/topics/doodba)
 
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
+[linking-addons]: #linking-addons-from-the-repos
+[auto-repos]: #automatic-download-of-repos
 [`addons.yaml`]: #optodoocustomsrcaddonsyaml
 [`compose_file` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
 [`nano`]: https://www.nano-editor.org/
