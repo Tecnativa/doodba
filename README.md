@@ -242,6 +242,9 @@ your [`addons.yaml`][] contains this:
 ```yaml
 server-tools:
   - module_auto_update
+
+https://github.com/OTHER-OWNER/REPO-NAME.git:
+  - module_name
 ```
 
 A `/opt/odoo/auto/repos.yaml` file with this will be generated and used to
@@ -262,13 +265,19 @@ download git code:
   target: origin $ODOO_VERSION
   merges:
     - origin $ODOO_VERSION
+/opt/odoo/custom/src/REPO-NAME:
+  depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/OTHER-OWNER/REPO-NAME.git:
+  target: origin $ODOO_VERSION
+  merges:
+    - origin $ODOO_VERSION
 ```
 
 All of this means that, you only need to define the git aggregator
 spec in [`repos.yaml`][] if anything diverges from the standard:
 
 - You need special merges.
-- You need a special origin.
 - The folder name does not match the origin pattern.
 - The branch name does not match `$ODOO_VERSION`.
 - Etc.
@@ -296,6 +305,8 @@ Advanced features:
 
 - You can use `ONLY` to supply a dictionary of environment variables and a
   list of possible values to enable that document in the matching environments.
+
+- You can use custom repository url, instead of just its name.
 
 - If an addon is found in several places at the same time, it will get linked
   according to this priority table:
@@ -328,6 +339,10 @@ server-tools: # Here we repeat server-tools, but no problem because it's a
   # different document
   - html_image_url_extractor
   - html_text
+---
+# Non-standard repository
+https://github.com/OTHER-OWNER/REPO-NAME.git:
+  - module_name
 ---
 # Enable demo ribbon only for devel and test environments
 ONLY:
