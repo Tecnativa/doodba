@@ -100,6 +100,8 @@ def addons_config(filtered=True, strict=False):
                     continue
                 # Flatten all sections in a single dict
                 for repo, partial_globs in doc.items():
+                    if repo == "ENV":
+                        continue
                     logger.debug("Processing %s repo", repo)
                     all_globs.setdefault(repo, set())
                     all_globs[repo].update(partial_globs)

@@ -270,6 +270,22 @@ class ScaffoldingCase(unittest.TestCase):
                 *commands,
             )
 
+    def test_addons_env(self):
+        """Test environment variables in addons.yaml"""
+        # 7.0 is skiped because the module is absent in that branch
+        for sub_env in matrix(odoo_skip={"7.0"}):
+            self.compose_test(
+                join(SCAFFOLDINGS_DIR, "addons_env"),
+                sub_env,
+                # check module from custom repo pattern
+                ("test", "-d", "custom/src/misc-addons"),
+                ("test", "-d", "custom/src/misc-addons/web_debranding"),
+                ("test", "-e", "auto/addons/web_debranding"),
+                # Migrations folder is only in OpenUpgrade
+                ("test", "-e", "auto/addons/crm"),
+                ("test", "-d", "auto/addons/crm/migrations"),
+            )
+
     def test_dotd(self):
         """Test environment with common ``*.d`` directories."""
         for sub_env in matrix():

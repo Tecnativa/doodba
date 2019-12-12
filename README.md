@@ -299,6 +299,14 @@ Advanced features:
 - You can use `ONLY` to supply a dictionary of environment variables and a
   list of possible values to enable that document in the matching environments.
 
+- You can use `ENV` to supply a dictionary of environment variables to be used
+  on downloading repositories. Following variables are supported:
+
+  - `DEFAULT_REPO_PATTERN`
+  - `DEFAULT_REPO_PATTERN_ODOO`
+  - `DEPTH_DEFAULT`
+  - `ODOO_VERSION` - can be used as repository branch
+
 - If an addon is found in several places at the same time, it will get linked
   according to this priority table:
 
@@ -345,6 +353,13 @@ ONLY:
     - prod
 server-tools:
   - auth_*
+---
+# Custom repositories
+ENV:
+  DEFAULT_REPO_PATTERN: https://github.com/Tecnativa/{}.git
+  ODOO_VERSION: 13.0-new-feature
+some-repo: # Cloned from https://github.com/Tecnativa/some-repo.git branch 13.0-new-feature
+  - some_custom_module
 ```
 
 ##### `/opt/odoo/custom/dependencies/*.txt`
