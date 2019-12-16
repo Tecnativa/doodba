@@ -556,6 +556,9 @@ This example merges [several sources][`odoo`]:
   merges:
     - ocb $ODOO_VERSION
     - odoo refs/pull/13635/head
+  shell_command_after:
+    # Useful to merge a diff when there's no git history correlation
+    - curl -sSL https://github.com/odoo/odoo/pull/37187.diff | patch -fp1
 ```
 
 ### [`odoo`](https://www.odoo.com/documentation/10.0/reference/cmdline.html)
