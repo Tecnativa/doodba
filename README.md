@@ -249,14 +249,16 @@ download git code:
 
 ```yaml
 /opt/odoo/custom/src/odoo:
-  depth: $DEPTH_DEFAULT
+  defaults:
+    depth: $DEPTH_DEFAULT
   remotes:
     origin: https://github.com/OCA/OCB.git
   target: origin $ODOO_VERSION
   merges:
     - origin $ODOO_VERSION
 /opt/odoo/custom/src/server-tools:
-  depth: $DEPTH_DEFAULT
+  defaults:
+    depth: $DEPTH_DEFAULT
   remotes:
     origin: https://github.com/OCA/server-tools.git
   target: origin $ODOO_VERSION
