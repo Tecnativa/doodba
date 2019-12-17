@@ -94,7 +94,8 @@ try:
         core_ok = args.core and repo == CORE
         extra_ok = args.extra and repo not in {CORE, PRIVATE}
         private_ok = args.private and repo == PRIVATE
-        if private_ok or core_ok or extra_ok:
+        manual_ok = addon in addons
+        if private_ok or core_ok or extra_ok or manual_ok:
             addon_path = os.path.join(SRC_DIR, repo, addon)
             manifest = {}
             for manifest_name in MANIFESTS:
@@ -116,6 +117,7 @@ except AddonsConfigError as error:
 # Use dependencies instead, if requested
 if args.dependencies:
     addons = dependencies - addons
+addons -= without
 
 # Do the required action
 if not addons:
