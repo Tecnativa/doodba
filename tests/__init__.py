@@ -105,6 +105,22 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-c", "addons list -c | grep ,crm,"),
                 # absent_addon is missing and should fail
                 ("bash", "-c", "! addons list -px"),
+                # Test addon inclusion, exclusion, dependencies...
+                (
+                    "bash",
+                    "-xc",
+                    'test "$(addons list -dw private_addon)" == base,dummy_addon,website',
+                ),
+                (
+                    "bash",
+                    "-xc",
+                    'test "$(addons list -dwprivate_addon -Wwebsite)" == base,dummy_addon',
+                ),
+                (
+                    "bash",
+                    "-xc",
+                    'test "$(addons list -dw private_addon -W dummy_addon)" == base,website',
+                ),
             )
             self.compose_test(
                 project_dir,
