@@ -11,6 +11,7 @@ from doodbalib import (
     AUTO_REPOS_YAML,
     CORE,
     LOG_LEVELS,
+    ODOO_DIR,
     PRIVATE,
     REPOS_YAML,
     SRC_DIR,
@@ -68,7 +69,11 @@ def aggregate(config):
                         )
 
 
-def origin_for(folder):
+def origin_for(
+    folder,
+    default_repo_pattern=DEFAULT_REPO_PATTERN,
+    odoo_repo_pattern=DEFAULT_REPO_PATTERN_ODOO,
+):
     """Guess the default git origin for that folder.
 
     :param str folder:
@@ -77,9 +82,9 @@ def origin_for(folder):
         pattern.
     """
     base = os.path.basename(folder)
-    pattern = DEFAULT_REPO_PATTERN
+    pattern = default_repo_pattern
     if base == "odoo":
-        pattern = DEFAULT_REPO_PATTERN_ODOO
+        pattern = odoo_repo_pattern
     return pattern.format(base)
 
 
@@ -89,7 +94,7 @@ def missing_repos_config():
     :return dict:
         git-aggregator-ready configuration dict for undefined repositories.
     """
-    defined, expected = set(), {os.path.join(SRC_DIR, "odoo")}
+    defined, expected = set(), {ODOO_DIR}
     # Find the repositories defined by hand
     try:
         with open(REPOS_YAML) as yaml_file:
@@ -98,31 +103,45 @@ def missing_repos_config():
                     defined.add(os.path.abspath(os.path.join(SRC_DIR, repo)))
     except (IOError, AttributeError):
         logger.debug("No repositories defined by hand")
+    addons_env = {}
     # Find the repositories that should be present
     try:
         with open(ADDONS_YAML) as yaml_file:
             for doc in yaml.safe_load_all(yaml_file):
+                env = dict(os.environ, **doc.get("ENV", {}))
                 for repo in doc:
-                    if repo in {PRIVATE, CORE, "ONLY"}:
+                    if repo in {PRIVATE, "ONLY", "ENV"}:
                         continue
-                    repo_path = os.path.abspath(os.path.join(SRC_DIR, repo))
+                    if repo == CORE:
+                        repo_path = ODOO_DIR
+                    else:
+                        repo_path = os.path.abspath(os.path.join(SRC_DIR, repo))
                     if not os.path.exists(repo_path) or os.path.isdir(
                         os.path.join(repo_path, ".git")
                     ):
                         expected.add(repo_path)
+                        addons_env[repo_path] = env
     except (IOError, AttributeError):
         logger.debug("No addons are expected to be present")
     # Find the undefined repositories and generate a config for them
     missing = expected - defined
-    config = {
-        repo_path: {
-            "defaults": {"depth": "$DEPTH_DEFAULT"},
-            "merges": ["origin $ODOO_VERSION"],
-            "remotes": {"origin": origin_for(repo_path)},
-            "target": "origin $ODOO_VERSION",
+    config = {}
+    for repo_path in missing:
+        env = addons_env.get(repo_path, os.environ)
+        depth = env["DEPTH_DEFAULT"]
+        origin_version = "origin %s" % env["ODOO_VERSION"]
+        config[repo_path] = {
+            "defaults": {"depth": depth},
+            "merges": [origin_version],
+            "remotes": {
+                "origin": origin_for(
+                    repo_path,
+                    env["DEFAULT_REPO_PATTERN"],
+                    env["DEFAULT_REPO_PATTERN_ODOO"],
+                )
+            },
+            "target": origin_version,
         }
-        for repo_path in missing
-    }
     logger.debug("Generated missing repos config %r", config)
     return config
 

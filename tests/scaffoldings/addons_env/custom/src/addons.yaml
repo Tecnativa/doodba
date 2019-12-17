@@ -1,0 +1,14 @@
+server-tools:
+  - module_auto_update
+---
+ENV:
+  DEFAULT_REPO_PATTERN_ODOO: https://github.com/OCA/OpenUpgrade.git
+odoo/addons:
+  - crm
+  - sale
+---
+ENV:
+  DEFAULT_REPO_PATTERN: https://github.com/it-projects-llc/{}.git
+  DEPTH_DEFAULT: 2
+misc-addons:
+  - web_debranding
