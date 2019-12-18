@@ -98,13 +98,13 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/private_addon"),
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     'test "$(addons list -p)" == disabled_addon,private_addon',
                 ),
-                ("bash", "-c", 'test "$(addons list -ip)" == private_addon'),
-                ("bash", "-c", "addons list -c | grep ,crm,"),
+                ("bash", "-xc", 'test "$(addons list -ip)" == private_addon'),
+                ("bash", "-xc", "addons list -c | grep ,crm,"),
                 # absent_addon is missing and should fail
-                ("bash", "-c", "! addons list -px"),
+                ("bash", "-xc", "! addons list -px"),
                 # Test addon inclusion, exclusion, dependencies...
                 (
                     "bash",
@@ -127,29 +127,29 @@ class ScaffoldingCase(unittest.TestCase):
                 dict(sub_env, DBNAME="limited_private"),
                 ("test", "-e", "auto/addons/web"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
-                ("bash", "-c", 'test -z "$(addons list -p)"'),
+                ("bash", "-xc", 'test -z "$(addons list -p)"'),
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     '[ "$(addons list -s. -pwfake1 -wfake2)" == fake1.fake2 ]',
                 ),
-                ("bash", "-c", "! addons list -wrepeat -Wrepeat"),
-                ("bash", "-c", "addons list -c | grep ,crm,"),
+                ("bash", "-xc", "! addons list -wrepeat -Wrepeat"),
+                ("bash", "-xc", "addons list -c | grep ,crm,"),
             )
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="limited_core"),
                 ("test", "!", "-e", "auto/addons/web"),
                 ("test", "!", "-e", "auto/addons/private_addon"),
-                ("bash", "-c", 'test -z "$(addons list -p)"'),
-                ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
+                ("bash", "-xc", 'test -z "$(addons list -p)"'),
+                ("bash", "-xc", 'test "$(addons list -c)" == crm,sale'),
             )
         # Skip Odoo versions that don't support __manifest__.py files
         for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
-                ("bash", "-c", 'test "$(addons list -ped)" == base,web,website'),
+                ("bash", "-xc", 'test "$(addons list -ped)" == base,web,website'),
                 # ``dummy_addon`` and ``private_addon`` exist
                 ("test", "-d", "auto/addons/dummy_addon"),
                 ("test", "-h", "auto/addons/dummy_addon"),
@@ -159,17 +159,17 @@ class ScaffoldingCase(unittest.TestCase):
                 ("realpath", "auto/addons/product"),
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     'test "$(realpath auto/addons/product)" == '
                     "/opt/odoo/custom/src/other-doodba/odoo/src/private/product",
                 ),
-                ("bash", "-c", 'test "$(addons list -e)" == dummy_addon,product'),
+                ("bash", "-xc", 'test "$(addons list -e)" == dummy_addon,product'),
             )
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="limited_private"),
                 ("test", "-e", "auto/addons/dummy_addon"),
-                ("bash", "-c", 'test "$(addons list -e)" == dummy_addon,product'),
+                ("bash", "-xc", 'test "$(addons list -e)" == dummy_addon,product'),
             )
             self.compose_test(
                 project_dir,
@@ -177,12 +177,12 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/dummy_addon"),
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     '[ "$(addons list -s. -pwfake1 -wfake2)" == fake1.fake2 ]',
                 ),
-                ("bash", "-c", 'test "$(addons list -e)" == dummy_addon,product'),
-                ("bash", "-c", 'test "$(addons list -c)" == crm,sale'),
-                ("bash", "-c", 'test "$(addons list -cWsale)" == crm'),
+                ("bash", "-xc", 'test "$(addons list -e)" == dummy_addon,product'),
+                ("bash", "-xc", 'test "$(addons list -c)" == crm,sale'),
+                ("bash", "-xc", 'test "$(addons list -cWsale)" == crm'),
             )
 
     @prerelease_skip
@@ -219,7 +219,7 @@ class ScaffoldingCase(unittest.TestCase):
             # DB was created with the correct language
             (
                 "bash",
-                "-c",
+                "-xc",
                 """test "$(psql -Atqc "SELECT code FROM res_lang
                                     WHERE active = TRUE")" == es_ES""",
             ),
@@ -240,21 +240,21 @@ class ScaffoldingCase(unittest.TestCase):
             # Default fonts must be liberation
             (
                 "bash",
-                "-c",
+                "-xc",
                 """test "$(fc-match monospace)" == '{}'""".format(
                     liberation.format("Mono")
                 ),
             ),
             (
                 "bash",
-                "-c",
+                "-xc",
                 """test "$(fc-match sans-serif)" == '{}'""".format(
                     liberation.format("Sans")
                 ),
             ),
             (
                 "bash",
-                "-c",
+                "-xc",
                 """test "$(fc-match serif)" == '{}'""".format(
                     liberation.format("Serif")
                 ),
@@ -318,15 +318,15 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-e", "/usr/sbin/sshd"),
                 ("test", "!", "-e", "/var/lib/apt/lists/lock"),
                 ("busybox", "whoami"),
-                ("bash", "-c", "echo $NODE_PATH"),
+                ("bash", "-xc", "echo $NODE_PATH"),
                 ("node", "-e", "require('test-npm-install')"),
                 ("aloha_world",),
-                ("python", "-c", "import Crypto; print(Crypto.__version__)"),
-                ("sh", "-c", "rst2html.py --version | grep 'Docutils 0.14'"),
+                ("python", "-xc", "import Crypto; print(Crypto.__version__)"),
+                ("sh", "-xc", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # ``requirements.txt`` from addon repos were processed
                 ("python", "-c", "import cfssl"),
                 # Local executable binaries found in $PATH
-                ("sh", "-c", "pip install --user -q flake8 && which flake8"),
+                ("sh", "-xc", "pip install --user -q flake8 && which flake8"),
                 # Addon cleanup works correctly
                 ("test", "!", "-e", "custom/src/private/dummy_addon"),
                 ("test", "!", "-e", "custom/src/dummy_repo/dummy_link"),
@@ -358,7 +358,7 @@ class ScaffoldingCase(unittest.TestCase):
                 # Patched Werkzeug version
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     (
                         'test "$(python -c "import werkzeug; '
                         'print(werkzeug.__version__)")" == 0.14.1'
@@ -383,7 +383,7 @@ class ScaffoldingCase(unittest.TestCase):
                 # 200-pip-without-ext
                 ("test", "-f", "custom/dependencies/200-pip-without-ext"),
                 ("python", "-c", "import Crypto; print(Crypto.__version__)"),
-                ("sh", "-c", "rst2html.py --version | grep 'Docutils 0.14'"),
+                ("sh", "-xc", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # 270-gem.txt
                 ("test", "-f", "custom/dependencies/270-gem.txt"),
                 ("aloha_world",),
@@ -397,23 +397,23 @@ class ScaffoldingCase(unittest.TestCase):
                 uids_dir,
                 sub_env,
                 # verify that odoo user has the given ids
-                ("bash", "-c", 'test "$(id -u)" == "1001"'),
-                ("bash", "-c", 'test "$(id -g)" == "1002"'),
-                ("bash", "-c", 'test "$(id -u -n)" == "odoo"'),
+                ("bash", "-xc", 'test "$(id -u)" == "1001"'),
+                ("bash", "-xc", 'test "$(id -g)" == "1002"'),
+                ("bash", "-xc", 'test "$(id -u -n)" == "odoo"'),
                 # all those directories need to belong to odoo (user or group odoo)
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"',
                 ),
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"',
                 ),
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
                 ),
             )
@@ -425,23 +425,23 @@ class ScaffoldingCase(unittest.TestCase):
                 uids_dir,
                 sub_env,
                 # verify that odoo user has the given ids
-                ("bash", "-c", 'test "$(id -u)" == "1000"'),
-                ("bash", "-c", 'test "$(id -g)" == "1000"'),
-                ("bash", "-c", 'test "$(id -u -n)" == "odoo"'),
+                ("bash", "-xc", 'test "$(id -u)" == "1000"'),
+                ("bash", "-xc", 'test "$(id -g)" == "1000"'),
+                ("bash", "-xc", 'test "$(id -u -n)" == "odoo"'),
                 # all those directories need to belong to odoo (user or group odoo)
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"',
                 ),
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"',
                 ),
                 (
                     "bash",
-                    "-c",
+                    "-xc",
                     'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
                 ),
             )
