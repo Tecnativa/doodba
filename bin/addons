@@ -10,6 +10,7 @@ from subprocess import check_call
 
 from doodbalib import (
     CORE,
+    ENTERPRISE,
     MANIFESTS,
     PRIVATE,
     SRC_DIR,
@@ -43,6 +44,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "-i", "--installable", action="store_true", help="Include only installable addons"
+)
+parser.add_argument(
+    "-n", "--enterprise", action="store_true", help="Use all enterprise addons"
 )
 parser.add_argument(
     "-p", "--private", action="store_true", help="Use all private addons"
@@ -92,10 +96,11 @@ try:
         if addon in without:
             continue
         core_ok = args.core and repo == CORE
-        extra_ok = args.extra and repo not in {CORE, PRIVATE}
+        enterprise_ok = args.enterprise and repo == ENTERPRISE
+        extra_ok = args.extra and repo not in {CORE, ENTERPRISE, PRIVATE}
         private_ok = args.private and repo == PRIVATE
         manual_ok = addon in addons
-        if private_ok or core_ok or extra_ok or manual_ok:
+        if private_ok or core_ok or extra_ok or enterprise_ok or manual_ok:
             addon_path = os.path.join(SRC_DIR, repo, addon)
             manifest = {}
             for manifest_name in MANIFESTS:
