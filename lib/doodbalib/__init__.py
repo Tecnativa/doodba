@@ -36,6 +36,7 @@ LOG_LEVELS = frozenset({"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"})
 FILE_APT_BUILD = os.path.join(CUSTOM_DIR, "dependencies", "apt_build.txt")
 PRIVATE = "private"
 CORE = "odoo/addons"
+ENTERPRISE = "enterprise"
 PRIVATE_DIR = os.path.join(SRC_DIR, PRIVATE)
 CORE_DIR = os.path.join(SRC_DIR, CORE)
 ODOO_DIR = os.path.join(SRC_DIR, "odoo")

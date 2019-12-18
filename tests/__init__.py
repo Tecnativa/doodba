@@ -121,6 +121,12 @@ class ScaffoldingCase(unittest.TestCase):
                     "-xc",
                     'test "$(addons list -dw private_addon -W dummy_addon)" == base,website',
                 ),
+                ("bash", "-xc", 'test "$(addons list -nd)" == base,iap',),
+                (
+                    "bash",
+                    "-xc",
+                    'test "$(addons list --enterprise)" == make_odoo_rich',
+                ),
             )
             self.compose_test(
                 project_dir,
