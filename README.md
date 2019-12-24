@@ -969,11 +969,9 @@ execute an arbitrary command in a running container.
 
 You will need to restart it whenever any Python code changes, so to do that:
 
-    docker-compose restart -t0 odoo
+    docker-compose restart odoo
 
-In production:
-
-    docker-compose restart odoo https
+In development mode odoo restarts by itself thanks to `--dev=reload` option.
 
 ##### Run unit tests for some addon
 
