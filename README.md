@@ -470,7 +470,7 @@ Usage:
 Environment variables are there so that if you need to connect with the
 database, you just need to execute:
 
-    docker exec -it your_container psql
+    docker-compose run -l traefik.enable=false --rm odoo psql
 
 The same is true for any other [Postgres client applications][].
 
