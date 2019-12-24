@@ -751,7 +751,7 @@ Once you fixed everything needed, run it with:
 
 ###### Global inverse proxy
 
-For [production][] and [test][] templates to work fine, you need to have a
+For [production][] and [testing][] templates to work fine, you need to have a
 working [Traefik][] inverse proxy in each node.
 
 To have it, use this `inverseproxy.yaml` file:
