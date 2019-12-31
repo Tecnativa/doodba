@@ -740,7 +740,7 @@ safe:
 - `./.docker/odoo.env` must define `ADMIN_PASSWORD`.
 - `./.docker/db-access.env` must define `PGPASSWORD`.
 - `./.docker/db-creation.env` must define `POSTGRES_PASSWORD` (must be equal to `PGPASSWORD` above).
-- `./.docker/smtp.env` must define `MAIL_RELAY_PASS` (password to access the real SMTP relay).
+- `./.docker/smtp.env` must define `RELAY_PASSWORD` (password to access the real SMTP relay).
 - `./.docker/backup.env` must define `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (obtained from S3 provider) and `PASSPHRASE` (to encrypt backup archives).
 
 ###### Booting production
