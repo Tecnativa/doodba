@@ -424,6 +424,35 @@ class ScaffoldingCase(unittest.TestCase):
                 ),
             )
 
+    def test_uids_mac_os(self):
+        """tests if we can build an image with a custom uid and gid of odoo"""
+        uids_dir = join(SCAFFOLDINGS_DIR, "uids_mac_os")
+        for sub_env in matrix():
+            self.compose_test(
+                uids_dir,
+                sub_env,
+                # verify that odoo user has the given ids
+                ("bash", "-c", 'test "$(id -u)" == "501"'),
+                ("bash", "-c", 'test "$(id -g)" == "20"'),
+                ("bash", "-c", 'test "$(id -u -n)" == "odoo"'),
+                # all those directories need to belong to odoo (user or group odoo/dialout)
+                (
+                    "bash",
+                    "-c",
+                    'test "$(stat -c \'%U:%g\' /var/lib/odoo)" == "odoo:20"',
+                ),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(stat -c \'%U:%g\' /opt/odoo/auto/addons)" == "root:20"',
+                ),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(stat -c \'%U:%g\' /opt/odoo/custom/src)" == "root:20"',
+                ),
+            )
+
     def test_default_uids(self):
         uids_dir = join(SCAFFOLDINGS_DIR, "uids_default")
         for sub_env in matrix():
