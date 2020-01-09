@@ -189,7 +189,7 @@ ONBUILD ARG UID=1000
 ONBUILD ARG GID=1000
 
 # Enable Odoo user and filestore
-ONBUILD RUN groupadd -g $GID odoo \
+ONBUILD RUN groupadd -g $GID odoo -o \
     && useradd -l -md /home/odoo -s /bin/false -u $UID -g $GID odoo \
     && mkdir -p /var/lib/odoo \
     && chown -R odoo:odoo /var/lib/odoo /qa/artifacts\
