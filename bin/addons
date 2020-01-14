@@ -19,6 +19,9 @@ from doodbalib import (
     logger,
 )
 
+# Exit codes
+EXIT_NO_ADDONS = 0x4
+
 # Define CLI options
 parser = ArgumentParser(description="Install addons in current environment")
 parser.add_argument(
@@ -127,7 +130,7 @@ addons -= without
 # Do the required action
 if not addons:
     print("No addons found", file=sys.stderr)
-    sys.exit(2)
+    sys.exit(EXIT_NO_ADDONS)
 addons = args.separator.join(sorted(addons))
 if args.action == "list":
     print(addons)

@@ -2,6 +2,7 @@
   "python.autoComplete.extraPaths": ["./lib", "./tests"],
   "editor.formatOnSaveTimeout": 1000,
   "python.formatting.provider": "black",
+  "python.formatting.blackArgs": [],
   "python.linting.flake8Args": ["--max-line-length=88"],
   "python.linting.flake8Enabled": true,
   "python.linting.pylintEnabled": true,
