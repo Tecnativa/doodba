@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+if [[ -e /etc/GeoIP.conf ]] ; then
+    set -e
+    geoipupdate
+fi

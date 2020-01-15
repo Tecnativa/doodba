@@ -171,6 +171,7 @@ ONBUILD ARG PGPASSWORD=odoopassword
 ONBUILD ARG PGHOST=db
 ONBUILD ARG PGPORT=5432
 ONBUILD ARG PGDATABASE=prod
+
 # Config variables
 ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
             DEFAULT_REPO_PATTERN="$DEFAULT_REPO_PATTERN" \
@@ -195,6 +196,11 @@ ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 # Enable setting custom uids for odoo user during build of scaffolds
 ONBUILD ARG UID=1000
 ONBUILD ARG GID=1000
+
+# Enable installing geoip during build of scaffolds (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
+ONBUILD ARG GEOIP_ACCOUNT_ID=""
+ONBUILD ARG GEOIP_LICENSE_KEY=""
+ONBUILD ARG GEOIP_UPDATER_VERSION="4.1.5"
 
 # Enable Odoo user and filestore
 ONBUILD RUN groupadd -g $GID odoo -o \

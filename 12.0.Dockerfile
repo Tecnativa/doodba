@@ -186,6 +186,11 @@ ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 ONBUILD ARG UID=1000
 ONBUILD ARG GID=1000
 
+# Enable installing geoip during build of scaffolds (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
+ONBUILD ARG GEOIP_ACCOUNT_ID=""
+ONBUILD ARG GEOIP_LICENSE_KEY=""
+ONBUILD ARG GEOIP_UPDATER_VERSION="4.1.5"
+
 # Enable Odoo user and filestore
 ONBUILD RUN groupadd -g $GID odoo -o \
     && useradd -l -md /home/odoo -s /bin/false -u $UID -g $GID odoo \

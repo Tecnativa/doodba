@@ -277,6 +277,11 @@ class ScaffoldingCase(unittest.TestCase):
             ("ssh", "-V"),
             # We are able to dump
             ("pg_dump", "-f/var/lib/odoo/prod.sql", "prod"),
+
+            # Geoip should not be activated
+            ("bash", "-xc", 'test "$(which geoipupdate)" == ""'),
+            ("test", "!", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
+            ("bash", "-xc", "! grep -R 'geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb' /opt/odoo/auto/odoo.conf"),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix(odoo_skip={"7.0", "8.0"}):
@@ -479,6 +484,20 @@ class ScaffoldingCase(unittest.TestCase):
                     "-xc",
                     'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
                 ),
+            )
+
+    def test_geoip(self):
+        geoip_dir = join(SCAFFOLDINGS_DIR, "geoip")
+        for sub_env in matrix():
+            self.compose_test(
+                geoip_dir,
+                sub_env,
+                # verify that geoip update works
+                ("geoipupdate",),
+                # verify that geoip database exists
+                ("test", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
+                # verify that geoip database is configured
+                ("grep", "-R", "geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb", "/opt/odoo/auto/odoo.conf")
             )
 
 
