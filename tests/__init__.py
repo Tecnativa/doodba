@@ -20,7 +20,9 @@ ODOO_VERSIONS = frozenset(
 )
 PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "12").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
-GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get("GEOIP_ACCOUNT_ID", False)
+GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
+    "GEOIP_ACCOUNT_ID", False
+)
 
 # This decorator skips tests that will fail until some branches and/or addons
 # are migrated to the next release. It is used in situations where Doodba is
@@ -490,7 +492,9 @@ class ScaffoldingCase(unittest.TestCase):
                 ),
             )
 
-    @unittest.skipIf(not GEIOP_CREDENTIALS_PROVIDED, "GeoIP credentials missing in environment")
+    @unittest.skipIf(
+        not GEIOP_CREDENTIALS_PROVIDED, "GeoIP credentials missing in environment"
+    )
     def test_geoip(self):
         geoip_dir = join(SCAFFOLDINGS_DIR, "geoip")
         for sub_env in matrix():
