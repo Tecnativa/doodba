@@ -20,7 +20,7 @@ LicenseKey ${GEOIP_LICENSE_KEY}
 # \`EditionIDs\` is from your MaxMind account.
 EditionIDs GeoLite2-City
     " > /etc/GeoIP.conf
-    curl --silent -output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
+    curl --silent -L -output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
     dpkg -i --force-confold geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
     rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
     chown -R root:odoo /usr/share/GeoIP/
