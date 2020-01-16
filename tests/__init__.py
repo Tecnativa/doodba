@@ -277,14 +277,13 @@ class ScaffoldingCase(unittest.TestCase):
             ("ssh", "-V"),
             # We are able to dump
             ("pg_dump", "-f/var/lib/odoo/prod.sql", "prod"),
-
             # Geoip should not be activated
             ("bash", "-xc", 'test "$(which geoipupdate)" == ""'),
             ("test", "!", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
             (
                 "bash",
                 "-xc",
-                "! grep -R 'geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb' /opt/odoo/auto/odoo.conf"
+                "! grep -R 'geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb' /opt/odoo/auto/odoo.conf",
             ),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
@@ -505,8 +504,8 @@ class ScaffoldingCase(unittest.TestCase):
                     "grep",
                     "-R",
                     "geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb",
-                    "/opt/odoo/auto/odoo.conf"
-                )
+                    "/opt/odoo/auto/odoo.conf",
+                ),
             )
 
 
