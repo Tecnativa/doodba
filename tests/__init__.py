@@ -281,7 +281,11 @@ class ScaffoldingCase(unittest.TestCase):
             # Geoip should not be activated
             ("bash", "-xc", 'test "$(which geoipupdate)" == ""'),
             ("test", "!", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
-            ("bash", "-xc", "! grep -R 'geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb' /opt/odoo/auto/odoo.conf"),
+            (
+                "bash",
+                "-xc",
+                "! grep -R 'geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb' /opt/odoo/auto/odoo.conf"
+            ),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix(odoo_skip={"7.0", "8.0"}):
@@ -497,7 +501,12 @@ class ScaffoldingCase(unittest.TestCase):
                 # verify that geoip database exists
                 ("test", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
                 # verify that geoip database is configured
-                ("grep", "-R", "geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb", "/opt/odoo/auto/odoo.conf")
+                (
+                    "grep",
+                    "-R",
+                    "geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb",
+                    "/opt/odoo/auto/odoo.conf"
+                )
             )
 
 

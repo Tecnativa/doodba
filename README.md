@@ -601,6 +601,7 @@ page under your [account](https://www.maxmind.com/en/account) when you create
 the license key.
 
 Example config (docker-compose.yml)
+
 ```
 services:
   odoo:
