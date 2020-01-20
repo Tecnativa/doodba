@@ -743,12 +743,6 @@ safe:
 - `./.docker/smtp.env` must define `RELAY_PASSWORD` (password to access the real SMTP relay).
 - `./.docker/backup.env` must define `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (obtained from S3 provider) and `PASSPHRASE` (to encrypt backup archives).
 
-###### Booting production
-
-Once you fixed everything needed, run it with:
-
-    docker-compose -f prod.yaml up --build --remove-orphans
-
 ###### Global inverse proxy
 
 For [production][] and [testing][] templates to work fine, you need to have a
@@ -843,6 +837,12 @@ This allows you to:
 - Have multiple Odoo instances in each node.
 - Add an SSL layer automatically and for free.
 
+###### Booting production
+
+Once you fixed everything needed and started [global inverse proxy](#global-inverse-proxy), run the production environment with:
+
+    docker-compose -f prod.yaml up --build --remove-orphans
+
 ##### Testing
 
 A good rule of thumb is test in testing before uploading to production, so this
@@ -856,12 +856,11 @@ but _removing possible pollution points_:
 - It is [isolated](#network-isolation).
 
 To use it, you need to [add secrets files just like for production](#adding-secrets), although secrets for smtp and backup containers are not needed because those don't exist here.
+Also, start [global inverse proxy](#global-inverse-proxy) before running the test environment.
 
 Test it in your machine with:
 
     docker-compose -f test.yaml up --build
-
-This environment also needs a [global inverse proxy](#global-inverse-proxy).
 
 ###### Global whitelist
 
