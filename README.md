@@ -750,6 +750,8 @@ working [Traefik][] inverse proxy in each node.
 
 To have it, use this `inverseproxy.yaml` file:
 
+<details><summary>inverseproxy.yaml (traefik 1.6)</summary>
+
 ```yaml
 version: "2.1"
 
@@ -818,6 +820,8 @@ volumes:
   acme:
 ```
 
+</details>
+
 Then boot it up with:
 
     docker-compose -p inverseproxy -f inverseproxy.yaml up -d
@@ -836,6 +840,75 @@ This allows you to:
 - Have multiple domains for each Odoo instance.
 - Have multiple Odoo instances in each node.
 - Add an SSL layer automatically and for free.
+
+Also, there is experimental support for traefik 2, which has more [options](https://docs.traefik.io/middlewares/overview/#available-middlewares) to congifure.
+
+<details><summary>inverseproxy.yaml (traefik 2.1)</summary>
+
+```yaml
+version: "2.1"
+
+services:
+  proxy:
+    image: traefik:2.1
+    networks:
+      shared:
+      private:
+      public:
+    volumes:
+      - acme:/etc/traefik/acme:rw,Z
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - dockersocket
+    restart: unless-stopped
+    privileged: true
+    tty: true
+    command:
+      - --entryPoints.web.address=:80
+      - --entryPoints.web-secured.address=:443
+      - --certificatesResolvers.main-acme.acme.email=your-email@your-domain.org
+      - --certificatesResolvers.main-acme.acme.storage=/etc/traefik/acme/acme.json
+      - --certificatesResolvers.main-acme.acme.httpChallenge.entryPoint=web
+      - --log.level=INFO
+      - --providers.docker
+      - --providers.docker.endpoint=http://dockersocket:2375
+      - --providers.docker.exposedByDefault=false
+
+  dockersocket:
+    image: tecnativa/docker-socket-proxy
+    privileged: true
+    networks:
+      private:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      CONTAINERS: 1
+      NETWORKS: 1
+      SERVICES: 1
+      SWARM: 1
+      TASKS: 1
+    restart: unless-stopped
+
+networks:
+  shared:
+    internal: true
+    driver_opts:
+      encrypted: 1
+
+  private:
+    internal: true
+    driver_opts:
+      encrypted: 1
+
+  public:
+
+volumes:
+  acme:
+```
+
+</details>
 
 ###### Booting production
 
