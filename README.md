@@ -79,6 +79,7 @@ You can start working with this straight away with our [scaffolding][].
         - [Adding secrets](#adding-secrets)
         - [Global inverse proxy](#global-inverse-proxy)
         - [Booting production](#booting-production)
+        - [Backups](#backups)
       - [Testing](#testing)
         - [Global whitelist](#global-whitelist)
     - [Other usage scenarios](#other-usage-scenarios)
@@ -905,6 +906,55 @@ Once you fixed everything needed and started
 [global inverse proxy](#global-inverse-proxy), run the production environment with:
 
     docker-compose -f prod.yaml up --build --remove-orphans
+
+###### Backups
+
+Backups are only available in the production environment. They are provided by
+[tecnativa/duplicity:postgres-s3](https://github.com/Tecnativa/docker-duplicity). The
+structure of the backed up folder:
+
+```
+├── prod.sql
+└── odoo/
+    ├── addons/
+    └── filestore/
+        └── prod/
+            ├── ...
+            └── ...
+```
+
+To make backup immediatly execute following command:
+
+```sh
+# Executes all jobs scheduled for daily run.
+# With default configuration it's equal to making full backup
+docker-compose exec backup /etc/periodic/daily/jobrunner
+```
+
+To restore backup:
+
+```sh
+# stop odoo if it's running
+docker-compose stop odoo
+
+# start backup and db
+docker-compose up -d backup
+
+# switch to some version
+docker-compose exec backup restore --time TIME_IN_BACKUP_NAME --force
+
+# ⚠️ DELETE PRODUCTION database
+#docker-compose backup dropdb
+
+# create new empty database
+docker-compose exec backup createdb
+
+# restore database
+docker-compose exec backup sh -c 'psql -f $SRC/$PGDATABASE.sql'
+
+# start odoo
+docker-compose up -d
+```
 
 ##### Testing
 
