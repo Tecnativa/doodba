@@ -281,7 +281,8 @@ class ScaffoldingCase(unittest.TestCase):
             # We are able to dump
             ("pg_dump", "-f/var/lib/odoo/prod.sql", "prod"),
             # Geoip should not be activated
-            ("bash", "-xc", 'test "$(which geoipupdate)" == ""'),
+            ("bash", "-xc", 'test "$(which geoipupdate)" != ""'),
+            ("bash", "-xc", 'test "$(which geoipupdate)" != ""'),
             ("test", "!", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
             (
                 "bash",

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+set -e
+chown -R root:odoo /usr/share/GeoIP/
+chmod g+w /usr/share/GeoIP/
 if [[ "$GEOIP_ACCOUNT_ID" != "" && "$GEOIP_LICENSE_KEY" != "" ]] ; then
-    set -e
     # see https://dev.maxmind.com/geoip/geoipupdate/
     echo "Activating GeoIP/GeoLite2 updates"
     echo "This product includes GeoLite2 data created by MaxMind, available from https://www.maxmind.com"
@@ -20,11 +22,6 @@ LicenseKey ${GEOIP_LICENSE_KEY}
 # \`EditionIDs\` is from your MaxMind account.
 EditionIDs GeoLite2-City
     " > /etc/GeoIP.conf
-    curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
-    dpkg -i --force-confold geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
-    rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
-    chown -R root:odoo /usr/share/GeoIP/
-    chmod g+w /usr/share/GeoIP/
 
     if [[ ! -e /opt/odoo/common/conf.d/60-geoip.conf ]] ; then
         echo "

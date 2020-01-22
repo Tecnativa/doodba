@@ -102,6 +102,12 @@ RUN python -m venv --system-site-packages /qa/venv \
     && mkdir -p /qa/artifacts \
     && git clone --depth 1 $MQT /qa/mqt
 
+# Install GeoIP updater
+ARG GEOIP_UPDATER_VERSION=4.1.5
+RUN curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && dpkg -i --force-confold geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
+
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
@@ -189,7 +195,6 @@ ONBUILD ARG GID=1000
 # Enable installing geoip during build of scaffolds (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
 ONBUILD ARG GEOIP_ACCOUNT_ID=""
 ONBUILD ARG GEOIP_LICENSE_KEY=""
-ONBUILD ARG GEOIP_UPDATER_VERSION="4.1.5"
 
 # Enable Odoo user and filestore
 ONBUILD RUN groupadd -g $GID odoo -o \
