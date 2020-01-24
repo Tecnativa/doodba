@@ -492,8 +492,10 @@ class ScaffoldingCase(unittest.TestCase):
         not GEIOP_CREDENTIALS_PROVIDED, "GeoIP credentials missing in environment"
     )
     def test_geoip(self):
-        for geoip_dir in [join(SCAFFOLDINGS_DIR, "geoip"),
-                          join(SCAFFOLDINGS_DIR, "geoip_environment")]:
+        for geoip_dir in [
+            join(SCAFFOLDINGS_DIR, "geoip"),
+            join(SCAFFOLDINGS_DIR, "geoip_environment"),
+        ]:
             for sub_env in matrix():
                 self.compose_test(
                     geoip_dir,
@@ -507,8 +509,8 @@ class ScaffoldingCase(unittest.TestCase):
                         "grep",
                         "-R",
                         "geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb",
-                        "/opt/odoo/auto/odoo.conf"
-                    )
+                        "/opt/odoo/auto/odoo.conf",
+                    ),
                 )
 
 
