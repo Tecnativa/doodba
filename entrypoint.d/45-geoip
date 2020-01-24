@@ -9,7 +9,7 @@ if [[ "$GEOIP_ACCOUNT_ID" != "" && "$GEOIP_LICENSE_KEY" != "" ]] ; then
     rm /tmp/GeoIP.conf
 fi
 
-if [[ -e /etc/GeoIP.conf ]] ; then
+if [[ "$(grep 'AccountID' /etc/GeoIP.conf | sed 's/AccountID //')" != "0" ]] ; then
     set -e
     geoipupdate
 fi
