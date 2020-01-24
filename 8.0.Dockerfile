@@ -114,7 +114,7 @@ RUN virtualenv --system-site-packages /qa/venv \
 # Install GeoIP updater
 ARG GEOIP_UPDATER_VERSION=4.1.5
 RUN curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && dpkg -i --force-confold geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
 
 # Execute installation script by Odoo version
@@ -194,9 +194,11 @@ ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 ONBUILD ARG UID=1000
 ONBUILD ARG GID=1000
 
-# Enable installing geoip during build of scaffolds (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
+# Enable configuring geoip during build and with environment of scaffolds (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
 ONBUILD ARG GEOIP_ACCOUNT_ID=""
 ONBUILD ARG GEOIP_LICENSE_KEY=""
+ONBUILD ENV GEOIP_ACCOUNT_ID="$GEOIP_ACCOUNT_ID" \
+            GEOIP_LICENSE_KEY="$GEOIP_LICENSE_KEY"
 
 # Enable Odoo user and filestore
 ONBUILD RUN groupadd -g $GID odoo -o \

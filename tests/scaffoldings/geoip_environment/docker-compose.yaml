@@ -1,0 +1,35 @@
+version: "2.1"
+services:
+  odoo:
+    build:
+      context: ./
+      args:
+        COMPILE: "false"
+        ODOO_VERSION: $ODOO_MINOR
+        PIP_INSTALL_ODOO: "false"
+        WITHOUT_DEMO: "false"
+
+    tty: true
+    depends_on:
+      - db
+    environment:
+      PYTHONOPTIMIZE: ""
+      UNACCENT: "false"
+
+      # This product includes GeoLite2 data created by MaxMind, available from https://www.maxmind.com
+      GEOIP_ACCOUNT_ID: $GEOIP_ACCOUNT_ID
+      GEOIP_LICENSE_KEY: $GEOIP_LICENSE_KEY
+    volumes:
+      - filestore:/var/lib/odoo:z
+
+  db:
+    image: postgres:${DB_VERSION}-alpine
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoopassword
+    volumes:
+      - db:/var/lib/postgresql/data:z
+
+volumes:
+  db:
+  filestore:
