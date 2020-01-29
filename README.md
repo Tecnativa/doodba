@@ -950,6 +950,8 @@ because it will let you save lots of processing power and IP addresses.
 
 The recommended `globalwhitelist/docker-compose.yaml` file should contain:
 
+<details><summary>globalwhitelist/docker-compose.yaml</summary>
+
 ```yaml
 version: "2.1"
 
@@ -1023,6 +1025,8 @@ services:
       TARGET: "www.gravatar.com"
       PRE_RESOLVE: 1
 ```
+
+</details>
 
 #### Other usage scenarios
 
