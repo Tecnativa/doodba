@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+# enable odoo user to change config and download database updates
+chown -R root:odoo /usr/share/GeoIP/ /etc/GeoIP.conf
+chmod g+w /usr/share/GeoIP/ /etc/GeoIP.conf
