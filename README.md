@@ -614,7 +614,9 @@ services:
 
 When building you should see a message `Activating GeoIP/GeoLite2 updates`.
 
-Upon (re)start the container will perform the updates as requested by the [eula](https://www.maxmind.com/en/geolite2/eula). You also can update the database by calling `geoipupdate` inside the running container.
+Upon (re)start the container will perform the updates as requested by the
+[eula](https://www.maxmind.com/en/geolite2/eula). You also can update the database by
+calling `geoipupdate` inside the running container.
 
 ## Scaffolding
 
