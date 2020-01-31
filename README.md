@@ -589,16 +589,15 @@ Note that version 9.0 has an `odoo` binary to provide forward compatibility
 
 ### GeoLite2
 
-To enable geoip support for Odoo you need to signup for a Maxmind account for
-GeoLite2: https://www.maxmind.com/en/geolite2/signup
+To enable geoip support for Odoo you need to signup for a Maxmind account for GeoLite2:
+https://www.maxmind.com/en/geolite2/signup
 
-Create a license key in your maxmind account and provide your account id and
-license key on build to the scaffolding.
+Create a license key in your maxmind account and provide your account id and license key
+on build to the scaffolding.
 
 The `GEOIP_ACCOUNT_ID` environment variable should hold the account id and
-`GEOIP_LICENSE_KEY` the license key. Both are visible on the "My License Key"
-page under your [account](https://www.maxmind.com/en/account) when you create
-the license key.
+`GEOIP_LICENSE_KEY` the license key. Both are visible on the "My License Key" page under
+your [account](https://www.maxmind.com/en/account) when you create the license key.
 
 Example config (docker-compose.yml)
 
