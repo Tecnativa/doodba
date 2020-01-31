@@ -7,17 +7,15 @@
 
 [![](https://api.travis-ci.org/Tecnativa/doodba.svg)](https://travis-ci.org/Tecnativa/doodba)
 
-**Doodba** stands for **Do**cker **Od**oo **Ba**se, and it is a
-highly opinionated image ready to put [Odoo](https://www.odoo.com) inside it,
-but **without Odoo**.
+**Doodba** stands for **Do**cker **Od**oo **Ba**se, and it is a highly opinionated image
+ready to put [Odoo](https://www.odoo.com) inside it, but **without Odoo**.
 
 ## What?
 
-Yes, the purpose of this is to serve as a base for you to build your own Odoo
-project, because most of them end up requiring a big amount of custom patches,
-merges, repositories, etc. With this image, you have a collection of good
-practices and tools to enable your team to have a standard Odoo project
-structure.
+Yes, the purpose of this is to serve as a base for you to build your own Odoo project,
+because most of them end up requiring a big amount of custom patches, merges,
+repositories, etc. With this image, you have a collection of good practices and tools to
+enable your team to have a standard Odoo project structure.
 
 BTW, we use [Debian][]. I hope you like that.
 
@@ -25,12 +23,12 @@ BTW, we use [Debian][]. I hope you like that.
 
 ## Why?
 
-Because developing Odoo is hard. You need lots of customizations, dependencies,
-and if you want to move from one version to another, it's a pain.
+Because developing Odoo is hard. You need lots of customizations, dependencies, and if
+you want to move from one version to another, it's a pain.
 
-Also because nobody wants Odoo as it comes from upstream, you most likely will
-need to add custom patches and addons, at least, so we need a way to put all
-together and make it work anywhere quickly.
+Also because nobody wants Odoo as it comes from upstream, you most likely will need to
+add custom patches and addons, at least, so we need a way to put all together and make
+it work anywhere quickly.
 
 ## How?
 
@@ -38,8 +36,8 @@ You can start working with this straight away with our [scaffolding][].
 
 ## Image usage
 
-Basically, every directory you have to worry about is found inside `/opt/odoo`.
-This is its structure:
+Basically, every directory you have to worry about is found inside `/opt/odoo`. This is
+its structure:
 
     custom/
         entrypoint.d/
@@ -79,15 +77,15 @@ Here you will put everything related to your project.
 
 #### `/opt/odoo/custom/entrypoint.d`
 
-Any executables found here will be run when you launch your container, before
-running the command you ask.
+Any executables found here will be run when you launch your container, before running
+the command you ask.
 
 #### `/opt/odoo/custom/build.d`
 
 Executables here will be aggregated with those in `/opt/odoo/common/build.d`.
 
-The resulting set of executables will then be sorted alphabetically (ascending)
-and then subsequently run.
+The resulting set of executables will then be sorted alphabetically (ascending) and then
+subsequently run.
 
 #### `/opt/odoo/custom/conf.d`
 
@@ -96,42 +94,40 @@ Files here will be environment-variable-expanded and concatenated in
 
 #### `/opt/odoo/custom/ssh`
 
-It must follow the same structure as a standard `~/.ssh` directory, including
-`config` and `known_hosts` files. In fact, it is completely equivalent to
-`~root/.ssh`.
+It must follow the same structure as a standard `~/.ssh` directory, including `config`
+and `known_hosts` files. In fact, it is completely equivalent to `~root/.ssh`.
 
-The `config` file can contain `IdentityFile` keys to represent the private
-key that should be used for that host. Unless specified otherwise, this
-defaults to `identity[.pub]`, `id_rsa[.pub]` or `id_dsa[.pub]` files found in
-this same directory.
+The `config` file can contain `IdentityFile` keys to represent the private key that
+should be used for that host. Unless specified otherwise, this defaults to
+`identity[.pub]`, `id_rsa[.pub]` or `id_dsa[.pub]` files found in this same directory.
 
-This is very useful **to use deployment keys** that grant git access to your
-private repositories.
+This is very useful **to use deployment keys** that grant git access to your private
+repositories.
 
-Example - a private key file in the `ssh` folder named `my_private_key` for
-the host `repo.example.com` would have a `config` entry similar to the below:
+Example - a private key file in the `ssh` folder named `my_private_key` for the host
+`repo.example.com` would have a `config` entry similar to the below:
 
 ```
 Host repo.example.com
   IdentityFile ~/.ssh/my_private_key
 ```
 
-Or you could just drop the key in `id_rsa` and `id_rsa.pub` files and it should
-work by default without the need of adding a `config` file.
+Or you could just drop the key in `id_rsa` and `id_rsa.pub` files and it should work by
+default without the need of adding a `config` file.
 
-Host key checking is enabled by default, which means that you also need to
-provide a `known_hosts` file for any repos that you wish to access via SSH.
+Host key checking is enabled by default, which means that you also need to provide a
+`known_hosts` file for any repos that you wish to access via SSH.
 
-In order to disable host key checks for a repo, your config would look something
-like this:
+In order to disable host key checks for a repo, your config would look something like
+this:
 
 ```
 Host repo.example.com
   StrictHostKeyChecking no
 ```
 
-For additional information regarding this directory, take a look at this
-[Digital Ocean Article][ssh-conf].
+For additional information regarding this directory, take a look at this [Digital Ocean
+Article][ssh-conf].
 
 #### `/opt/odoo/custom/src`
 
@@ -142,9 +138,9 @@ When putting code here, you can either:
 - Use [`repos.yaml`][], that will fill anything at build time.
 - Directly copy all there.
 
-Recommendation: use [`repos.yaml`][] for everything except for [`private`][],
-and ignore in your `.gitignore` and `.dockerignore` files every folder here
-except [`private`][], with rules like these:
+Recommendation: use [`repos.yaml`][] for everything except for [`private`][], and ignore
+in your `.gitignore` and `.dockerignore` files every folder here except [`private`][],
+with rules like these:
 
     odoo/custom/src/*
     !odoo/custom/src/private
@@ -159,11 +155,11 @@ You can choose your Odoo version, and even merge PRs from many of them using
 
 - [Original Odoo][], by [Odoo S.A.][].
 
-- [OCB][] (Odoo Community Backports), by [OCA][].
-  The original + some features - some stability strictness.
+- [OCB][] (Odoo Community Backports), by [OCA][]. The original + some features - some
+  stability strictness.
 
-- [OpenUpgrade][], by [OCA][].
-  The original, frozen at new version launch time + migration scripts.
+- [OpenUpgrade][], by [OCA][]. The original, frozen at new version launch time +
+  migration scripts.
 
 ##### `/opt/odoo/custom/src/private`
 
@@ -209,21 +205,19 @@ web:
 
 ###### Automatic download of repos
 
-Doodba is smart enough to download automatically git repositories even if they
-are missing in `repos.yaml`. It will happen if it is used in [`addons.yaml`][],
-except for the special [`private`][] repo. This will help you keep your
-deployment definitions DRY.
+Doodba is smart enough to download automatically git repositories even if they are
+missing in `repos.yaml`. It will happen if it is used in [`addons.yaml`][], except for
+the special [`private`][] repo. This will help you keep your deployment definitions DRY.
 
-You can configure this behavior with these environment variables (default
-values shown):
+You can configure this behavior with these environment variables (default values shown):
 
 - `DEFAULT_REPO_PATTERN="https://github.com/OCA/{}.git"`
 - `DEFAULT_REPO_PATTERN_ODOO="https://github.com/OCA/OCB.git"`
 
-As you probably guessed, we use something like `str.format(repo_basename)`
-on top of those variables to compute the default remote origin. If, i.e.,
-you want to use your own repositories as default remotes, just add these
-build arguments to your `docker-compose.yaml` file:
+As you probably guessed, we use something like `str.format(repo_basename)` on top of
+those variables to compute the default remote origin. If, i.e., you want to use your own
+repositories as default remotes, just add these build arguments to your
+`docker-compose.yaml` file:
 
 ```yaml
 # [...]
@@ -236,16 +230,16 @@ services:
 # [...]
 ```
 
-So, for example, if your [`repos.yaml`][] file is empty and
-your [`addons.yaml`][] contains this:
+So, for example, if your [`repos.yaml`][] file is empty and your [`addons.yaml`][]
+contains this:
 
 ```yaml
 server-tools:
   - module_auto_update
 ```
 
-A `/opt/odoo/auto/repos.yaml` file with this will be generated and used to
-download git code:
+A `/opt/odoo/auto/repos.yaml` file with this will be generated and used to download git
+code:
 
 ```yaml
 /opt/odoo/custom/src/odoo:
@@ -266,8 +260,8 @@ download git code:
     - origin $ODOO_VERSION
 ```
 
-All of this means that, you only need to define the git aggregator
-spec in [`repos.yaml`][] if anything diverges from the standard:
+All of this means that, you only need to define the git aggregator spec in
+[`repos.yaml`][] if anything diverges from the standard:
 
 - You need special merges.
 - You need a special origin.
@@ -289,30 +283,29 @@ web:
 
 Advanced features:
 
-- You can bundle [several YAML documents][] if you want to logically group your
-  addons and some repos are repeated among groups, by separating each document
-  with `---`.
+- You can bundle [several YAML documents][] if you want to logically group your addons
+  and some repos are repeated among groups, by separating each document with `---`.
 
-- Addons under `private` and `odoo/addons` are linked automatically unless you
-  specify them.
+- Addons under `private` and `odoo/addons` are linked automatically unless you specify
+  them.
 
-- You can use `ONLY` to supply a dictionary of environment variables and a
-  list of possible values to enable that document in the matching environments.
+- You can use `ONLY` to supply a dictionary of environment variables and a list of
+  possible values to enable that document in the matching environments.
 
-- You can use `ENV` to supply a dictionary of environment variables to be used
-  on downloading repositories. Following variables are supported:
+- You can use `ENV` to supply a dictionary of environment variables to be used on
+  downloading repositories. Following variables are supported:
 
   - `DEFAULT_REPO_PATTERN`
   - `DEFAULT_REPO_PATTERN_ODOO`
   - `DEPTH_DEFAULT`
   - `ODOO_VERSION` - can be used as repository branch
 
-- If an addon is found in several places at the same time, it will get linked
-  according to this priority table:
+- If an addon is found in several places at the same time, it will get linked according
+  to this priority table:
 
   1. Addons in [`private`][].
-  2. Addons in other repositories (in case one is matched in several, it will
-     be random, BEWARE!). Better have no duplicated names if possible.
+  2. Addons in other repositories (in case one is matched in several, it will be random,
+     BEWARE!). Better have no duplicated names if possible.
   3. Core Odoo addons from [`odoo/addons`][`odoo`].
 
 - If an addon is specified but not available at runtime, it will fail silently.
@@ -364,26 +357,24 @@ some-repo: # Cloned from https://github.com/Tecnativa/some-repo.git branch 13.0-
 
 ##### `/opt/odoo/custom/dependencies/*.txt`
 
-Files to indicate dependencies of your subimage, one for each of the supported
-package managers:
+Files to indicate dependencies of your subimage, one for each of the supported package
+managers:
 
-- `apt_build.txt`: build-time dependencies, installed before any others and
-  removed after all the others too. Usually these would include Debian packages
-  such as `build-essential` or `python-dev`. From Doodba 11.0, this is most
-  likely not needed, as build dependencies are shipped with the image, and
-  local python develpment headers should be used instead of those downloaded
-  from apt.
+- `apt_build.txt`: build-time dependencies, installed before any others and removed
+  after all the others too. Usually these would include Debian packages such as
+  `build-essential` or `python-dev`. From Doodba 11.0, this is most likely not needed,
+  as build dependencies are shipped with the image, and local python develpment headers
+  should be used instead of those downloaded from apt.
 - `apt.txt`: run-time dependencies installed by apt.
 - `gem.txt`: run-time dependencies installed by gem.
 - `npm.txt`: run-time dependencies installed by npm.
-- `pip.txt`: a normal [pip `requirements.txt`][] file, for run-time
-  dependencies too. It will get executed with `--update` flag, just in case
-  you want to overwrite any of the pre-bundled dependencies.
+- `pip.txt`: a normal [pip `requirements.txt`][] file, for run-time dependencies too. It
+  will get executed with `--update` flag, just in case you want to overwrite any of the
+  pre-bundled dependencies.
 
 ### `/opt/odoo/common`: The useful one
 
-This folder is full of magic. I'll document it some day. For now, just look at
-the code.
+This folder is full of magic. I'll document it some day. For now, just look at the code.
 
 Only some notes:
 
@@ -407,68 +398,64 @@ It will have the result of merging all configurations under
 
 ## The `Dockerfile`
 
-I will document all build arguments and environment variables some day, but for
-now keep this in mind:
+I will document all build arguments and environment variables some day, but for now keep
+this in mind:
 
-- This is just a base image, full of tools. **You need to build your project
-  subimage** from this one, even if your project's `Dockerfile` only contains
-  these 2 lines:
+- This is just a base image, full of tools. **You need to build your project subimage**
+  from this one, even if your project's `Dockerfile` only contains these 2 lines:
 
       FROM tecnativa/doodba
       MAINTAINER Me <me@example.com>
 
-- The above sentence becomes true because we have a lot of `ONBUILD` sentences
-  here, so at least **your project must have a `./custom` folder** along with
-  its `Dockerfile` for it to work.
+- The above sentence becomes true because we have a lot of `ONBUILD` sentences here, so
+  at least **your project must have a `./custom` folder** along with its `Dockerfile`
+  for it to work.
 
-- All should be magic if you adhere to our opinions here. Just put the code
-  where it should go, and relax.
+- All should be magic if you adhere to our opinions here. Just put the code where it
+  should go, and relax.
 
 ## Bundled tools
 
-There is a good collections of tools available in the image that help dealing
-with Odoo and its peculiarities:
+There is a good collections of tools available in the image that help dealing with Odoo
+and its peculiarities:
 
 ### `addons`
 
-A handy CLI tool to automate addon management based on the current environment.
-It allows you to install, update, test and/or list private, extra and/or core
-addons available to current container, based on current [`addons.yaml`][]
-configuration.
+A handy CLI tool to automate addon management based on the current environment. It
+allows you to install, update, test and/or list private, extra and/or core addons
+available to current container, based on current [`addons.yaml`][] configuration.
 
 Call `addons --help` for usage instructions.
 
 ### `click-odoo` and related scripts
 
-The great [`click-odoo`][] scripting framework and the collection of scripts
-found in [`click-odoo-contrib`][] are included. Refer to their sites to know
-how to use them.
+The great [`click-odoo`][] scripting framework and the collection of scripts found in
+[`click-odoo-contrib`][] are included. Refer to their sites to know how to use them.
 
 \* Note: This replaces the deprecated `python-odoo-shell` binary.
 
 ### [`nano`][]
 
-The CLI text editor we all know, just in case you need to inspect some bug in
-hot deployments.
+The CLI text editor we all know, just in case you need to inspect some bug in hot
+deployments.
 
 ### `log`
 
-Just a little shell script that you can use to add logs to your build or
-entrypoint scripts:
+Just a little shell script that you can use to add logs to your build or entrypoint
+scripts:
 
     log INFO I'm informing
 
 ### `pot`
 
-Little shell shortcut for exporting a translation template from any addon(s).
-Usage:
+Little shell shortcut for exporting a translation template from any addon(s). Usage:
 
     pot my_addon,my_other_addon
 
 ### [`psql`](https://www.postgresql.org/docs/current/app-psql.html)
 
-Environment variables are there so that if you need to connect with the
-database, you just need to execute:
+Environment variables are there so that if you need to connect with the database, you
+just need to execute:
 
     docker-compose run -l traefik.enable=false --rm odoo psql
 
@@ -476,8 +463,8 @@ The same is true for any other [Postgres client applications][].
 
 ### [`ptvsd`](https://github.com/DonJayamanne/pythonVSCode)
 
-[VSCode][] debugger. If you use this editor with its python module, you will
-find it useful.
+[VSCode][] debugger. If you use this editor with its python module, you will find it
+useful.
 
 To debug at a certain point of the code, add this Python code somewhere:
 
@@ -488,9 +475,8 @@ print("ptvsd waiting...")
 ptvsd.wait_for_attach()
 ```
 
-To start Odoo within a ptvsd environment, which will obey the breakpoints
-established in your IDE (but will work slowly), just add `-e PTVSD_ENABLE=1`
-to your odoo container.
+To start Odoo within a ptvsd environment, which will obey the breakpoints established in
+your IDE (but will work slowly), just add `-e PTVSD_ENABLE=1` to your odoo container.
 
 If you use the official [scaffolding][], you can boot it in ptvsd mode with:
 
@@ -499,9 +485,8 @@ export DOODBA_PTVSD_ENABLE=1
 docker-compose -f devel.yaml up -d
 ```
 
-Of course, you need to have properly configured your [VSCode][]. To do so, make
-sure in your project there is a `.vscode/launch.json` file with these minimal
-contents:
+Of course, you need to have properly configured your [VSCode][]. To do so, make sure in
+your project there is a `.vscode/launch.json` file with these minimal contents:
 
 ```json
 {
@@ -528,8 +513,8 @@ Then, execute that configuration as usual.
 
 ### [`pudb`](https://github.com/inducer/pudb)
 
-This is another great debugger that includes remote debugging via telnet, which
-can be useful for some cases, or for people that prefer it over [wdb](#wdb).
+This is another great debugger that includes remote debugging via telnet, which can be
+useful for some cases, or for people that prefer it over [wdb](#wdb).
 
 To use it, inject this in any Python script:
 
@@ -540,21 +525,20 @@ pudb.remote.set_trace(term_size=(80, 24))
 
 Then open a telnet connection to it (running in `0.0.0.0:6899` by default).
 
-It is safe to use in [production][] environments **if you know what you are
-doing and do not expose the debugging port to attackers**. Usage:
+It is safe to use in [production][] environments **if you know what you are doing and do
+not expose the debugging port to attackers**. Usage:
 
     docker-compose exec odoo telnet localhost 6899
 
 ### [`git-aggregator`](https://pypi.python.org/pypi/git-aggregator)
 
-We found this one to be the most useful tool for downlading code, merging it
-and placing it somewhere.
+We found this one to be the most useful tool for downlading code, merging it and placing
+it somewhere.
 
 ### `autoaggregate`
 
-This little script wraps `git-aggregator` to make it work fine and
-automatically with this image. Used in the [scaffolding][]'s `setup-devel.yaml`
-step.
+This little script wraps `git-aggregator` to make it work fine and automatically with
+this image. Used in the [scaffolding][]'s `setup-devel.yaml` step.
 
 #### Example [`repos.yaml`][] file
 
@@ -580,12 +564,12 @@ This example merges [several sources][`odoo`]:
 
 ### [`odoo`](https://www.odoo.com/documentation/10.0/reference/cmdline.html)
 
-We set an `$OPENERP_SERVER` environment variable pointing to [the autogenerated
-configuration file](#optodooautoodooconf) so you don't have to worry about
-it. Just execute `odoo` and it will work fine.
+We set an `$OPENERP_SERVER` environment variable pointing to
+[the autogenerated configuration file](#optodooautoodooconf) so you don't have to worry
+about it. Just execute `odoo` and it will work fine.
 
-Note that version 9.0 has an `odoo` binary to provide forward compatibility
-(but it has the `odoo.py` one too).
+Note that version 9.0 has an `odoo` binary to provide forward compatibility (but it has
+the `odoo.py` one too).
 
 ## Scaffolding
 
@@ -594,12 +578,11 @@ Get up and running quickly with the provided
 
 ### Skip the boring parts
 
-You will need these tools, so install them locally (and learn how to use them,
-check their docs, Doodba is not the place to learn them 😉):
+You will need these tools, so install them locally (and learn how to use them, check
+their docs, Doodba is not the place to learn them 😉):
 
 - [Git](https://git-scm.com/do)
-- [Docker Engine](https://www.docker.com/products/docker-engine)
-  (running locally)
+- [Docker Engine](https://www.docker.com/products/docker-engine) (running locally)
 - [Docker Compose](https://docs.docker.com/compose/overview/)
 
 Then run these Bash commands:
@@ -615,8 +598,8 @@ docker-compose -f setup-devel.yaml run --rm odoo
 docker-compose up
 ```
 
-And if you don't want to have a chance to do a `git pull` and get possible
-future scaffolding updates merged in your project's `git log`:
+And if you don't want to have a chance to do a `git pull` and get possible future
+scaffolding updates merged in your project's `git log`:
 
 ```bash
 rm -Rf .git
@@ -625,19 +608,19 @@ git init
 
 ### Tell me the boring parts
 
-The scaffolding provides you a boilerplate-ready project to start developing
-Odoo in no time.
+The scaffolding provides you a boilerplate-ready project to start developing Odoo in no
+time.
 
 #### Environments
 
-This scaffolding comes with some environment configurations, ready for you to
-extend them. Each of them is a [Docker Compose
-file](https://docs.docker.com/compose/compose-file/) almost ready to work out
-of the box (or almost), but that will assume that you understand it and will
+This scaffolding comes with some environment configurations, ready for you to extend
+them. Each of them is a
+[Docker Compose file](https://docs.docker.com/compose/compose-file/) almost ready to
+work out of the box (or almost), but that will assume that you understand it and will
 modify it.
 
-After you clone the scaffolding, **search for `XXX` comments**, they will help
-you on making it work.
+After you clone the scaffolding, **search for `XXX` comments**, they will help you on
+making it work.
 
 ##### Development
 
@@ -650,22 +633,21 @@ Once finished, you can start using Odoo with:
 
     docker-compose -f devel.yaml up --build
 
-This allows you to track only what Git needs to track and provides faster
-Docker builds.
+This allows you to track only what Git needs to track and provides faster Docker builds.
 
 You might consider adding this line to your `~/.bashrc`:
 
     export UID GID="$(id -g $USER)" UMASK="$(umask)"
 
-To browse Odoo go to `http://localhost:${ODOO_MAJOR}069`
-(i.e. for Odoo 11.0 this would be `http://localhost:11069`).
+To browse Odoo go to `http://localhost:${ODOO_MAJOR}069` (i.e. for Odoo 11.0 this would
+be `http://localhost:11069`).
 
 This environment has several special features:
 
 ###### [`wdb`](https://github.com/Kozea/wdb/)
 
-This is one of the greatest Python debugger available, and even more for
-Docker-based development, so here you have it preinstalled.
+This is one of the greatest Python debugger available, and even more for Docker-based
+development, so here you have it preinstalled.
 
 I told you, this image is opinionated. :wink:
 
@@ -676,23 +658,23 @@ import wdb
 wdb.set_trace()
 ```
 
-It's available by default on the [development][] environment,
-where you can browse http://localhost:1984 to use it.
+It's available by default on the [development][] environment, where you can browse
+http://localhost:1984 to use it.
 
 **DO NOT USE IT IN PRODUCTION ENVIRONMENTS.** (I had to say it).
 
 ###### [MailHog](https://github.com/mailhog/MailHog)
 
-It provides a fake SMTP server that intercepts all mail sent by Odoo and
-displays a simple interface that lets you see and debug all that mail
-comfortably, including headers sent, attachments, etc.
+It provides a fake SMTP server that intercepts all mail sent by Odoo and displays a
+simple interface that lets you see and debug all that mail comfortably, including
+headers sent, attachments, etc.
 
 - For [development][], it's in http://localhost:8025
 - For [testing][], it's in http://$DOMAIN_TEST/smtpfake/
 - For [production][], it's not used.
 
-All environments are configured by default to use the bundled SMTP relay.
-They are configured by these environment variables:
+All environments are configured by default to use the bundled SMTP relay. They are
+configured by these environment variables:
 
 - `SMTP_SERVER`
 - `SMTP_PORT`
@@ -701,22 +683,20 @@ They are configured by these environment variables:
 - `SMTP_SSL`
 - `EMAIL_FROM`
 
-For them to be useful, you need to remove any `ir.mail_server` records in your
-database.
+For them to be useful, you need to remove any `ir.mail_server` records in your database.
 
 ###### Network isolation
 
-The Docker network is in `--internal` mode, which means that it has
-no access to the Internet. This feature protects you in cases where
-a [production][] database is restored and Odoo tries to connect to
-SMTP/IMAP/POP3 servers to send or receive emails. Also when you are
-using [connectors](https://github.com/OCA/connector),
-[mail trackers](https://www.odoo.com/apps/modules/browse?search=mail_tracking)
-or any API sync/calls.
+The Docker network is in `--internal` mode, which means that it has no access to the
+Internet. This feature protects you in cases where a [production][] database is restored
+and Odoo tries to connect to SMTP/IMAP/POP3 servers to send or receive emails. Also when
+you are using [connectors](https://github.com/OCA/connector),
+[mail trackers](https://www.odoo.com/apps/modules/browse?search=mail_tracking) or any
+API sync/calls.
 
-If you still need to have public access, set `internal: false` in the
-environment file, detach all containers from that network, remove the network,
-reatach all containers to it, and possibly restart them. You can also just do:
+If you still need to have public access, set `internal: false` in the environment file,
+detach all containers from that network, remove the network, reatach all containers to
+it, and possibly restart them. You can also just do:
 
     docker-compose down
     docker-compose up -d
@@ -726,27 +706,29 @@ Usually a better option is
 
 ##### Production
 
-This environment is just a template. **It is not production-ready**. You must
-change many things inside it, it's just a guideline.
+This environment is just a template. **It is not production-ready**. You must change
+many things inside it, it's just a guideline.
 
 It includes pluggable `smtp` and `backup` services.
 
 ###### Adding secrets
 
-Before booting this environment, you need to create a few files, which are
-excluded in Git and contain some secrets, needed to make this environment
-safe:
+Before booting this environment, you need to create a few files, which are excluded in
+Git and contain some secrets, needed to make this environment safe:
 
 - `./.docker/odoo.env` must define `ADMIN_PASSWORD`.
 - `./.docker/db-access.env` must define `PGPASSWORD`.
-- `./.docker/db-creation.env` must define `POSTGRES_PASSWORD` (must be equal to `PGPASSWORD` above).
-- `./.docker/smtp.env` must define `RELAY_PASSWORD` (password to access the real SMTP relay).
-- `./.docker/backup.env` must define `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (obtained from S3 provider) and `PASSPHRASE` (to encrypt backup archives).
+- `./.docker/db-creation.env` must define `POSTGRES_PASSWORD` (must be equal to
+  `PGPASSWORD` above).
+- `./.docker/smtp.env` must define `RELAY_PASSWORD` (password to access the real SMTP
+  relay).
+- `./.docker/backup.env` must define `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
+  (obtained from S3 provider) and `PASSPHRASE` (to encrypt backup archives).
 
 ###### Global inverse proxy
 
-For [production][] and [testing][] templates to work fine, you need to have a
-working [Traefik][] inverse proxy in each node.
+For [production][] and [testing][] templates to work fine, you need to have a working
+[Traefik][] inverse proxy in each node.
 
 To have it, use this `inverseproxy.yaml` file:
 
@@ -822,14 +804,13 @@ Then boot it up with:
 
     docker-compose -p inverseproxy -f inverseproxy.yaml up -d
 
-This will intercept all requests coming from port 80 (`http`) and redirect them
-to port 443 (`https`), it will download and install required SSL certificates
-from [Let's Encrypt][] whenever you boot a new [production][] instance, add the
-required proxy headers to the request, and then redirect all traffic to/from
-odoo automatically.
+This will intercept all requests coming from port 80 (`http`) and redirect them to port
+443 (`https`), it will download and install required SSL certificates from [Let's
+Encrypt][] whenever you boot a new [production][] instance, add the required proxy
+headers to the request, and then redirect all traffic to/from odoo automatically.
 
-It includes [a security-enhaced proxy][docker-socket-proxy] to reduce attack
-surface when listening to the Docker socket.
+It includes [a security-enhaced proxy][docker-socket-proxy] to reduce attack surface
+when listening to the Docker socket.
 
 This allows you to:
 
@@ -839,15 +820,16 @@ This allows you to:
 
 ###### Booting production
 
-Once you fixed everything needed and started [global inverse proxy](#global-inverse-proxy), run the production environment with:
+Once you fixed everything needed and started
+[global inverse proxy](#global-inverse-proxy), run the production environment with:
 
     docker-compose -f prod.yaml up --build --remove-orphans
 
 ##### Testing
 
 A good rule of thumb is test in testing before uploading to production, so this
-environment tries to imitate the [production][] one in everything,
-but _removing possible pollution points_:
+environment tries to imitate the [production][] one in everything, but _removing
+possible pollution points_:
 
 - It has a fake `smtp` service based on [MailHog][].
 
@@ -855,8 +837,10 @@ but _removing possible pollution points_:
 
 - It is [isolated](#network-isolation).
 
-To use it, you need to [add secrets files just like for production](#adding-secrets), although secrets for smtp and backup containers are not needed because those don't exist here.
-Also, start [global inverse proxy](#global-inverse-proxy) before running the test environment.
+To use it, you need to [add secrets files just like for production](#adding-secrets),
+although secrets for smtp and backup containers are not needed because those don't exist
+here. Also, start [global inverse proxy](#global-inverse-proxy) before running the test
+environment.
 
 Test it in your machine with:
 
@@ -864,16 +848,16 @@ Test it in your machine with:
 
 ###### Global whitelist
 
-Since the testing environment is [network-isolated](#network-isolation),
-this can change some deadlocks or big timeouts in code chunks that are not
-ready for such situation. Odoo happens to have some of them.
+Since the testing environment is [network-isolated](#network-isolation), this can change
+some deadlocks or big timeouts in code chunks that are not ready for such situation.
+Odoo happens to have some of them.
 
-The [development][] environment includes the default recommended whitelist
-proxies, but for [testing][], it is recommended to have a separate docker
-compose project running along in the same server that provides a
-`globalwhitelist_default` network where all whitelist proxies exist. This is
-a better practice for a testing environment where many services might coexist,
-because it will let you save lots of processing power and IP addresses.
+The [development][] environment includes the default recommended whitelist proxies, but
+for [testing][], it is recommended to have a separate docker compose project running
+along in the same server that provides a `globalwhitelist_default` network where all
+whitelist proxies exist. This is a better practice for a testing environment where many
+services might coexist, because it will let you save lots of processing power and IP
+addresses.
 
 The recommended `globalwhitelist/docker-compose.yaml` file should contain:
 
@@ -953,12 +937,12 @@ services:
 
 #### Other usage scenarios
 
-In examples below I will skip the `-f <environment>.yaml` part and assume you
-know which environment you want to use.
+In examples below I will skip the `-f <environment>.yaml` part and assume you know which
+environment you want to use.
 
-Also, we recommend to use `run` subcommand to create a new container with same
-settings and volumes. Sometimes you may prefer to use `exec` instead, to
-execute an arbitrary command in a running container.
+Also, we recommend to use `run` subcommand to create a new container with same settings
+and volumes. Sometimes you may prefer to use `exec` instead, to execute an arbitrary
+command in a running container.
 
 ##### Inspect the database
 
@@ -1015,8 +999,8 @@ docker-compose run --rm odoo click-odoo-update --watcher-max-seconds 30
 This script is part of [`click-odoo-contrib`][]; check it for more details.
 
 \* Note: `--watcher-max-seconds` is available because we ship a
-[patched](https://github.com/acsone/click-odoo-contrib/pull/38)
-version. Check that PR for docs.
+[patched](https://github.com/acsone/click-odoo-contrib/pull/38) version. Check that PR
+for docs.
 
 \* Note: This replaces the old deprecated `autoupdate` script.
 
@@ -1040,25 +1024,25 @@ Then open `http://localhost:$SomeFreePort`.
 
 ### Will there be not retrocompatible changes on the image?
 
-This image is production-ready, but it is constantly evolving too, so some new
-features can break some old ones, or conflict with them, and some old features
-might get deprecated and removed at some point.
+This image is production-ready, but it is constantly evolving too, so some new features
+can break some old ones, or conflict with them, and some old features might get
+deprecated and removed at some point.
 
-The best you can do is to [subscribe to the compatibility breakage
-announcements issue][retrobreak].
+The best you can do is to [subscribe to the compatibility breakage announcements
+issue][retrobreak].
 
 ### How to have good QA and test in my CI with Doodba?
 
-Inside this image, there's the `/qa` folder, which provides some necessary
-plumbing to perform quality assurance and continous integration if you use
-[doodba-qa][], which is a separate (but related) project with that purpose.
+Inside this image, there's the `/qa` folder, which provides some necessary plumbing to
+perform quality assurance and continous integration if you use [doodba-qa][], which is a
+separate (but related) project with that purpose.
 
 Go there to get more instructions.
 
 ### I need to force addition or removal of `www.` prefix in production
 
-These instructions assume you use the official [scaffolding][].
-To **remove** the `www.` prefix, set these params in the `.env` file:
+These instructions assume you use the official [scaffolding][]. To **remove** the `www.`
+prefix, set these params in the `.env` file:
 
     DOMAIN_PROD=example.com
     DOMAIN_PROD_ALT=www.example.com
@@ -1068,8 +1052,8 @@ To **add** the `www.` prefix, it is almost the same:
     DOMAIN_PROD=www.example.com
     DOMAIN_PROD_ALT=example.com
 
-Of course, both domains should point to the same machine before booting, or
-Let's Encrypt might ban your server for some time.
+Of course, both domains should point to the same machine before booting, or Let's
+Encrypt might ban your server for some time.
 
 ### How to run a parallel Odoo container without crashing Traefik?
 
@@ -1087,8 +1071,8 @@ In `.env`, set `DOMAIN_PROD` to `host1.com,host2.com,www.host1.com`, etc.
 
 ### How to choose initial DB creation language?
 
-This image includes a hack that will set the initial language to load when
-Odoo creates its database for the first time. These conditions must match:
+This image includes a hack that will set the initial language to load when Odoo creates
+its database for the first time. These conditions must match:
 
 - `$PGDATABASE` is set.
 - That database does not yet exist.
@@ -1103,8 +1087,8 @@ Do:
     set -x GID (id -g $USER)
     set -x UMASK (umask)
 
-You can make those variables universal (available in all terminals you open
-from now on) by using `set -Ux` instead of `set -x`.
+You can make those variables universal (available in all terminals you open from now on)
+by using `set -Ux` instead of `set -x`.
 
 ### When I boot `devel.yaml` for the first time, Odoo crashes
 
@@ -1118,16 +1102,15 @@ Most likely you are using versions `8.0` or `9.0` of the image. If so:
 
 ### How can I run a Posbox/IoT box service for development?
 
-Posbox has special needs that are not useful for most projects, and is quite
-tightly related to specific hardware and peripherals, so it makes not much
-sense to ship it by default in Doodba and its [scaffolding][].
+Posbox has special needs that are not useful for most projects, and is quite tightly
+related to specific hardware and peripherals, so it makes not much sense to ship it by
+default in Doodba and its [scaffolding][].
 
-However, for testing connection issues, developing, etc., you might want to
-boot a resource-limited posbox instance imitation.
+However, for testing connection issues, developing, etc., you might want to boot a
+resource-limited posbox instance imitation.
 
-The best you can do is buy a Posbox/IoT box and peripherals and use it, but
-for quick tests that do not involve specific hardware, you can boot it with
-Doodba by:
+The best you can do is buy a Posbox/IoT box and peripherals and use it, but for quick
+tests that do not involve specific hardware, you can boot it with Doodba by:
 
 - Add the `apt` dependency `usbutils` (which contains `lsusb` binary).
 - Add the `pip` dependencies `evdev` and `netifaces`.
@@ -1201,8 +1184,8 @@ Once you apply those changes, to use it:
 1. Install `point_of_sale` in Odoo.
 1. Configure the POS in Odoo to connect to Posbox in `localhost:8070`.
 
-Of course this won't be fully functional, but it will give you an overview
-on the posbox stuff.
+Of course this won't be fully functional, but it will give you an overview on the posbox
+stuff.
 
 [Beware about possible mixed content errors][mixed-content-posbox].
 
@@ -1217,47 +1200,47 @@ It runs triggers when doing the automatic build in the Docker Hub.
 
 ### Can I have my own [scaffolding][]?
 
-You probably **should**, and rebase on our updates. However, if you are
-planning on a general update to it that you find interesting for the
-general-purpose one, please send us a pull request.
+You probably **should**, and rebase on our updates. However, if you are planning on a
+general update to it that you find interesting for the general-purpose one, please send
+us a pull request.
 
 ### Can I skip the `-f <environment>.yaml` part for `docker-compose` commands?
 
-Let's suppose you want to use [`test.yaml`][testing] environment by default,
-no matter where you clone the project:
+Let's suppose you want to use [`test.yaml`][testing] environment by default, no matter
+where you clone the project:
 
     ln -s test.yaml docker-compose.yaml
     git add docker-compose.yaml
     git commit
 
-Let's suppose you only want to use `devel.yaml` in your local development
-machine by default:
+Let's suppose you only want to use `devel.yaml` in your local development machine by
+default:
 
     ln -s devel.yaml docker-compose.yml
 
-Notice the difference in the prefix (`.yaml` vs. `.yml`). Docker Compose will
-use the `.yml` one if both are found, so that's the one we considered you
-should use in your local clones, and that's the one that will be git-ignored by
-default by the scaffolding `.gitignore` file.
+Notice the difference in the prefix (`.yaml` vs. `.yml`). Docker Compose will use the
+`.yml` one if both are found, so that's the one we considered you should use in your
+local clones, and that's the one that will be git-ignored by default by the scaffolding
+`.gitignore` file.
 
 As a design choice, the scaffolding defaults to being explicit.
 
 ### How can I pin an image version?
 
-Version-pinning is a good idea to keep your code from differing among image
-updates. It's the best way to ensure no updates got in between the last time
-you checked the image and the time you deploy it to production.
+Version-pinning is a good idea to keep your code from differing among image updates.
+It's the best way to ensure no updates got in between the last time you checked the
+image and the time you deploy it to production.
 
 You can do it through **its sha256 code**.
 
-Get any image's code through inspect, running from a computer where the correct
-image version is downloaded:
+Get any image's code through inspect, running from a computer where the correct image
+version is downloaded:
 
     docker image inspect --format='{{.RepoDigests}}' tecnativa/doodba:10.0-onbuild
 
-Alternatively, you can browse [this image's builds][builds], click on the one
-you know it works fine for you, and search for the `digest` word using your
-browser's _search in page_ system (Ctrl+F usually).
+Alternatively, you can browse [this image's builds][builds], click on the one you know
+it works fine for you, and search for the `digest` word using your browser's _search in
+page_ system (Ctrl+F usually).
 
 You will find lines similar to:
 
@@ -1269,8 +1252,8 @@ You will find lines similar to:
     9.0: digest: sha256:33a540eca6441b950d633d3edc77d2cc46586717410f03d51c054ce348b2e977 size: 4508
     [...]
 
-Once you find them, you can use that pinned version in your builds, using a
-Dockerfile similar to this one:
+Once you find them, you can use that pinned version in your builds, using a Dockerfile
+similar to this one:
 
 ```Dockerfile
 # Hash-pinned version of tecnativa/doodba:10.0-onbuild
@@ -1284,16 +1267,16 @@ Make sure there's a `ir.config_parameter` called `report.url` with the value
 
 ### How to change report fonts?
 
-Doodba ships [Liberation fonts](https://wikipedia.org/wiki/Liberation_fonts)
-as defaults.
+Doodba ships [Liberation fonts](https://wikipedia.org/wiki/Liberation_fonts) as
+defaults.
 
 If you want to make another font package _available_, just add it to
-[`apt.txt`][dependencies] (if it's a normal Debian package) or install it in
-a [custom build script][build.d] called i.e. `build.d/200-custom-fonts`
-(if you need to install it in a more complex way).
+[`apt.txt`][dependencies] (if it's a normal Debian package) or install it in a [custom
+build script][build.d] called i.e. `build.d/200-custom-fonts` (if you need to install it
+in a more complex way).
 
-If, in addition to that, you want those fonts to be the _defaults_, then add
-one (or more) of these build arguments:
+If, in addition to that, you want those fonts to be the _defaults_, then add one (or
+more) of these build arguments:
 
 - `FONT_MONO`
 - `FONT_SANS`
@@ -1301,42 +1284,43 @@ one (or more) of these build arguments:
 
 ### How can I whitelist a service and allow external access to it?
 
-This can become useful when you have isolated environments
-(like in `devel.yaml` and `test.yaml` by default) but you need to allow
-some external API access for them. I.e., you could use
-Google Fonts API for your customer's reports, and those reports
-would take forever and end up rendering badly in staging environments.
+This can become useful when you have isolated environments (like in `devel.yaml` and
+`test.yaml` by default) but you need to allow some external API access for them. I.e.,
+you could use Google Fonts API for your customer's reports, and those reports would take
+forever and end up rendering badly in staging environments.
 
 In such case, we recommend using the
-[tecnativa/whitelist](https://hub.docker.com/r/tecnativa/whitelist/) image.
-Read its docs there.
+[tecnativa/whitelist](https://hub.docker.com/r/tecnativa/whitelist/) image. Read its
+docs there.
 
 ### How can I help?
 
-Just [head to our project](https://github.com/Tecnativa/doodba) and
-open an issue or pull request.
+Just [head to our project](https://github.com/Tecnativa/doodba) and open an issue or
+pull request.
 
-If you plan to open a pull request, remember that you will usually have to open
-two of them:
+If you plan to open a pull request, remember that you will usually have to open two of
+them:
 
-1. Targeting the `master` branch, from which the main images are built.
-   This pull request must include tests.
-2. Targeting the `scaffolding` branch, which serves as the base for projects
-   using this base image. This one is not always required.
+1. Targeting the `master` branch, from which the main images are built. This pull
+   request must include tests.
+2. Targeting the `scaffolding` branch, which serves as the base for projects using this
+   base image. This one is not always required.
 
-If you need to add a feature or fix for `scaffolding`, before merging that PR,
-we need tests that ensure that backwards compatibility with previous
-scaffolding versions is preserved.
+If you need to add a feature or fix for `scaffolding`, before merging that PR, we need
+tests that ensure that backwards compatibility with previous scaffolding versions is
+preserved.
 
 ## Related Projects
 
 - [QA tools for Doodba-based projects][doodba-qa]
 - [Ansible role for automated deployment / update from Le Filament](https://github.com/remi-filament/ansible_role_odoo_docker)
-- Find others by searching [GitHub projects tagged with `#doodba`](https://github.com/topics/doodba)
+- Find others by searching
+  [GitHub projects tagged with `#doodba`](https://github.com/topics/doodba)
 
 [`/opt/odoo/auto/addons`]: #optodooautoaddons
 [`addons.yaml`]: #optodoocustomsrcaddonsyaml
-[`compose_file` environment variable]: https://docs.docker.com/compose/reference/envvars/#/composefile
+[`compose_file` environment variable]:
+  https://docs.docker.com/compose/reference/envvars/#/composefile
 [`nano`]: https://www.nano-editor.org/
 [`odoo.conf`]: #optodooautoodooconf
 [`odoo`]: #optodoocustomsrcodoo
@@ -1361,13 +1345,16 @@ scaffolding versions is preserved.
 [odoo s.a.]: https://www.odoo.com
 [openupgrade]: https://github.com/OCA/OpenUpgrade/
 [original odoo]: https://github.com/odoo/odoo
-[pip `requirements.txt`]: https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
-[postgres client applications]: https://www.postgresql.org/docs/current/static/reference-client.html
+[pip `requirements.txt`]:
+  https://pip.readthedocs.io/en/latest/user_guide/#requirements-files
+[postgres client applications]:
+  https://www.postgresql.org/docs/current/static/reference-client.html
 [production]: #production
 [retrobreak]: https://github.com/Tecnativa/doodba/issues/67
 [scaffolding]: #scaffolding
 [several yaml documents]: http://www.yaml.org/spec/1.2/spec.html#id2760395
-[ssh-conf]: https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client
+[ssh-conf]:
+  https://www.digitalocean.com/community/tutorials/how-to-configure-custom-connection-options-for-your-ssh-client
 [testing]: #testing
 [traefik]: https://traefik.io/
 [vscode]: https://code.visualstudio.com/
