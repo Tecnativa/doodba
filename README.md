@@ -434,7 +434,7 @@ The great [`click-odoo`][] scripting framework and the collection of scripts fou
 
 \* Note: This replaces the deprecated `python-odoo-shell` binary.
 
-### [`nano`][]
+### [`nano`](https://www.nano-editor.org/)
 
 The CLI text editor we all know, just in case you need to inspect some bug in hot
 deployments.
@@ -540,9 +540,9 @@ it somewhere.
 This little script wraps `git-aggregator` to make it work fine and automatically with
 this image. Used in the [scaffolding][]'s `setup-devel.yaml` step.
 
-#### Example [`repos.yaml`][] file
+#### Example `repos.yaml` file
 
-This example merges [several sources][`odoo`]:
+This [`repos.yaml`][] example merges [several sources][`odoo`]:
 
 ```yaml
 ./odoo:
@@ -1079,9 +1079,9 @@ its database for the first time. These conditions must match:
 - `$INITIAL_LANG` is set to any Odoo lang code. I.e. `es_ES`.
 - Odoo is booted.
 
-### I use [Fish][], how to export needed variables?
+### I use Fish shell, how to export needed variables?
 
-Do:
+In [Fish][] you need to do following:
 
     set -x UID (id -u $USER)
     set -x GID (id -g $USER)
@@ -1198,7 +1198,7 @@ Of course. There's no guarantee that we will like it, but please do it. :wink:
 It runs triggers when doing the automatic build in the Docker Hub.
 [Check this](https://hub.docker.com/r/thibaultdelor/testautobuildhooks/).
 
-### Can I have my own [scaffolding][]?
+### Can I have my own scaffolding?
 
 You probably **should**, and rebase on our updates. However, if you are planning on a
 general update to it that you find interesting for the general-purpose one, please send
@@ -1321,7 +1321,6 @@ preserved.
 [`addons.yaml`]: #optodoocustomsrcaddonsyaml
 [`compose_file` environment variable]:
   https://docs.docker.com/compose/reference/envvars/#/composefile
-[`nano`]: https://www.nano-editor.org/
 [`odoo.conf`]: #optodooautoodooconf
 [`odoo`]: #optodoocustomsrcodoo
 [`private`]: #optodoocustomsrcprivate
