@@ -67,6 +67,7 @@ You can start working with this straight away with our [scaffolding][].
   - [`autoaggregate`](#autoaggregate)
     - [Example `repos.yaml` file](#example-reposyaml-file)
   - [`odoo`](#odoo)
+  - [GeoLite2](#geolite2)
 - [Scaffolding](#scaffolding)
   - [Skip the boring parts](#skip-the-boring-parts)
   - [Tell me the boring parts](#tell-me-the-boring-parts)
