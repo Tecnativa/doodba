@@ -31,3 +31,8 @@ repos:
     rev: 1.19.1
     hooks:
       - id: prettier
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+    rev: v1.1.0
+    hooks:
+      - id: markdown-toc
+        args: [--bullets=-, -i]
