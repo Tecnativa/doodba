@@ -34,6 +34,87 @@ it work anywhere quickly.
 
 You can start working with this straight away with our [scaffolding][].
 
+<!-- toc -->
+
+- [Image usage](#image-usage)
+  - [`/opt/odoo/custom`: The important one](#optodoocustom-the-important-one)
+    - [`/opt/odoo/custom/entrypoint.d`](#optodoocustomentrypointd)
+    - [`/opt/odoo/custom/build.d`](#optodoocustombuildd)
+    - [`/opt/odoo/custom/conf.d`](#optodoocustomconfd)
+    - [`/opt/odoo/custom/ssh`](#optodoocustomssh)
+    - [`/opt/odoo/custom/src`](#optodoocustomsrc)
+      - [`/opt/odoo/custom/src/odoo`](#optodoocustomsrcodoo)
+      - [`/opt/odoo/custom/src/private`](#optodoocustomsrcprivate)
+      - [`/opt/odoo/custom/src/repos.yaml`](#optodoocustomsrcreposyaml)
+        - [Automatic download of repos](#automatic-download-of-repos)
+      - [`/opt/odoo/custom/src/addons.yaml`](#optodoocustomsrcaddonsyaml)
+      - [`/opt/odoo/custom/dependencies/*.txt`](#optodoocustomdependenciestxt)
+  - [`/opt/odoo/common`: The useful one](#optodoocommon-the-useful-one)
+  - [`/opt/odoo/auto`: The automatic one](#optodooauto-the-automatic-one)
+    - [`/opt/odoo/auto/addons`](#optodooautoaddons)
+    - [`/opt/odoo/auto/odoo.conf`](#optodooautoodooconf)
+- [The `Dockerfile`](#the-dockerfile)
+- [Bundled tools](#bundled-tools)
+  - [`addons`](#addons)
+  - [`click-odoo` and related scripts](#click-odoo-and-related-scripts)
+  - [`nano`](#nano)
+  - [`log`](#log)
+  - [`pot`](#pot)
+  - [`psql`](#psql)
+  - [`ptvsd`](#ptvsd)
+  - [`pudb`](#pudb)
+  - [`git-aggregator`](#git-aggregator)
+  - [`autoaggregate`](#autoaggregate)
+    - [Example `repos.yaml` file](#example-reposyaml-file)
+  - [`odoo`](#odoo)
+- [Scaffolding](#scaffolding)
+  - [Skip the boring parts](#skip-the-boring-parts)
+  - [Tell me the boring parts](#tell-me-the-boring-parts)
+    - [Environments](#environments)
+      - [Development](#development)
+        - [`wdb`](#wdb)
+        - [MailHog](#mailhog)
+        - [Network isolation](#network-isolation)
+      - [Production](#production)
+        - [Adding secrets](#adding-secrets)
+        - [Global inverse proxy](#global-inverse-proxy)
+        - [Booting production](#booting-production)
+      - [Testing](#testing)
+        - [Global whitelist](#global-whitelist)
+    - [Other usage scenarios](#other-usage-scenarios)
+      - [Inspect the database](#inspect-the-database)
+      - [Restart Odoo](#restart-odoo)
+      - [Run unit tests for some addon](#run-unit-tests-for-some-addon)
+      - [Reading the logs](#reading-the-logs)
+      - [Install some addon without stopping current running process](#install-some-addon-without-stopping-current-running-process)
+      - [Update some addon without stopping current running process](#update-some-addon-without-stopping-current-running-process)
+      - [Update changed addons only](#update-changed-addons-only)
+      - [Export some addon's translations to stdout](#export-some-addons-translations-to-stdout)
+      - [Open an odoo shell](#open-an-odoo-shell)
+      - [Open another UI instance linked to same filestore and database](#open-another-ui-instance-linked-to-same-filestore-and-database)
+- [FAQ](#faq)
+  - [Will there be not retrocompatible changes on the image?](#will-there-be-not-retrocompatible-changes-on-the-image)
+  - [How to have good QA and test in my CI with Doodba?](#how-to-have-good-qa-and-test-in-my-ci-with-doodba)
+  - [I need to force addition or removal of `www.` prefix in production](#i-need-to-force-addition-or-removal-of-www-prefix-in-production)
+  - [How to run a parallel Odoo container without crashing Traefik?](#how-to-run-a-parallel-odoo-container-without-crashing-traefik)
+  - [How to allow access from several host names?](#how-to-allow-access-from-several-host-names)
+  - [How to choose initial DB creation language?](#how-to-choose-initial-db-creation-language)
+  - [I use Fish shell, how to export needed variables?](#i-use-fish-shell-how-to-export-needed-variables)
+  - [When I boot `devel.yaml` for the first time, Odoo crashes](#when-i-boot-develyaml-for-the-first-time-odoo-crashes)
+  - [How can I run a Posbox/IoT box service for development?](#how-can-i-run-a-posboxiot-box-service-for-development)
+  - [This project is too opinionated, but can I question any of those opinions?](#this-project-is-too-opinionated-but-can-i-question-any-of-those-opinions)
+  - [What's this `hooks` folder here?](#whats-this-hooks-folder-here)
+  - [Can I have my own scaffolding?](#can-i-have-my-own-scaffolding)
+  - [Can I skip the `-f .yaml` part for `docker-compose` commands?](#can-i-skip-the--f-yaml-part-for-docker-compose-commands)
+  - [How can I pin an image version?](#how-can-i-pin-an-image-version)
+  - [How to get proper assets when printing reports?](#how-to-get-proper-assets-when-printing-reports)
+  - [How to change report fonts?](#how-to-change-report-fonts)
+  - [How can I whitelist a service and allow external access to it?](#how-can-i-whitelist-a-service-and-allow-external-access-to-it)
+  - [How can I help?](#how-can-i-help)
+- [Related Projects](#related-projects)
+
+<!-- tocstop -->
+
 ## Image usage
 
 Basically, every directory you have to worry about is found inside `/opt/odoo`. This is
@@ -434,7 +515,7 @@ The great [`click-odoo`][] scripting framework and the collection of scripts fou
 
 \* Note: This replaces the deprecated `python-odoo-shell` binary.
 
-### [`nano`][]
+### [`nano`](https://www.nano-editor.org/)
 
 The CLI text editor we all know, just in case you need to inspect some bug in hot
 deployments.
@@ -540,9 +621,9 @@ it somewhere.
 This little script wraps `git-aggregator` to make it work fine and automatically with
 this image. Used in the [scaffolding][]'s `setup-devel.yaml` step.
 
-#### Example [`repos.yaml`][] file
+#### Example `repos.yaml` file
 
-This example merges [several sources][`odoo`]:
+This [`repos.yaml`][] example merges [several sources][`odoo`]:
 
 ```yaml
 ./odoo:
@@ -1079,9 +1160,9 @@ its database for the first time. These conditions must match:
 - `$INITIAL_LANG` is set to any Odoo lang code. I.e. `es_ES`.
 - Odoo is booted.
 
-### I use [Fish][], how to export needed variables?
+### I use Fish shell, how to export needed variables?
 
-Do:
+In [Fish][] you need to do following:
 
     set -x UID (id -u $USER)
     set -x GID (id -g $USER)
@@ -1198,7 +1279,7 @@ Of course. There's no guarantee that we will like it, but please do it. :wink:
 It runs triggers when doing the automatic build in the Docker Hub.
 [Check this](https://hub.docker.com/r/thibaultdelor/testautobuildhooks/).
 
-### Can I have my own [scaffolding][]?
+### Can I have my own scaffolding?
 
 You probably **should**, and rebase on our updates. However, if you are planning on a
 general update to it that you find interesting for the general-purpose one, please send
@@ -1321,7 +1402,6 @@ preserved.
 [`addons.yaml`]: #optodoocustomsrcaddonsyaml
 [`compose_file` environment variable]:
   https://docs.docker.com/compose/reference/envvars/#/composefile
-[`nano`]: https://www.nano-editor.org/
 [`odoo.conf`]: #optodooautoodooconf
 [`odoo`]: #optodoocustomsrcodoo
 [`private`]: #optodoocustomsrcprivate
