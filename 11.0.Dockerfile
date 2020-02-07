@@ -29,6 +29,10 @@ ENV DB_FILTER=.* \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost
 
+# Enable configuring geoip with scaffolding environment (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
+ENV GEOIP_ACCOUNT_ID="" \
+    GEOIP_LICENSE_KEY=""
+
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 RUN apt-get -qq update \
@@ -195,12 +199,6 @@ ONBUILD COPY $LOCAL_CUSTOM_DIR /opt/odoo/custom
 # Enable setting custom uids for odoo user during build of scaffolds
 ONBUILD ARG UID=1000
 ONBUILD ARG GID=1000
-
-# Enable configuring geoip during build and with environment of scaffolds (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
-ONBUILD ARG GEOIP_ACCOUNT_ID=""
-ONBUILD ARG GEOIP_LICENSE_KEY=""
-ONBUILD ENV GEOIP_ACCOUNT_ID="$GEOIP_ACCOUNT_ID" \
-            GEOIP_LICENSE_KEY="$GEOIP_LICENSE_KEY"
 
 # Enable Odoo user and filestore
 ONBUILD RUN groupadd -g $GID odoo -o \
