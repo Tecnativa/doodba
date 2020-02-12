@@ -86,6 +86,7 @@ RUN pip install \
         virtualenv \
         wdb \
         simplejson \
+        geoip2 \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
@@ -121,6 +122,7 @@ ARG GEOIP_UPDATER_VERSION=4.1.5
 RUN curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
+# TODO check if we can remove libgeoip-dev again (we shouldn't need the header files at runtime)
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
