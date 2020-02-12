@@ -81,6 +81,7 @@ RUN pip install \
         pudb \
         virtualenv \
         wdb \
+        simplejson \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
