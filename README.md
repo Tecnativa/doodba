@@ -685,6 +685,34 @@ Upon (re)start the container will perform the updates as requested by the
 [eula](https://www.maxmind.com/en/geolite2/eula). You also can update the database by
 calling `geoipupdate` inside the running container.
 
+When you run geoip in an isolated environment (odoo is only able to access whitelisted
+addresses) make sure odoo is able to access `updates.maxmind.com`. You could do so by
+adding the whitelist proxy like this to your docker-compose.yml:
+
+```
+    odoo:
+        ...
+        depends_on:
+            ...
+            - maxmind_proxy
+            ...
+        ...
+    ...
+
+    maxmind_proxy:
+        image: tecnativa/whitelist
+        networks:
+            default:
+                aliases:
+                    - updates.maxmind.com
+            public:
+        environment:
+            TARGET: updates.maxmind.com
+            PRE_RESOLVE: 1
+    ...
+
+```
+
 ## Scaffolding
 
 Get up and running quickly with the provided
