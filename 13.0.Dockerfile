@@ -134,6 +134,7 @@ RUN build_deps=" \
         pudb \
         watchdog \
         wdb \
+        geoip2 \
     && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
