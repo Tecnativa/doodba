@@ -668,7 +668,7 @@ your [account](https://www.maxmind.com/en/account) when you create the license k
 
 Example config (docker-compose.yml)
 
-```
+```yaml
 services:
   odoo:
     environment:
@@ -679,7 +679,7 @@ services:
   ...
 ```
 
-When building you should see a message `Activating GeoIP/GeoLite2 updates`.
+When booting you should see a message `Activating GeoIP/GeoLite2 updates`.
 
 Upon (re)start the container will perform the updates as requested by the
 [eula](https://www.maxmind.com/en/geolite2/eula). You also can update the database by
@@ -689,7 +689,7 @@ When you run geoip in an isolated environment (odoo is only able to access white
 addresses) make sure odoo is able to access `updates.maxmind.com`. You could do so by
 adding the whitelist proxy like this to your docker-compose.yml:
 
-```
+```yaml
     odoo:
         ...
         depends_on:
@@ -1123,6 +1123,18 @@ services:
           - "www.gravatar.com"
     environment:
       TARGET: "www.gravatar.com"
+      PRE_RESOLVE: 1
+
+  updates_maxmind_com:
+    image: tecnativa/whitelist
+    restart: unless-stopped
+    networks:
+      public:
+      shared:
+        aliases:
+          - "updates.maxmind.com"
+    environment:
+      TARGET: "updates.maxmind.com"
       PRE_RESOLVE: 1
 ```
 
