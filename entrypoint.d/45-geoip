@@ -10,5 +10,6 @@ if [[ "$GEOIP_ACCOUNT_ID" != "" && "$GEOIP_LICENSE_KEY" != "" ]] ; then
 fi
 
 if [[ "$(grep 'AccountID' /etc/GeoIP.conf | sed 's/AccountID //')" != "0" ]] ; then
-    geoipupdate
+    # run geoip update in background to make sure it doesn't block odoo startup
+    geoipupdate &
 fi
