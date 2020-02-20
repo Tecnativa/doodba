@@ -22,8 +22,12 @@ if GEOIP_ACCOUNT_ID not in {"", "0"} and GEOIP_LICENSE_KEY not in {"", "0"}:
     geoip_file = local.path("/etc/GeoIP.conf")
     geoip_conf = geoip_file.read()
     # Patch it with provided account and license keys
-    geoip_conf = re.sub(r"^AccountID\s*.*$", "AccountID {}".format(GEOIP_ACCOUNT_ID), geoip_conf)
-    geoip_conf = re.sub(r"^LicenseKey\s*.*$", "LicenseKey {}".format(GEOIP_LICENSE_KEY), geoip_conf)
+    geoip_conf = re.sub(
+        r"^AccountID\s*.*$", "AccountID {}".format(GEOIP_ACCOUNT_ID), geoip_conf
+    )
+    geoip_conf = re.sub(
+        r"^LicenseKey\s*.*$", "LicenseKey {}".format(GEOIP_LICENSE_KEY), geoip_conf
+    )
     geoip_file.write(geoip_conf)
     # run geoip update in background to make sure it doesn't block odoo startup
     geoipupdate & NOHUP(stdout=sys.stdout, stderr=sys.stderr)
