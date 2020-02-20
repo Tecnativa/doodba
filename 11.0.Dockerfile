@@ -78,6 +78,7 @@ RUN pip install \
         click-odoo-contrib \
         git-aggregator \
         pg_activity \
+        plumbum \
         ptvsd \
         pudb \
         watchdog \

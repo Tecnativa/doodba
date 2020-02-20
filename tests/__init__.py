@@ -278,6 +278,7 @@ class ScaffoldingCase(unittest.TestCase):
             ("pg_activity", "--version"),
             ("psql", "--version"),
             ("ssh", "-V"),
+            ("python", "-c", "import plumbum"),
             # We are able to dump
             ("pg_dump", "-f/var/lib/odoo/prod.sql", "prod"),
             # Geoip should not be activated

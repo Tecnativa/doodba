@@ -130,6 +130,7 @@ RUN build_deps=" \
         click-odoo-contrib \
         pg_activity \
         phonenumbers \
+        plumbum \
         ptvsd \
         pudb \
         watchdog \

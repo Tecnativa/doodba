@@ -81,6 +81,7 @@ WORKDIR /opt/odoo
 RUN pip install \
         click-odoo-contrib \
         git-aggregator \
+        plumbum \
         ptvsd \
         pudb \
         virtualenv \
