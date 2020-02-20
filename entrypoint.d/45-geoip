@@ -5,7 +5,7 @@ import sys
 
 from doodbalib import logger
 
-from plumbum import NOHUP, local
+from plumbum import BG, local
 from plumbum.cmd import geoipupdate
 
 GEOIP_ACCOUNT_ID = local.env["GEOIP_ACCOUNT_ID"]
@@ -34,4 +34,4 @@ if GEOIP_ACCOUNT_ID not in {"", "0"} and GEOIP_LICENSE_KEY not in {"", "0"}:
     )
     geoip_file.write(geoip_conf)
     # run geoip update in background to make sure it doesn't block odoo startup
-    geoipupdate & NOHUP(stdout=sys.stdout, stderr=sys.stderr)
+    geoipupdate & BG(stdout=sys.stdout, stderr=sys.stderr)
