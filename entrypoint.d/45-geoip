@@ -23,10 +23,14 @@ if GEOIP_ACCOUNT_ID not in {"", "0"} and GEOIP_LICENSE_KEY not in {"", "0"}:
     geoip_conf = geoip_file.read()
     # Patch it with provided account and license keys
     geoip_conf = re.sub(
-        r"^AccountID\s*.*$", "AccountID {}".format(GEOIP_ACCOUNT_ID), geoip_conf
+        r"(^|\n)AccountID\s*[^\n]*(\n|$)",
+        "\\1AccountID {}\\2".format(GEOIP_ACCOUNT_ID),
+        geoip_conf
     )
     geoip_conf = re.sub(
-        r"^LicenseKey\s*.*$", "LicenseKey {}".format(GEOIP_LICENSE_KEY), geoip_conf
+        r"(^|\n)LicenseKey\s*[^\n]*(\n|$)",
+        "\\1LicenseKey {}\\2".format(GEOIP_LICENSE_KEY),
+        geoip_conf
     )
     geoip_file.write(geoip_conf)
     # run geoip update in background to make sure it doesn't block odoo startup
