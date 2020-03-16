@@ -502,14 +502,15 @@ class ScaffoldingCase(unittest.TestCase):
                 (
                     "bash",
                     "-c",
-                    "timeout 60s bash -c 'while (ps fax | grep geoipupdate | grep -v grep); do sleep 1; done' &&"
+                    "timeout 60s bash -c 'while (ls -l /proc/*/exe 2>&1 | grep geoipupdate); do sleep 1; done' &&"
                     " geoipupdate",
                 ),
                 # verify that geoip database exists after entrypoint finished its update
+                # using ls and /proc because ps is missing in image for 13.0
                 (
                     "bash",
                     "-c",
-                    "timeout 60s bash -c 'while (ps fax | grep geoipupdate | grep -v grep); do sleep 1; done' &&"
+                    "timeout 60s bash -c 'while (ls -l /proc/*/exe 2>&1 | grep geoipupdate); do sleep 1; done' &&"
                     " test -e /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
                 ),
                 # verify that geoip database is configured
