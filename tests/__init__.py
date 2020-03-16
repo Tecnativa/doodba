@@ -510,13 +510,13 @@ class ScaffoldingCase(unittest.TestCase):
                     "bash",
                     "-c",
                     "timeout 60s bash -c 'while (ps fax | grep geoipupdate | grep -v grep); do sleep 1; done' &&"
-                    " test -e /usr/share/GeoIP/GeoLite2-City.mmdb",
+                    " test -e /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
                 ),
                 # verify that geoip database is configured
                 (
                     "grep",
                     "-R",
-                    "geoip_database = /usr/share/GeoIP/GeoLite2-City.mmdb",
+                    "geoip_database = /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
                     "/opt/odoo/auto/odoo.conf",
                 ),
             )

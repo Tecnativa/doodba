@@ -19,7 +19,7 @@ if GEOIP_ACCOUNT_ID not in {"", "0"} and GEOIP_LICENSE_KEY not in {"", "0"}:
         "available from https://www.maxmind.com"
     )
     # Obtain current GeoIP configuration
-    geoip_file = local.path("/etc/GeoIP.conf")
+    geoip_file = local.path("/opt/odoo/auto/geoip/GeoIP.conf")
     geoip_conf = geoip_file.read()
     # Patch it with provided account and license keys
     geoip_conf = re.sub(
