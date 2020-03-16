@@ -32,6 +32,7 @@ ENV DB_FILTER=.* \
 # Enable configuring geoip with scaffolding environment (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
 ENV GEOIP_ACCOUNT_ID="" \
     GEOIP_LICENSE_KEY=""
+ARG GEOIP_UPDATER_VERSION=4.1.5
 
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
@@ -59,6 +60,9 @@ RUN apt-get -qq update \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends postgresql-client \
+    && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
     && apt-get autopurge -yqq \
     && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
@@ -90,12 +94,6 @@ RUN python -m venv --system-site-packages /qa/venv \
     && deactivate \
     && mkdir -p /qa/artifacts \
     && git clone --depth 1 $MQT /qa/mqt
-
-# Install GeoIP updater
-ARG GEOIP_UPDATER_VERSION=4.1.5
-RUN curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
 
 ARG ODOO_SOURCE=OCA/OCB
 ARG ODOO_VERSION=13.0

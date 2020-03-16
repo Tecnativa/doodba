@@ -32,6 +32,7 @@ ENV DB_FILTER=.* \
 # Enable configuring geoip with scaffolding environment (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
 ENV GEOIP_ACCOUNT_ID="" \
     GEOIP_LICENSE_KEY=""
+ARG GEOIP_UPDATER_VERSION=4.1.5
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
@@ -60,6 +61,9 @@ RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends ./wkhtmltox.deb \
     && rm wkhtmltox.deb \
     && wkhtmltopdf --version \
+    && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
 # Special case to get latest Less
@@ -107,12 +111,6 @@ RUN python -m venv --system-site-packages /qa/venv \
     && deactivate \
     && mkdir -p /qa/artifacts \
     && git clone --depth 1 $MQT /qa/mqt
-
-# Install GeoIP updater
-ARG GEOIP_UPDATER_VERSION=4.1.5
-RUN curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb
 
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
