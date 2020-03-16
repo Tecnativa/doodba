@@ -498,10 +498,20 @@ class ScaffoldingCase(unittest.TestCase):
             self.compose_test(
                 geoip_dir,
                 sub_env,
-                # verify that geoip update works
-                ("geoipupdate",),
-                # verify that geoip database exists
-                ("test", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
+                # verify that geoipupdate works after waiting for entrypoint to finish its update
+                (
+                    "bash",
+                    "-c",
+                    "timeout 60s bash -c 'while (ps fax | grep geoipupdate | grep -v grep); do sleep 1; done' &&"
+                    " geoipupdate",
+                ),
+                # verify that geoip database exists after entrypoint finished its update
+                (
+                    "bash",
+                    "-c",
+                    "timeout 60s bash -c 'while (ps fax | grep geoipupdate | grep -v grep); do sleep 1; done' &&"
+                    " test -e /usr/share/GeoIP/GeoLite2-City.mmdb",
+                ),
                 # verify that geoip database is configured
                 (
                     "grep",
