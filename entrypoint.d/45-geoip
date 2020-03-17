@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import re
+import sys
+
+from doodbalib import logger
+
+from plumbum import BG, local
+from plumbum.cmd import geoipupdate
+
+GEOIP_ACCOUNT_ID = local.env["GEOIP_ACCOUNT_ID"]
+GEOIP_LICENSE_KEY = local.env["GEOIP_LICENSE_KEY"]
+
+if GEOIP_ACCOUNT_ID not in {"", "0"} and GEOIP_LICENSE_KEY not in {"", "0"}:
+    # see https://dev.maxmind.com/geoip/geoipupdate/
+    logger.info("Activating GeoIP/GeoLite2 updates")
+    logger.info(
+        "This product includes GeoLite2 data created by MaxMind, "
+        "available from https://www.maxmind.com"
+    )
+    # Obtain current GeoIP configuration
+    geoip_file = local.path("/opt/odoo/auto/geoip/GeoIP.conf")
+    geoip_conf = geoip_file.read()
+    # Patch it with provided account and license keys
+    geoip_conf = re.sub(
+        r"(^|\n)AccountID\s*[^\n]*(\n|$)",
+        "\\1AccountID {}\\2".format(GEOIP_ACCOUNT_ID),
+        geoip_conf,
+    )
+    geoip_conf = re.sub(
+        r"(^|\n)LicenseKey\s*[^\n]*(\n|$)",
+        "\\1LicenseKey {}\\2".format(GEOIP_LICENSE_KEY),
+        geoip_conf,
+    )
+    geoip_file.write(geoip_conf)
+    # run geoip update in background to make sure it doesn't block odoo startup
+    geoipupdate & BG(stdout=sys.stdout, stderr=sys.stderr)

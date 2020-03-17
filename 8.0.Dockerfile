@@ -2,6 +2,7 @@ FROM debian:8 AS base
 
 EXPOSE 8069 8072
 
+ARG GEOIP_UPDATER_VERSION=4.1.5
 ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='2583399a865d7604726da166ee7cec656b87ae0a6016e6bce7571dcd3045f98b'
@@ -9,6 +10,8 @@ ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
+    GEOIP_ACCOUNT_ID="" \
+    GEOIP_LICENSE_KEY="" \
     GIT_AUTHOR_NAME=docker-odoo \
     INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
@@ -54,6 +57,9 @@ RUN sed -Ei 's@(^deb http://deb.debian.org/debian jessie-updates main$)@#\1@' /e
     && apt-get install -yqq --no-install-recommends --fix-broken \
     && rm fonts-liberation2.deb wkhtmltox.deb \
     && wkhtmltopdf --version \
+    && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && rm -Rf /var/lib/apt/lists/*
 
 # Special case to get latest PostgreSQL client
@@ -77,11 +83,13 @@ WORKDIR /opt/odoo
 RUN pip install \
         click-odoo-contrib \
         git-aggregator \
+        plumbum \
         ptvsd \
         pudb \
         virtualenv \
         wdb \
         simplejson \
+        geoip2 \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
@@ -90,11 +98,14 @@ RUN ln -s /usr/local/lib/python2.7/dist-packages/doodbalib \
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
-RUN mkdir -p auto/addons custom/src/private \
+RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
     && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/doodbalib \
+    && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
+    && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
+    && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
     && sync
 
 # Doodba-QA dependencies in a separate virtualenv

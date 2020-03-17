@@ -2,6 +2,7 @@ FROM python:3.7-slim-buster AS base
 
 EXPOSE 8069 8072
 
+ARG GEOIP_UPDATER_VERSION=4.1.5
 ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
@@ -9,6 +10,8 @@ ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
+    GEOIP_ACCOUNT_ID="" \
+    GEOIP_LICENSE_KEY="" \
     GIT_AUTHOR_NAME=docker-odoo \
     INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
@@ -55,6 +58,9 @@ RUN apt-get -qq update \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends postgresql-client \
+    && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && apt-get autopurge -yqq \
     && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
@@ -65,11 +71,14 @@ COPY lib/doodbalib /usr/local/lib/python3.7/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
-RUN mkdir -p auto/addons custom/src/private \
+RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
     && chmod -R a+rX /usr/local/lib/python3.7/site-packages/doodbalib \
+    && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
+    && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
+    && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
     && sync
 
 # Doodba-QA dependencies in a separate virtualenv
@@ -120,10 +129,12 @@ RUN build_deps=" \
         click-odoo-contrib \
         pg_activity \
         phonenumbers \
+        plumbum \
         ptvsd \
         pudb \
         watchdog \
         wdb \
+        geoip2 \
     && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
@@ -171,6 +182,7 @@ ONBUILD ARG PGPASSWORD=odoopassword
 ONBUILD ARG PGHOST=db
 ONBUILD ARG PGPORT=5432
 ONBUILD ARG PGDATABASE=prod
+
 # Config variables
 ONBUILD ENV ADMIN_PASSWORD="$ADMIN_PASSWORD" \
             DEFAULT_REPO_PATTERN="$DEFAULT_REPO_PATTERN" \

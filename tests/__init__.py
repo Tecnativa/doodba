@@ -20,6 +20,9 @@ ODOO_VERSIONS = frozenset(
 )
 PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "12").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
+GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
+    "GEOIP_ACCOUNT_ID", False
+)
 
 # This decorator skips tests that will fail until some branches and/or addons
 # are migrated to the next release. It is used in situations where Doodba is
@@ -275,8 +278,13 @@ class ScaffoldingCase(unittest.TestCase):
             ("pg_activity", "--version"),
             ("psql", "--version"),
             ("ssh", "-V"),
+            ("python", "-c", "import plumbum"),
             # We are able to dump
             ("pg_dump", "-f/var/lib/odoo/prod.sql", "prod"),
+            # Geoip should not be activated
+            ("bash", "-xc", 'test "$(which geoipupdate)" != ""'),
+            ("test", "!", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
+            ("bash", "-xc", "! geoipupdate"),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix(odoo_skip={"7.0", "8.0"}):
@@ -478,6 +486,39 @@ class ScaffoldingCase(unittest.TestCase):
                     "bash",
                     "-xc",
                     'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
+                ),
+            )
+
+    @unittest.skipIf(
+        not GEIOP_CREDENTIALS_PROVIDED, "GeoIP credentials missing in environment"
+    )
+    def test_geoip(self):
+        geoip_dir = join(SCAFFOLDINGS_DIR, "geoip")
+        for sub_env in matrix():
+            self.compose_test(
+                geoip_dir,
+                sub_env,
+                # verify that geoipupdate works after waiting for entrypoint to finish its update
+                (
+                    "bash",
+                    "-c",
+                    "timeout 60s bash -c 'while (ls -l /proc/*/exe 2>&1 | grep geoipupdate); do sleep 1; done' &&"
+                    " geoipupdate",
+                ),
+                # verify that geoip database exists after entrypoint finished its update
+                # using ls and /proc because ps is missing in image for 13.0
+                (
+                    "bash",
+                    "-c",
+                    "timeout 60s bash -c 'while (ls -l /proc/*/exe 2>&1 | grep geoipupdate); do sleep 1; done' &&"
+                    " test -e /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
+                ),
+                # verify that geoip database is configured
+                (
+                    "grep",
+                    "-R",
+                    "geoip_database = /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
+                    "/opt/odoo/auto/odoo.conf",
                 ),
             )
 

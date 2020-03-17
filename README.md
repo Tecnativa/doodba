@@ -67,6 +67,7 @@ You can start working with this straight away with our [scaffolding][].
   - [`autoaggregate`](#autoaggregate)
     - [Example `repos.yaml` file](#example-reposyaml-file)
   - [`odoo`](#odoo)
+  - [GeoLite2](#geolite2)
 - [Scaffolding](#scaffolding)
   - [Skip the boring parts](#skip-the-boring-parts)
   - [Tell me the boring parts](#tell-me-the-boring-parts)
@@ -653,6 +654,65 @@ about it. Just execute `odoo` and it will work fine.
 Note that version 9.0 has an `odoo` binary to provide forward compatibility (but it has
 the `odoo.py` one too).
 
+### GeoLite2
+
+To enable geoip support for Odoo you need to signup for a Maxmind account for GeoLite2:
+https://www.maxmind.com/en/geolite2/signup
+
+Create a license key in your maxmind account and provide your account id and license key
+on build to the scaffolding.
+
+The `GEOIP_ACCOUNT_ID` environment variable should hold the account id and
+`GEOIP_LICENSE_KEY` the license key. Both are visible on the "My License Key" page under
+your [account](https://www.maxmind.com/en/account) when you create the license key.
+
+Example config (docker-compose.yml)
+
+```yaml
+services:
+  odoo:
+    environment:
+      ...
+      # This product includes GeoLite2 data created by MaxMind, available from https://www.maxmind.com
+      GEOIP_ACCOUNT_ID: 1234
+      GEOIP_LICENSE_KEY: aBcDeF
+  ...
+```
+
+When booting you should see a message `Activating GeoIP/GeoLite2 updates`.
+
+Upon (re)start the container will perform the updates as requested by the
+[eula](https://www.maxmind.com/en/geolite2/eula). You also can update the database by
+calling `geoipupdate` inside the running container.
+
+When you run geoip in an isolated environment (odoo is only able to access whitelisted
+addresses) make sure odoo is able to access `updates.maxmind.com`. You could do so by
+adding the whitelist proxy like this to your docker-compose.yml:
+
+```yaml
+    odoo:
+        ...
+        depends_on:
+            ...
+            - maxmind_proxy
+            ...
+        ...
+    ...
+
+    maxmind_proxy:
+        image: tecnativa/whitelist
+        networks:
+            default:
+                aliases:
+                    - updates.maxmind.com
+            public:
+        environment:
+            TARGET: updates.maxmind.com
+            PRE_RESOLVE: 1
+    ...
+
+```
+
 ## Scaffolding
 
 Get up and running quickly with the provided
@@ -1063,6 +1123,18 @@ services:
           - "www.gravatar.com"
     environment:
       TARGET: "www.gravatar.com"
+      PRE_RESOLVE: 1
+
+  updates_maxmind_com:
+    image: tecnativa/whitelist
+    restart: unless-stopped
+    networks:
+      public:
+      shared:
+        aliases:
+          - "updates.maxmind.com"
+    environment:
+      TARGET: "updates.maxmind.com"
       PRE_RESOLVE: 1
 ```
 
