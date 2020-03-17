@@ -2,6 +2,7 @@ FROM python:3.7-stretch AS base
 
 EXPOSE 8069 8072
 
+ARG GEOIP_UPDATER_VERSION=4.1.5
 ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
@@ -9,6 +10,8 @@ ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
+    GEOIP_ACCOUNT_ID="" \
+    GEOIP_LICENSE_KEY="" \
     GIT_AUTHOR_NAME=docker-odoo \
     INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
@@ -28,11 +31,6 @@ ENV DB_FILTER=.* \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost
-
-# Enable configuring geoip with scaffolding environment (by setting GEOIP_ACCOUNT_ID and GEOIP_LICENSE_KEY)
-ENV GEOIP_ACCOUNT_ID="" \
-    GEOIP_LICENSE_KEY=""
-ARG GEOIP_UPDATER_VERSION=4.1.5
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
