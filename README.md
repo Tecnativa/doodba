@@ -1092,11 +1092,11 @@ In development mode odoo restarts by itself thanks to `--dev=reload` option.
 ```bash
 modules=addon1,addon2
 # Install their dependencies first
-docker-compose run --rm odoo addons init --dependencies $modules
+docker-compose run --rm odoo addons init --dependencies --with $modules
 # Test them at install
-docker-compose run --rm odoo addons init --test $modules
+docker-compose run --rm odoo addons init --test --with $modules
 # Test them again at update
-docker-compose run --rm odoo addons update --test $modules
+docker-compose run --rm odoo addons update --test --with $modules
 ```
 
 \* Note: This replaces the old deprecated `unittest` script.
