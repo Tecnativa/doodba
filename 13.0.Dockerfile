@@ -127,6 +127,7 @@ RUN build_deps=" \
         astor \
         git-aggregator \
         click-odoo-contrib \
+        firebase_admin \
         pg_activity \
         phonenumbers \
         plumbum \
