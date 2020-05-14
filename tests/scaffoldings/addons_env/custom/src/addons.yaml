@@ -8,7 +8,7 @@ odoo/addons:
   - sale
 ---
 ENV:
-  DEFAULT_REPO_PATTERN: https://github.com/it-projects-llc/{}.git
-  DEPTH_DEFAULT: 2
+  DEFAULT_REPO_PATTERN: https://github.com/itpp-labs/{}.git
+  ODOO_VERSION: 554222498d5101ef59fc4d3e1059e2b407dffd6f
 misc-addons:
   - web_debranding
