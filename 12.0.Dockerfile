@@ -40,7 +40,7 @@ RUN apt-get -qq update \
         chromium \
         ffmpeg \
         fonts-liberation2 \
-        gettext-base \
+        gettext \
         gnupg2 \
         locales-all \
         nano \

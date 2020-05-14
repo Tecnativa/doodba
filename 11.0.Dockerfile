@@ -39,7 +39,7 @@ RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
         chromium \
         fonts-liberation2 \
-        gettext-base \
+        gettext \
         gnupg2 \
         locales-all \
         ruby-compass \

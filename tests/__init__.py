@@ -277,6 +277,7 @@ class ScaffoldingCase(unittest.TestCase):
             ("git", "--version"),
             ("pg_activity", "--version"),
             ("psql", "--version"),
+            ("msgmerge", "--version"),
             ("ssh", "-V"),
             ("python", "-c", "import plumbum"),
             # We are able to dump
