@@ -108,7 +108,7 @@ RUN python -m venv --system-site-packages /qa/venv \
         flake8 \
         pylint-odoo \
         six \
-    && npm install --loglevel error --prefix /qa eslint \
+    && npm install --loglevel error --prefix /qa 'eslint@<7' \
     && deactivate \
     && mkdir -p /qa/artifacts \
     && git clone --depth 1 $MQT /qa/mqt
