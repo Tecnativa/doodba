@@ -44,7 +44,7 @@ RUN apt-get -qq update \
         chromium \
         ffmpeg \
         fonts-liberation2 \
-        gettext-base \
+        gettext \
         git \
         gnupg2 \
         locales-all \
