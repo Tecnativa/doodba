@@ -1,0 +1,81 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  schedule:
+    # See https://crontab.guru/weekly
+    - cron: 0 0 * * 0
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+      - name: Set PY
+        run:
+          echo "::set-env name=PY::$(python -c 'import hashlib,
+          sys;print(hashlib.sha256(sys.version.encode()+sys.executable.encode()).hexdigest())')"
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+      - uses: pre-commit/action@v1.0.1
+
+  build-test-push:
+    runs-on: ubuntu-latest
+    needs: pre-commit
+    strategy:
+      matrix:
+        # Test modern Odoo versions with latest Postgres version
+        pg_version: ["12"]
+        odoo_version:
+          - "13.0"
+          - "12.0"
+          - "11.0"
+          - "10.0"
+        # Test older Odoo versions with older Postgres versions
+        include:
+          - odoo_version: "9.0"
+            pg_version: "11"
+          - odoo_version: "8.0"
+            pg_version: "10"
+          - odoo_version: "7.0"
+            pg_version: "9.6"
+    env:
+      # Indicates what's the equivalent to tecnativa/doodba:latest image
+      LATEST_RELEASE: "13.0"
+      # Variables found by default in Docker Hub builder
+      DOCKER_REPO: tecnativa/doodba
+      DOCKER_TAG: ${{ matrix.odoo_version }}
+      GIT_SHA1: ${{ github.sha }}
+      # Other variables to configure tests and execution environment
+      DOCKER_BUILDKIT: 1
+      PG_VERSIONS: ${{ matrix.pg_version }}
+    steps:
+      # Prepare
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+      - run: pip install -r requirements-ci.txt
+      # Build images
+      - run: ./hooks/build
+      # Test
+      - run: python -m unittest -v tests
+      # Push
+      - name: push to docker hub
+        if: github.repository == 'Tecnativa/doodba' && github.ref == 'master'
+        env:
+          REGISTRY_HOST: docker.io
+          REGISTRY_PASSWORD: ${{ secrets.dockerhub_password }}
+          REGISTRY_USERNAME: ${{ secrets.dockerhub_username }}
+        run: ./hooks/push
+      - name: push to github registry
+        if: github.repository == 'Tecnativa/doodba' && github.ref == 'master'
+        env:
+          REGISTRY_HOST: docker.pkg.github.com
+          REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          REGISTRY_USERNAME: ${{ github.actor }}
+        run: ./hooks/push
