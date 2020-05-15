@@ -7,8 +7,9 @@
   "python.linting.flake8Enabled": true,
   "python.linting.pylintEnabled": true,
   "python.pythonPath": "python3",
+  "editor.formatOnSave": true,
 
-  "[python]": {
-    "editor.formatOnSave": true
+  "[dockerfile]": {
+    "editor.formatOnSave": false
   }
 }
