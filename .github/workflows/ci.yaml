@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: pre-commit
     strategy:
+      fail-fast: false
       matrix:
         # Test modern Odoo versions with latest Postgres version
         pg_version: ["12"]
