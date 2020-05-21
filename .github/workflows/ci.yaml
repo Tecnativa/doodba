@@ -66,14 +66,14 @@ jobs:
       - run: python -m unittest -v tests
       # Push
       - name: push to docker hub
-        if: github.repository == 'Tecnativa/doodba' && github.ref == 'master'
+        if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
         env:
           REGISTRY_HOST: docker.io
           REGISTRY_PASSWORD: ${{ secrets.dockerhub_password }}
           REGISTRY_USERNAME: ${{ secrets.dockerhub_username }}
         run: ./hooks/push
       - name: push to github registry
-        if: github.repository == 'Tecnativa/doodba' && github.ref == 'master'
+        if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
         env:
           REGISTRY_HOST: docker.pkg.github.com
           REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
