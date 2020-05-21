@@ -3,7 +3,7 @@
 from plumbum import FG, local
 from plumbum.cmd import docker  # noqa pylint: disable=import-error
 
-REGISTRY = local.env["REGISTRY_USERNAME"]
+REGISTRY = local.env["REGISTRY_HOST"]
 REPO = local.env["DOCKER_REPO"]
 VERSION = local.env["DOCKER_TAG"]
 
@@ -14,10 +14,10 @@ docker["image", "ls", "--digests", REPO] & FG
 docker(
     "login",
     "--username",
-    REGISTRY,
+    local.env["REGISTRY_USERNAME"],
     "--password",
-    local.env["REGISTRY_TOKEN"],
-    local.env["REGISTRY_HOST"],
+    local.env["REGISTRY_PASSWORD"],
+    REGISTRY,
 )
 
 # Push built images
