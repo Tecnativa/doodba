@@ -76,7 +76,7 @@ jobs:
       - name: push to github registry
         if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
         env:
-          DOCKER_REPO_SUFFIX: /stable
+          DOCKER_REPO_SUFFIX: /doodba
           REGISTRY_HOST: docker.pkg.github.com
           REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
           REGISTRY_USERNAME: ${{ github.actor }}
