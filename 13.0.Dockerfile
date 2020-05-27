@@ -1,4 +1,4 @@
-FROM python:3.7-slim-buster AS base
+FROM python:3.6-slim-buster AS base
 
 EXPOSE 8069 8072
 
@@ -19,7 +19,7 @@ ENV DB_FILTER=.* \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
-    PIP_NO_CACHE_DIR=1 \
+    PIP_NO_CACHE_DIR=0 \
     PTVSD_ARGS="--host 0.0.0.0 --port 6899 --wait --multiprocess" \
     PTVSD_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
@@ -67,7 +67,7 @@ RUN apt-get -qq update \
 
 WORKDIR /opt/odoo
 COPY bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.7/site-packages/doodbalib
+COPY lib/doodbalib /usr/local/lib/python3.6/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
@@ -75,7 +75,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.7/site-packages/doodbalib \
+    && chmod -R a+rX /usr/local/lib/python3.6/site-packages/doodbalib \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
     && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
@@ -115,6 +115,8 @@ RUN build_deps=" \
         libsasl2-dev \
         libtiff5-dev \
         libwebp-dev \
+        libxml2-dev \
+        libxslt-dev \
         tcl-dev \
         tk-dev \
         zlib1g-dev \
@@ -135,7 +137,7 @@ RUN build_deps=" \
         watchdog \
         wdb \
         geoip2 \
-    && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
+    && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
