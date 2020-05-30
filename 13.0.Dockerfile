@@ -137,6 +137,7 @@ RUN build_deps=" \
         watchdog \
         wdb \
         geoip2 \
+        inotify \
     && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \

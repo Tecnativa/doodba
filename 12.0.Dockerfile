@@ -82,6 +82,7 @@ RUN pip install \
         watchdog \
         wdb \
         geoip2 \
+        inotify \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib
