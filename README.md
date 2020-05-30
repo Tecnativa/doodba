@@ -60,6 +60,7 @@ You can start working with this straight away with our [template][].
   - [`log`](#log)
   - [`pot`](#pot)
   - [`psql`](#psql)
+  - [`inotify`](#inotify)
   - [`ptvsd`](#ptvsd)
   - [`pudb`](#pudb)
   - [`git-aggregator`](#git-aggregator)
@@ -503,6 +504,20 @@ just need to execute:
     docker-compose run -l traefik.enable=false --rm odoo psql
 
 The same is true for any other [Postgres client applications][].
+
+### [`inotify`](https://github.com/dsoprea/PyInotify)
+
+Enables hot code reloading when odoo is started with `--dev` and passed `reload` or
+`all` as an argument.
+
+[copier template](https://github.com/Tecnativa/doodba-copier-template) enables this by
+default in the development environment.
+
+Doodba supports this feature under;
+
+- [11.0](https://www.odoo.com/documentation/11.0/reference/cmdline.html#cmdoption-odoo-bin-dev)
+- [12.0](https://www.odoo.com/documentation/12.0/reference/cmdline.html#developer-features)
+- [13.0](https://www.odoo.com/documentation/13.0/reference/cmdline.html#developer-features)
 
 ### [`ptvsd`](https://github.com/DonJayamanne/pythonVSCode)
 
