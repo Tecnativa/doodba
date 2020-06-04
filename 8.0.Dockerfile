@@ -90,6 +90,7 @@ RUN pip install \
         wdb \
         simplejson \
         geoip2 \
+    && pip check \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
@@ -118,6 +119,7 @@ RUN virtualenv --system-site-packages /qa/venv \
         flake8 \
         pylint-odoo \
         six \
+    && pip check \
     && npm install --loglevel error --prefix /qa 'eslint@<6' \
     && deactivate \
     && mkdir -p /qa/artifacts \
@@ -130,7 +132,7 @@ ARG ODOO_SOURCE=OCA/OCB
 ARG ODOO_VERSION=10.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 RUN install.sh
-RUN pip install pg_activity
+RUN pip install pg_activity && pip check
 
 # Metadata
 ARG VCS_REF
@@ -218,4 +220,4 @@ ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo
 # HACK Special case for Werkzeug
-ONBUILD RUN pip install --user Werkzeug==0.14.1
+ONBUILD RUN pip install --user Werkzeug==0.14.1 && pip check

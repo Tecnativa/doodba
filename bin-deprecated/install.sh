@@ -49,6 +49,7 @@ fi
 if [ "$ODOO_VERSION" == "10.0" ]; then
     pip install astor
 fi
+pip check
 
 # Remove all installed garbage
 apt-get -y purge $apt_deps

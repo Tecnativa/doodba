@@ -11,6 +11,7 @@ class Installer(object):
 
     _cleanup_commands = []
     _install_command = None
+    _install_check_command = None
     _remove_command = None
 
     def __init__(self, file_path):
@@ -29,9 +30,11 @@ class Installer(object):
     def install(self):
         """Install the requirements from the given file."""
         if self._requirements:
-            return not self._run_command(self._install_command + self._requirements)
-        else:
-            logger.info("No installable requirements found in %s", self.file_path)
+            self._run_command(self._install_command + self._requirements)
+            if self._install_check_command:
+                self._run_command(self._install_check_command)
+            return True
+        logger.info("No installable requirements found in %s", self.file_path)
         return False
 
     def remove(self):
@@ -98,6 +101,7 @@ class NpmInstaller(Installer):
 
 class PipInstaller(Installer):
     _install_command = ["pip", "install", "--no-cache-dir", "-r"]
+    _install_check_command = ["pip", "check"]
 
     def requirements(self):
         """Pip will use its ``--requirements`` feature."""

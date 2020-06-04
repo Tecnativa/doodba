@@ -87,6 +87,7 @@ RUN pip install \
         wdb \
         geoip2 \
         inotify \
+    && pip check \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib
@@ -115,6 +116,7 @@ RUN python -m venv --system-site-packages /qa/venv \
         flake8 \
         pylint-odoo \
         six \
+    && pip check \
     && npm install --loglevel error --prefix /qa 'eslint@<6' \
     && deactivate \
     && mkdir -p /qa/artifacts \
@@ -131,6 +133,7 @@ RUN debs="libldap2-dev libsasl2-dev" \
     && apt-get install -yqq --no-install-recommends $debs \
     && pip install \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    && pip check \
     && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
     && apt-get purge -yqq $debs \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
@@ -220,4 +223,4 @@ ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo
 # HACK Special case for Werkzeug
-ONBUILD RUN pip install --user Werkzeug==0.14.1
+ONBUILD RUN pip install --user Werkzeug==0.14.1 && pip check

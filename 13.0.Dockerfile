@@ -91,6 +91,7 @@ RUN python -m venv --system-site-packages /qa/venv \
         flake8 \
         pylint-odoo \
         six \
+    && pip check \
     && npm install --loglevel error --prefix /qa eslint \
     && deactivate \
     && mkdir -p /qa/artifacts \
@@ -138,6 +139,7 @@ RUN build_deps=" \
         wdb \
         geoip2 \
         inotify \
+    && pip check \
     && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
