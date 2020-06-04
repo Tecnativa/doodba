@@ -20,6 +20,8 @@ ENV DB_FILTER=.* \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
     PIP_NO_CACHE_DIR=0 \
+    PIPX_BIN_DIR=/usr/local/bin \
+    PIPX_HOME=/usr/local/src/pipx \
     PTVSD_ARGS="--host 0.0.0.0 --port 6899 --wait --multiprocess" \
     PTVSD_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
@@ -128,18 +130,19 @@ RUN build_deps=" \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         'websocket-client~=0.56' \
         astor \
-        git-aggregator \
-        click-odoo-contrib \
-        pg_activity \
         phonenumbers \
+        pipx \
         plumbum \
         ptvsd \
         pudb \
         watchdog \
         wdb \
-        geoip2 \
+        'geoip2<3' \
         inotify \
     && pip check \
+    && pipx install --system-site-packages click-odoo-contrib \
+    && pipx install git-aggregator \
+    && pipx install pg_activity \
     && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \

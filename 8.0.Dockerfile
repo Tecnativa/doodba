@@ -20,6 +20,8 @@ ENV DB_FILTER=.* \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
     PIP_NO_CACHE_DIR=0 \
+    PIPSI_HOME=/usr/local/src/pipsi/venvs \
+    PIPSI_BIN_DIR=/usr/local/bin \
     PTVSD_ARGS="--host 0.0.0.0 --port 6899 --wait --multiprocess" \
     PTVSD_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
@@ -81,15 +83,17 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 # Other facilities
 WORKDIR /opt/odoo
 RUN pip install \
-        click-odoo-contrib \
-        git-aggregator \
         plumbum \
         ptvsd \
         pudb \
-        virtualenv \
+        'virtualenv<16.2.0' \
         wdb \
         simplejson \
-        geoip2 \
+        'geoip2<2.4.0' \
+    && curl https://raw.githubusercontent.com/mitsuhiko/pipsi/db3e3fccbe4f8f9ed1104ed7293ec8fec6579efc/get-pipsi.py | python - --src 'git+https://github.com/mitsuhiko/pipsi.git@db3e3fccbe4f8f9ed1104ed7293ec8fec6579efc#egg=pipsi' --no-modify-path \
+    && pipsi install --system-site-packages click-odoo-contrib \
+    && pipsi install git-aggregator \
+    && pipsi install pg_activity \
     && pip check \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
@@ -132,7 +136,6 @@ ARG ODOO_SOURCE=OCA/OCB
 ARG ODOO_VERSION=10.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 RUN install.sh
-RUN pip install pg_activity && pip check
 
 # Metadata
 ARG VCS_REF
