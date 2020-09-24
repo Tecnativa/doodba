@@ -48,6 +48,7 @@ def aggregate(config):
                 log_level,
                 "--jobs",
                 str(cpu_count() or 1),
+                "aggregate",
             ],
             cwd=SRC_DIR,
             stderr=sys.stderr,
