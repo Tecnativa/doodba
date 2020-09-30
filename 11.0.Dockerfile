@@ -20,8 +20,8 @@ ENV DB_FILTER=.* \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
     PIP_NO_CACHE_DIR=0 \
-    PTVSD_ARGS="--host 0.0.0.0 --port 6899 --wait --multiprocess" \
-    PTVSD_ENABLE=0 \
+    DEBUGPY_ARGS="--listen 0.0.0.0:6899 --wait-for-client" \
+    DEBUGPY_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
     PYTHONOPTIMIZE=1 \
@@ -82,7 +82,7 @@ RUN pip install \
         git-aggregator \
         pg_activity \
         plumbum \
-        ptvsd \
+        debugpy \
         pudb \
         watchdog \
         wdb \
