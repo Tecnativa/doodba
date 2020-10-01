@@ -394,8 +394,8 @@ server-tools:
 # Custom repositories
 ENV:
   DEFAULT_REPO_PATTERN: https://github.com/Tecnativa/{}.git
-  ODOO_VERSION: 13.0-new-feature
-some-repo: # Cloned from https://github.com/Tecnativa/some-repo.git branch 13.0-new-feature
+  ODOO_VERSION: 14.0-new-feature
+some-repo: # Cloned from https://github.com/Tecnativa/some-repo.git branch 14.0-new-feature
   - some_custom_module
 ```
 
@@ -513,11 +513,9 @@ Enables hot code reloading when odoo is started with `--dev` and passed `reload`
 [copier template](https://github.com/Tecnativa/doodba-copier-template) enables this by
 default in the development environment.
 
-Doodba supports this feature under;
-
-- [11.0](https://www.odoo.com/documentation/11.0/reference/cmdline.html#cmdoption-odoo-bin-dev)
-- [12.0](https://www.odoo.com/documentation/12.0/reference/cmdline.html#developer-features)
-- [13.0](https://www.odoo.com/documentation/13.0/reference/cmdline.html#developer-features)
+Doodba supports this feature under versions 11.0 and later. Check
+[CLI docs](https://www.odoo.com/documentation/13.0/reference/cmdline.html#developer-features)
+for details.
 
 ### [`debugpy`](https://github.com/microsoft/vscode-python)
 
