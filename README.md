@@ -528,7 +528,7 @@ To debug at a certain point of the code, add this Python code somewhere:
 
 ```python
 import debugpy
-debugpy.listen(5678)
+debugpy.listen(6899)
 print("Waiting for debugger attach")
 debugpy.wait_for_client()
 debugpy.breakpoint()
@@ -563,7 +563,7 @@ your project there is a `.vscode/launch.json` file with these minimal contents:
           "remoteRoot": "/opt/odoo"
         }
       ],
-      "port": 5678,
+      "port": 6899,
       "host": "localhost"
     }
   ]
