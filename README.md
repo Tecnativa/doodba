@@ -61,7 +61,7 @@ You can start working with this straight away with our [template][].
   - [`pot`](#pot)
   - [`psql`](#psql)
   - [`inotify`](#inotify)
-  - [`ptvsd`](#ptvsd)
+  - [`debugpy`](#debugpy)
   - [`pudb`](#pudb)
   - [`git-aggregator`](#git-aggregator)
   - [`autoaggregate`](#autoaggregate)
@@ -519,7 +519,7 @@ Doodba supports this feature under;
 - [12.0](https://www.odoo.com/documentation/12.0/reference/cmdline.html#developer-features)
 - [13.0](https://www.odoo.com/documentation/13.0/reference/cmdline.html#developer-features)
 
-### [`ptvsd`](https://github.com/DonJayamanne/pythonVSCode)
+### [`debugpy`](https://github.com/microsoft/vscode-python)
 
 [VSCode][] debugger. If you use this editor with its python module, you will find it
 useful.
@@ -527,19 +527,22 @@ useful.
 To debug at a certain point of the code, add this Python code somewhere:
 
 ```python
-import ptvsd
-ptvsd.enable_attach("doodba-rocks", address=("0.0.0.0", 6899))
-print("ptvsd waiting...")
-ptvsd.wait_for_attach()
+import debugpy
+debugpy.listen(6899)
+print("Waiting for debugger attach")
+debugpy.wait_for_client()
+debugpy.breakpoint()
+print('break on this line')
 ```
 
-To start Odoo within a ptvsd environment, which will obey the breakpoints established in
-your IDE (but will work slowly), just add `-e PTVSD_ENABLE=1` to your odoo container.
+To start Odoo within a debugpy environment, which will obey the breakpoints established
+in your IDE (but will work slowly), just add `-e DEBUGPY_ENABLE=1` to your odoo
+container.
 
-If you use the official [template][], you can boot it in ptvsd mode with:
+If you use the official [template][], you can boot it in debugpy mode with:
 
 ```bash
-export DOODBA_PTVSD_ENABLE=1
+export DOODBA_DEBUGPY_ENABLE=1
 docker-compose -f devel.yaml up -d
 ```
 

@@ -4,7 +4,7 @@
 import os
 import subprocess
 import sys
-from logging import DEBUG, INFO
+from logging import DEBUG, INFO, WARNING
 
 from doodbalib import logger, which
 
@@ -46,11 +46,25 @@ if extra_command:
                 # No DB exists, set initial language
                 extra_command += ["--load-language", os.environ["INITIAL_LANG"]]
         if os.environ["PTVSD_ENABLE"] == "1":
+            # Warn deprecation
+            logger.log(
+                WARNING,
+                "ptvsd has beed deprecated for python debugging. "
+                "Please use debugpy (see https://github.com/Tecnativa/doodba#debugpy)",
+            )
             # See `python -m ptvsd -h` to understand this
             extra_command[0] = os.path.realpath(which(extra_command[0]))
             extra_command = (
                 ["python", "-m", "ptvsd"]
                 + os.environ["PTVSD_ARGS"].split()
+                + extra_command
+            )
+        elif os.environ["DEBUGPY_ENABLE"] == "1":
+            # See `python -m debugpy -h` to understand this
+            extra_command[0] = os.path.realpath(which(extra_command[0]))
+            extra_command = (
+                ["python", "-m", "debugpy"]
+                + os.environ["DEBUGPY_ARGS"].split()
                 + extra_command
             )
     logger.log(
