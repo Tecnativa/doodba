@@ -34,6 +34,7 @@ jobs:
         # Test modern Odoo versions with latest Postgres version
         pg_version: ["12"]
         odoo_version:
+          - "14.0"
           - "13.0"
           - "12.0"
           - "11.0"
@@ -48,7 +49,7 @@ jobs:
             pg_version: "9.6"
     env:
       # Indicates what's the equivalent to tecnativa/doodba:latest image
-      LATEST_RELEASE: "13.0"
+      LATEST_RELEASE: "14.0"
       # Variables found by default in Docker Hub builder
       DOCKER_REPO: tecnativa/doodba
       DOCKER_TAG: ${{ matrix.odoo_version }}

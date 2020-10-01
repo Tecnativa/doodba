@@ -1,2 +1,2 @@
 server-tools:
-  - module_auto_update
+  - base_search_fuzzy

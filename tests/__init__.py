@@ -16,9 +16,9 @@ logging.basicConfig(level=logging.DEBUG)
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 ODOO_VERSIONS = frozenset(
-    environ.get("DOCKER_TAG", "7.0 8.0 9.0 10.0 11.0 12.0 13.0").split()
+    environ.get("DOCKER_TAG", "7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0").split()
 )
-PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "12").split())
+PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "13").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
     "GEOIP_ACCOUNT_ID", False
@@ -29,7 +29,7 @@ GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ
 # preparing the pre-release for the next version of Odoo, which hasn't been
 # released yet.
 prerelease_skip = unittest.skipIf(
-    ODOO_VERSIONS == {"13.0"}, "Tests not supported in pre-release"
+    ODOO_VERSIONS == {"14.0"}, "Tests not supported in pre-release"
 )
 
 
@@ -220,7 +220,13 @@ class ScaffoldingCase(unittest.TestCase):
             # Odoo settings work
             ("./custom/scripts/test_settings.py",),
         )
-        # Odoo 8.0 has no shell, and --load-language doesn't work fine in 9.0
+        if ODOO_VERSIONS & {"9.0", "10.0", "11.0"}:
+            commands += (
+                # Check Odoo settings using python-odoo-shell, which is available
+                # only for Odoo 9-11 (for 8 too, but it had no built-in shell)
+                ("./custom/scripts/test_settings_python_odoo_shell.py",),
+            )
+        # --load-language doesn't work fine in Odoo 9.0
         for sub_env in matrix(odoo={"9.0"}):
             self.compose_test(folder, sub_env, *commands)
         # Extra tests for versions >= 10.0, that support --load-language fine
@@ -301,6 +307,9 @@ class ScaffoldingCase(unittest.TestCase):
                 *commands,
             )
 
+    # HACK https://github.com/itpp-labs/misc-addons/issues/1014
+    # TODO Remove decorator
+    @prerelease_skip
     def test_addons_env(self):
         """Test environment variables in addons.yaml"""
         # Old versions are skiped because they don't support __manifest__.py,
@@ -355,8 +364,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("--version",),
             )
 
-    # TODO Remove decorator when OCB 13.0 is released and server-tools 13.0
-    # has a valid module to test
+    # TODO Remove decorator when base_search_fuzzy is migrated to 14.0
     @prerelease_skip
     def test_dependencies(self):
         """Test dependencies installation."""
@@ -369,8 +377,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-f", "custom/dependencies/gem.txt"),
                 ("test", "!", "-f", "custom/dependencies/npm.txt"),
                 ("test", "!", "-f", "custom/dependencies/pip.txt"),
-                # It should have module_auto_update available
-                ("test", "-d", "custom/src/server-tools/module_auto_update"),
+                # It should have base_search_fuzzy available
+                ("test", "-d", "custom/src/server-tools/base_search_fuzzy"),
                 # Patched Werkzeug version
                 (
                     "bash",
