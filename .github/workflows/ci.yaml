@@ -17,8 +17,9 @@ jobs:
       - uses: actions/setup-python@v1
       - name: Set PY
         run:
-          echo "::set-env name=PY::$(python -c 'import hashlib,
+          echo "PY=$(python -c 'import hashlib,
           sys;print(hashlib.sha256(sys.version.encode()+sys.executable.encode()).hexdigest())')"
+          >> $GITHUB_ENV
       - uses: actions/cache@v1
         with:
           path: ~/.cache/pre-commit
