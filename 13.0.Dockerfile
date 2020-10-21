@@ -136,6 +136,7 @@ RUN build_deps=" \
         plumbum \
         ptvsd \
         debugpy \
+        pydevd-odoo \
         pudb \
         watchdog \
         wdb \
