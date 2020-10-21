@@ -127,6 +127,7 @@ RUN build_deps=" \
         astor \
         click-odoo-contrib \
         debugpy \
+        pydevd-odoo \
         geoip2 \
         git-aggregator \
         inotify \
