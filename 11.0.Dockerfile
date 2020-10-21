@@ -86,6 +86,7 @@ RUN pip install \
         plumbum \
         ptvsd \
         debugpy \
+        pydevd-odoo \
         pudb \
         watchdog \
         wdb \
