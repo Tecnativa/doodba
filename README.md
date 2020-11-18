@@ -695,8 +695,8 @@ FROM tecnativa/doodba@sha256:fba69478f9b0616561aa3aba4d18e4bcc2f728c9568057946c9
 
 ### How can I help?
 
-Just [head to our project](https://github.com/Tecnativa/doodba) and open an issue or
-pull request.
+Just [head to our project](https://github.com/Tecnativa/doodba) and open a discussion,
+issue or pull request.
 
 ## Related Projects
 
