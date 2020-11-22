@@ -19,11 +19,16 @@ if os.path.isfile("%s.yaml" % ADDONS_YAML):
 else:
     ADDONS_YAML = "%s.yml" % ADDONS_YAML
 
-REPOS_YAML = os.path.join(SRC_DIR, "repos")
-if os.path.isfile("%s.yaml" % REPOS_YAML):
-    REPOS_YAML = "%s.yaml" % REPOS_YAML
+CUSTOM_REPOS_FILENAME = os.environ.get("CUSTOM_REPOS_FILENAME", False)
+
+if CUSTOM_REPOS_FILENAME:
+    REPOS_YAML = "%s/%s" % (SRC_DIR, CUSTOM_REPOS_FILENAME)
 else:
-    REPOS_YAML = "%s.yml" % REPOS_YAML
+    REPOS_YAML = os.path.join(SRC_DIR, "repos")
+    if os.path.isfile("%s.yaml" % REPOS_YAML):
+        REPOS_YAML = "%s.yaml" % REPOS_YAML
+    else:
+        REPOS_YAML = "%s.yml" % REPOS_YAML
 
 AUTO_REPOS_YAML = os.path.join(AUTO_DIR, "repos")
 if os.path.isfile("%s.yml" % AUTO_REPOS_YAML):
