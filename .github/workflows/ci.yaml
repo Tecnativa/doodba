@@ -75,11 +75,11 @@ jobs:
           REGISTRY_PASSWORD: ${{ secrets.dockerhub_password }}
           REGISTRY_USERNAME: ${{ secrets.dockerhub_username }}
         run: ./hooks/push
-      - name: push to github registry
+      - name: push to github container registry
         if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
         env:
           DOCKER_REPO_SUFFIX: /doodba
-          REGISTRY_HOST: docker.pkg.github.com
-          REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-          REGISTRY_USERNAME: ${{ github.actor }}
+          REGISTRY_HOST: ghcr.io
+          REGISTRY_PASSWORD: ${{ secrets.GHCR_PASSWORD }}
+          REGISTRY_USERNAME: ${{ secrets.GHCR_USERNAME }}
         run: ./hooks/push
