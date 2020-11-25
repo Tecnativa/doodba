@@ -80,6 +80,6 @@ jobs:
         env:
           DOCKER_REPO_SUFFIX: /doodba
           REGISTRY_HOST: ghcr.io
-          REGISTRY_PASSWORD: ${{ secrets.GHCR_PASSWORD }}
-          REGISTRY_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.BOT_TOKEN }}
+          REGISTRY_USERNAME: ${{ secrets.BOT_LOGIN }}
         run: ./hooks/push
