@@ -72,8 +72,8 @@ jobs:
         if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
         env:
           REGISTRY_HOST: docker.io
-          REGISTRY_PASSWORD: ${{ secrets.dockerhub_password }}
-          REGISTRY_USERNAME: ${{ secrets.dockerhub_username }}
+          REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_LOGIN }}
         run: ./hooks/push
       - name: push to github container registry
         if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
