@@ -349,7 +349,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("python", "-xc", "import Crypto; print(Crypto.__version__)"),
                 ("sh", "-xc", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # ``requirements.txt`` from addon repos were processed
-                ("python", "-c", "import cfssl"),
+                ("python", "-c", "import numpy"),
                 # Local executable binaries found in $PATH
                 ("sh", "-xc", "pip install --user -q flake8 && which flake8"),
                 # Addon cleanup works correctly
