@@ -62,11 +62,15 @@ jobs:
       # Prepare
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
-      - run: pip install -r requirements-ci.txt
+      # Install dev and test dependencies
+      - run: pip install poetry
+      - name: Patch $PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - run: poetry install
       # Build images
-      - run: ./hooks/build
+      - run: poetry run ./hooks/build
       # Test
-      - run: python -m unittest -v tests
+      - run: poetry run python -m unittest -v tests
       # Push
       - name: push to docker hub
         if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
