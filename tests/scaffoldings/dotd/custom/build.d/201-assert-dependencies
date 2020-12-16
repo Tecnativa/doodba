@@ -4,4 +4,4 @@ set -ex
 which busybox
 aloha_world
 node -e "require('test-npm-install')"
-python -c "import cfssl, Crypto"
+python -c "import numpy, Crypto"
