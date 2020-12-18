@@ -78,11 +78,11 @@ jobs:
           REGISTRY_HOST: docker.io
           REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
           REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_LOGIN }}
-        run: ./hooks/push
+        run: poetry run ./hooks/push
       - name: push to github container registry
         if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
         env:
           REGISTRY_HOST: ghcr.io
           REGISTRY_PASSWORD: ${{ secrets.BOT_TOKEN }}
           REGISTRY_USERNAME: ${{ secrets.BOT_LOGIN }}
-        run: ./hooks/push
+        run: poetry run ./hooks/push
