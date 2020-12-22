@@ -8,8 +8,6 @@ from logging import DEBUG, INFO, WARNING
 
 from doodbalib import logger, which
 
-from psycopg2 import OperationalError, connect
-
 # Call this file linked from another file called `build` or `entrypoint`
 mode = os.path.basename(__file__)
 
@@ -39,6 +37,8 @@ if extra_command:
     # Set the DB creation language, if needed
     if extra_command[0] in {"odoo", "/usr/local/bin/odoo"}:
         if os.environ.get("INITIAL_LANG"):
+            from psycopg2 import OperationalError, connect
+
             try:
                 connection = connect(dbname=os.environ.get("PGDATABASE"))
                 connection.close()

@@ -532,6 +532,38 @@ class ScaffoldingCase(unittest.TestCase):
                 ),
             )
 
+    def test_postgres_client_version(self):
+        postgres_client_version_dir = join(SCAFFOLDINGS_DIR, "postgres_client_version")
+        for sub_env in matrix():
+            self.compose_test(
+                postgres_client_version_dir,
+                sub_env,
+                ("psql", "--version"),
+                # verify that psql --version is as expected
+                (
+                    "bash",
+                    "-c",
+                    '[[ "$(psql --version)" == "psql (PostgreSQL) %s."* ]]'
+                    % sub_env["DB_VERSION"],
+                ),
+                ("pg_dump", "--version"),
+                # verify that pg_dump --version is as expected
+                (
+                    "bash",
+                    "-c",
+                    '[[ "$(pg_dump --version)" == "pg_dump (PostgreSQL) %s."* ]]'
+                    % sub_env["DB_VERSION"],
+                ),
+                ("pg_restore", "--version"),
+                # verify that pg_restore --version is as expected
+                (
+                    "bash",
+                    "-c",
+                    '[[ "$(pg_restore --version)" == "pg_restore (PostgreSQL) %s."* ]]'
+                    % sub_env["DB_VERSION"],
+                ),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
