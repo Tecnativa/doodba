@@ -56,7 +56,6 @@ RUN apt-get -qq update \
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
-    && apt-get install -yqq --no-install-recommends postgresql-client \
     && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
@@ -225,6 +224,7 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && ln -s /opt/odoo/custom/ssh ~root/.ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
+ONBUILD ARG DB_VERSION=latest
 ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo

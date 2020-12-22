@@ -64,12 +64,9 @@ RUN sed -Ei 's@(^deb http://deb.debian.org/debian jessie-updates main$)@#\1@' /e
     && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && rm -Rf /var/lib/apt/lists/*
 
-# Special case to get latest PostgreSQL client
+# Special case to get latest PostgreSQL client in 250-postgres-client
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends postgresql-client \
-    && rm -Rf /var/lib/apt/lists/* /tmp/*
 
 # Special case to get latest Less and PhantomJS
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
@@ -218,6 +215,7 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && ln -s /opt/odoo/custom/ssh ~root/.ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
+ONBUILD ARG DB_VERSION=latest
 ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo

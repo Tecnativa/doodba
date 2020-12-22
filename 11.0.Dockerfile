@@ -55,7 +55,7 @@ RUN apt-get -qq update \
     && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get update \
-    && apt-get install -yqq --no-install-recommends nodejs postgresql-client \
+    && apt-get install -yqq --no-install-recommends nodejs \
     && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.stretch_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
     && apt-get install -yqq --no-install-recommends ./wkhtmltox.deb \
@@ -221,6 +221,7 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && ln -s /opt/odoo/custom/ssh ~root/.ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
+ONBUILD ARG DB_VERSION=latest
 ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo
