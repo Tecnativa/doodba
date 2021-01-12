@@ -159,11 +159,12 @@ def addons_config(filtered=True, strict=False):
             continue
         repos.discard(CORE)
         # Other addons fall in between
-        if len(repos) != 1:
+        if filtered and len(repos) != 1:
             raise AddonsConfigError(
                 u"Addon {} defined in several repos {}".format(addon, repos)
             )
-        yield addon, repos.pop()
+        for repo in repos:
+            yield addon, repo
 
 
 try:

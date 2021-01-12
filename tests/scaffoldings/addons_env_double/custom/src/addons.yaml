@@ -1,0 +1,12 @@
+---
+ONLY:
+  DOODBA_ENVIRONMENT:
+    - test
+rma-old: # rma should have version 12.0.1.6.1
+  - rma
+---
+ONLY:
+  DOODBA_ENVIRONMENT:
+    - prod
+rma-new: # rma should have version 12.0.2.0.0
+  - rma

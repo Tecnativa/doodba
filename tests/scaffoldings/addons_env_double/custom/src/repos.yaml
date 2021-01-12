@@ -1,0 +1,25 @@
+# Odoo is always required
+./odoo:
+  defaults:
+    # Shallow repositores are faster & thinner
+    depth: $DEPTH_DEFAULT
+  remotes:
+    ocb: https://github.com/OCA/OCB.git
+    odoo: https://github.com/odoo/odoo.git
+  target: ocb $ODOO_VERSION
+  merges:
+    - ocb $ODOO_VERSION
+
+rma-old:
+  remotes:
+    origin: https://github.com/OCA/rma.git
+  target: origin _merged_branch
+  merges:
+    - origin 242b7e21a174e48f713459f836794560e68290de # rma v12.0.1.6.1
+
+rma-new:
+  remotes:
+    origin: https://github.com/OCA/rma.git
+  target: origin _merged_branch
+  merges:
+    - origin 96d2081987292ae02efda9826cbe5ba1ad84d6c3 # rma v12.0.2.0.0

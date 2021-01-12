@@ -327,6 +327,35 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-d", "auto/addons/crm/migrations"),
             )
 
+    # HACK https://github.com/itpp-labs/misc-addons/issues/1014
+    # TODO Remove decorator
+    @prerelease_skip
+    def test_addons_env_double(self):
+        """Test double addon reference in addons.yaml"""
+        common_tests = (
+            ("test", "-d", "custom/src/rma-old/rma"),
+            ("test", "!", "-d", "custom/src/rma-old/rma_sale"),
+            ("test", "-d", "custom/src/rma-new/rma"),
+            ("test", "!", "-d", "custom/src/rma-new/rma_sale"),
+        )
+        # Old versions are skiped because they don't support __manifest__.py,
+        # and the test is hacking ODOO_VERSION to pin a commit
+        for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
+            self.compose_test(
+                join(SCAFFOLDINGS_DIR, "addons_env_double"),
+                dict(sub_env, DOODBA_ENVIRONMENT="test"),
+                *common_tests,
+                # Check version is 12.0.1.6.1
+                ("grep", "-q", "12.0.1.6.1", "auto/addons/rma/__manifest__.py"),
+            )
+            self.compose_test(
+                join(SCAFFOLDINGS_DIR, "addons_env_double"),
+                dict(sub_env, DOODBA_ENVIRONMENT="prod"),
+                *common_tests,
+                # Check version is 12.0.2.0.0
+                ("grep", "-q", "12.0.2.0.0", "auto/addons/rma/__manifest__.py"),
+            )
+
     def test_dotd(self):
         """Test environment with common ``*.d`` directories."""
         for sub_env in matrix():
