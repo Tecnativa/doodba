@@ -1,9 +1,21 @@
 #!/bin/bash
 set -e
 
+# make sure odoo has a user.name configured, as merges would not succeed otherwise
+# (even if GIT_AUTHOR_NAME and EMAIL are set and should be used, it seems gitaggregate is not passing them to git)
+su --shell="$SHELL" odoo -c 'git config user.name 1>/dev/null || git config --global user.name "'"$GIT_AUTHOR_NAME"'"'
+
+# copy ssh directory to odoo user as well (gitaggregate may also be run as odoo user)
+if [[ ! -e ~odoo/.ssh ]] ; then
+    cp -a /opt/odoo/custom/ssh ~odoo/.ssh
+fi
+
 if [ "$AGGREGATE" != true ]; then
     log WARNING Not aggregating code repositories
     exit 0
 fi
 
+# during build checkout sources for root:odoo
+# to checkout sources as odoo:odoo set AGGREGATE to false for build and execute autoaggregate during runtime
+export UID=0 GID=$GID UMASK=0027
 exec autoaggregate
