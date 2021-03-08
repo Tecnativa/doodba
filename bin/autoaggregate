@@ -63,7 +63,13 @@ def aggregate(config):
             for root, dirs, files in os.walk(SRC_DIR):
                 for target in dirs + files:
                     try:
-                        os.chown(os.path.join(root, target), UID, GID)
+                        target_path = os.path.join(root, target)
+                        if not os.path.islink(target_path):
+                            # if target_path is a link we would only chown the
+                            # target, as the target should be chowned separately
+                            # we can skip all symlinks and prevent showing
+                            # unclear errors
+                            os.chown(target_path, UID, GID)
                     except Exception:
                         logger.debug(
                             "Error trying to chown on file. Skipping...", exc_info=True
