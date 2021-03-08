@@ -2,6 +2,6 @@
 # Dependencies are processed at step 200
 set -ex
 which busybox
-aloha_world
+hello-world
 node -e "require('test-npm-install')"
 python -c "import numpy, Crypto"

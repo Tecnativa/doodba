@@ -1,2 +1,2 @@
 # This line should be ignored
-aloha_world
+hello-world
