@@ -48,7 +48,7 @@ RUN sed -Ei 's@(^deb http://deb.debian.org/debian jessie-updates main$)@#\1@' /e
         locales-all zlibc \
         bzip2 ca-certificates curl gettext git nano \
         openssh-client telnet xz-utils \
-    && curl https://bootstrap.pypa.io/2.7/get-pip.py | python /dev/stdin \
+    && curl https://bootstrap.pypa.io/pip/2.7/get-pip.py | python /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -yqq nodejs \
     && curl -SLo fonts-liberation2.deb http://ftp.debian.org/debian/pool/main/f/fonts-liberation2/fonts-liberation2_2.00.1-3_all.deb \
