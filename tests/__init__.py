@@ -374,7 +374,12 @@ class ScaffoldingCase(unittest.TestCase):
                 ("busybox", "whoami"),
                 ("bash", "-xc", "echo $NODE_PATH"),
                 ("node", "-e", "require('test-npm-install')"),
-                ("aloha_world",),
+                ("hello-world",),
+                (
+                    "bash",
+                    "-c",
+                    'test "$(hello-world)" == "this is executable hello-world"',
+                ),
                 ("python", "-xc", "import Crypto; print(Crypto.__version__)"),
                 ("sh", "-xc", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # ``requirements.txt`` from addon repos were processed
@@ -439,7 +444,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("sh", "-xc", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # 270-gem.txt
                 ("test", "-f", "custom/dependencies/270-gem.txt"),
-                ("aloha_world",),
+                ("hello-world",),
             )
 
     def test_modified_uids(self):
