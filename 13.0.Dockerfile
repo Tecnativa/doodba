@@ -131,7 +131,7 @@ RUN build_deps=" \
         astor \
         git-aggregator \
         click-odoo-contrib \
-        pg_activity \
+        "pg_activity<=2.0.3" \
         phonenumbers \
         plumbum \
         ptvsd \

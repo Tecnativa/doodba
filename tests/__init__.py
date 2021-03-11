@@ -598,6 +598,38 @@ class ScaffoldingCase(unittest.TestCase):
                 ),
             )
 
+    def test_symlinks(self):
+        symlink_dir = join(SCAFFOLDINGS_DIR, "symlinks")
+        for sub_env in matrix():
+            self.compose_test(
+                symlink_dir,
+                sub_env,
+                # there should be no addon for broken symlinks
+                ("test", "!", "-e", "/opt/odoo/auto/addons/broken_addon_link"),
+                # there should be an addon for working symlinks
+                ("test", "-e", "/opt/odoo/auto/addons/addon_alias"),
+                # and the addon should have a manifest (this addon link would probably not work in odoo,
+                # we are just testing filesystem here)
+                (
+                    "test",
+                    "-e",
+                    "/opt/odoo/auto/addons/addon_alias/__manifest__.py",
+                    "-o",
+                    "-e",
+                    "/opt/odoo/auto/addons/addon_alias/__openerp__.py",
+                ),
+                # verify that symlinking outside the src directory doesn't enable changing permission of important stuff
+                ("bash", "-c", '[[ "$(stat -c %U:%G /bin/date)" == "root:root" ]]',),
+                # verify that everything in src dir (except symlinks) is accessible by odoo
+                (
+                    "bash",
+                    "-c",
+                    "files=$(find /opt/odoo/custom/src -not -group odoo -and -not -type l "
+                    " | wc -l) &&"
+                    " [[ $files == 0 ]]",
+                ),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

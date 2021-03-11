@@ -82,7 +82,7 @@ RUN pip install \
         astor \
         click-odoo-contrib \
         git-aggregator \
-        pg_activity \
+        "pg_activity<=2.0.3" \
         plumbum \
         ptvsd \
         debugpy \
