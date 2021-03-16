@@ -131,7 +131,7 @@ RUN build_deps=" \
         geoip2 \
         git-aggregator \
         inotify \
-        pg_activity \
+        https://github.com/dalibo/pg_activity/archive/entry-points.zip \
         phonenumbers \
         plumbum \
         pudb \
