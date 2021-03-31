@@ -238,6 +238,9 @@ class ScaffoldingCase(unittest.TestCase):
                 """test "$(psql -Atqc "SELECT code FROM res_lang
                                     WHERE active = TRUE")" == es_ES""",
             ),
+            # If `preparedb` is executed, we should have `report.url` set
+            ("preparedb",),
+            ("./custom/scripts/test_ir_config_parameters.py",),
         )
         for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
             self.compose_test(folder, sub_env, *commands)
