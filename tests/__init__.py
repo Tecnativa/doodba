@@ -15,9 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
-ODOO_VERSIONS = frozenset(
-    environ.get("DOCKER_TAG", "7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0").split()
-)
+ODOO_VERSIONS = frozenset(environ.get("DOCKER_TAG", "11.0 12.0 13.0 14.0").split())
 PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "13").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
@@ -153,8 +151,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-xc", 'test -z "$(addons list -p)"'),
                 ("bash", "-xc", 'test "$(addons list -c)" == crm,sale'),
             )
-        # Skip Odoo versions that don't support __manifest__.py files
-        for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
@@ -220,16 +216,12 @@ class ScaffoldingCase(unittest.TestCase):
             # Odoo settings work
             ("./custom/scripts/test_settings.py",),
         )
-        if ODOO_VERSIONS & {"9.0", "10.0", "11.0"}:
+        if "11.0" in ODOO_VERSIONS:
             commands += (
                 # Check Odoo settings using python-odoo-shell, which is available
                 # only for Odoo 9-11 (for 8 too, but it had no built-in shell)
                 ("./custom/scripts/test_settings_python_odoo_shell.py",),
             )
-        # --load-language doesn't work fine in Odoo 9.0
-        for sub_env in matrix(odoo={"9.0"}):
-            self.compose_test(folder, sub_env, *commands)
-        # Extra tests for versions >= 10.0, that support --load-language fine
         commands += (
             # DB was created with the correct language
             (
@@ -242,7 +234,7 @@ class ScaffoldingCase(unittest.TestCase):
             ("preparedb",),
             ("./custom/scripts/test_ir_config_parameters.py",),
         )
-        for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
+        for sub_env in matrix():
             self.compose_test(folder, sub_env, *commands)
 
     def test_smallest(self):
@@ -297,17 +289,9 @@ class ScaffoldingCase(unittest.TestCase):
             ("bash", "-xc", "! geoipupdate"),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
-        for sub_env in matrix(odoo_skip={"7.0", "8.0"}):
+        for sub_env in matrix():
             self.compose_test(
                 smallest_dir, sub_env, *commands, ("python", "-c", "import watchdog")
-            )
-        for sub_env in matrix(odoo={"8.0"}):
-            self.compose_test(
-                smallest_dir,
-                sub_env,
-                # Odoo <= 8.0 does not autocreate the database
-                ("createdb",),
-                *commands,
             )
 
     # HACK https://github.com/itpp-labs/misc-addons/issues/1014
@@ -315,9 +299,8 @@ class ScaffoldingCase(unittest.TestCase):
     @prerelease_skip
     def test_addons_env(self):
         """Test environment variables in addons.yaml"""
-        # Old versions are skiped because they don't support __manifest__.py,
-        # and the test is hacking ODOO_VERSION to pin a commit
-        for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
+        # The test is hacking ODOO_VERSION to pin a commit
+        for sub_env in matrix():
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "addons_env"),
                 sub_env,
@@ -341,9 +324,8 @@ class ScaffoldingCase(unittest.TestCase):
             ("test", "-d", "custom/src/rma-new/rma"),
             ("test", "!", "-d", "custom/src/rma-new/rma_sale"),
         )
-        # Old versions are skiped because they don't support __manifest__.py,
-        # and the test is hacking ODOO_VERSION to pin a commit
-        for sub_env in matrix(odoo_skip={"7.0", "8.0", "9.0"}):
+        # The test is hacking ODOO_VERSION to pin a commit
+        for sub_env in matrix():
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "addons_env_double"),
                 dict(sub_env, DOODBA_ENVIRONMENT="test"),
@@ -406,7 +388,7 @@ class ScaffoldingCase(unittest.TestCase):
     def test_dependencies(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies")
-        for sub_env in matrix(odoo_skip={"7.0"}):
+        for sub_env in matrix():
             self.compose_test(
                 dependencies_dir,
                 sub_env,
