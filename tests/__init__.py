@@ -5,6 +5,7 @@
 Each test must be a valid docker-compose.yaml file with a ``odoo`` service.
 """
 import logging
+import os
 import unittest
 from itertools import product
 from os import environ
@@ -637,6 +638,18 @@ class ScaffoldingCase(unittest.TestCase):
                     "git --git-dir=/opt/odoo/custom/src/odoo/.git log -n 1"
                     " | grep 'docker-odoo <https://hub.docker.com/r/tecnativa/odoo>'",
                 ),
+            )
+
+    def test_aggregate_permissions(self):
+        symlink_dir = join(SCAFFOLDINGS_DIR, "aggregate_permissions")
+        for sub_env in matrix():
+            self.compose_test(
+                symlink_dir,
+                dict(sub_env, UID=str(os.getuid()), GID=str(os.getgid())),
+                ("autoaggregate",),
+                # test that permissions are set in a way that enables a second autoaggregation after the first one
+                # e.g. when used in dev we update the source code sometimes/daily
+                ("autoaggregate",),
             )
 
 
