@@ -80,7 +80,8 @@ RUN gem install --no-rdoc --no-ri --no-update-sources autoprefixer-rails --versi
 WORKDIR /opt/odoo
 RUN pip install \
         astor \
-        click-odoo-contrib \
+        # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
+        git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
         git-aggregator \
         "pg_activity<=2.0.3" \
         plumbum \
