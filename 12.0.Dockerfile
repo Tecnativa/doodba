@@ -107,11 +107,13 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
 COPY qa /qa
 RUN python -m venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
+    # HACK: Upgrade pip: higher version needed to install pyproject.toml based packages
+    && pip install -U pip \
     && pip install --no-cache-dir \
         click \
         coverage \
         flake8 \
-        pylint-odoo \
+        git+https://github.com/OCA/pylint-odoo.git@refs/pull/329/head \
         six \
     && npm install --loglevel error --prefix /qa 'eslint@<7' \
     && deactivate \
