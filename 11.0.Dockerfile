@@ -83,7 +83,7 @@ RUN pip install \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
         git-aggregator \
-        "pg_activity<=2.0.3" \
+        "pg_activity<2.0.0" \
         plumbum \
         ptvsd \
         debugpy \
