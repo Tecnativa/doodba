@@ -7,23 +7,12 @@ services:
         COMPILE: "false"
         ODOO_VERSION: $ODOO_MINOR
         WITHOUT_DEMO: "false"
-    tty: true
-    depends_on:
-      - db
     environment:
       PYTHONOPTIMIZE: ""
       UNACCENT: "false"
+    entrypoint: "" # we are not using odoo but only checking the repo state here, this skips starting the db
     volumes:
       - filestore:/var/lib/odoo:z
 
-  db:
-    image: postgres:${DB_VERSION}-alpine
-    environment:
-      POSTGRES_USER: odoo
-      POSTGRES_PASSWORD: odoopassword
-    volumes:
-      - db:/var/lib/postgresql/data:z
-
 volumes:
-  db:
   filestore:

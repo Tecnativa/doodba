@@ -16,7 +16,7 @@ services:
       GID: "${GID:-1000}"
       UMASK: "$UMASK"
     user: root
-    entrypoint: "" # we are calling autoaggregate inside the tests
+    entrypoint: "" # we are only calling autoaggregate inside the tests
     volumes:
       - ./custom/src/:/opt/odoo/custom/src:rw,z
       - filestore:/var/lib/odoo:z
