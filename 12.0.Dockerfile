@@ -84,6 +84,7 @@ RUN pip install \
         debugpy \
         pydevd-odoo \
         pudb \
+        python-magic \
         watchdog \
         wdb \
         geoip2 \
