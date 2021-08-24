@@ -139,6 +139,7 @@ RUN build_deps=" \
         debugpy \
         pydevd-odoo \
         pudb \
+        python-magic \
         watchdog \
         wdb \
         geoip2 \

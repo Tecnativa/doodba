@@ -137,6 +137,7 @@ RUN build_deps=" \
         phonenumbers \
         plumbum \
         pudb \
+        python-magic \
         watchdog \
         wdb \
     && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \
