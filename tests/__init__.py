@@ -28,7 +28,7 @@ GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ
 # preparing the pre-release for the next version of Odoo, which hasn't been
 # released yet.
 prerelease_skip = unittest.skipIf(
-    ODOO_VERSIONS & {"14.0", "15.0"}, "Tests not supported in pre-release"
+    ODOO_VERSIONS & {"15.0"}, "Tests not supported in pre-release"
 )
 
 
@@ -301,7 +301,9 @@ class ScaffoldingCase(unittest.TestCase):
     def test_addons_env(self):
         """Test environment variables in addons.yaml"""
         # The test is hacking ODOO_VERSION to pin a commit
-        for sub_env in matrix():
+        # It uses OCA/OpenUpgrade as base for Odoo, which won't work from v14
+        # and onwards as it no longer is a fork from Odoo
+        for sub_env in matrix(odoo_skip={"14.0", "15.0"}):
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "addons_env"),
                 sub_env,
@@ -312,6 +314,18 @@ class ScaffoldingCase(unittest.TestCase):
                 # Migrations folder is only in OpenUpgrade
                 ("test", "-e", "auto/addons/crm"),
                 ("test", "-d", "auto/addons/crm/migrations"),
+            )
+        for sub_env in matrix(odoo_skip={"14.0", "15.0"}):
+            self.compose_test(
+                join(SCAFFOLDINGS_DIR, "addons_env_ou"),
+                sub_env,
+                # check module from custom repo pattern
+                ("test", "-d", "custom/src/misc-addons"),
+                ("test", "-d", "custom/src/misc-addons/web_debranding"),
+                ("test", "-e", "auto/addons/web_debranding"),
+                # Migrations folder
+                ("test", "-e", "auto/addons/openupgrade_scripts"),
+                ("test", "-d", "auto/addons/openupgrade_scripts/scripts"),
             )
 
     # HACK https://github.com/itpp-labs/misc-addons/issues/1014
