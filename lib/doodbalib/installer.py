@@ -88,7 +88,7 @@ class AptInstaller(Installer):
 
 class GemInstaller(Installer):
     _cleanup_commands = ["rm -Rf ~/.gem /var/lib/gems/*/cache/"]
-    _install_command = ["gem", "install", "--no-rdoc", "--no-ri", "--no-update-sources"]
+    _install_command = ["gem", "install", "--no-document", "--no-update-sources"]
 
 
 class NpmInstaller(Installer):
