@@ -48,7 +48,7 @@ def matrix(
             product(("DB_VERSION",), PG_VERSIONS & pg - pg_skip),
         ),
     )
-    return [dict(e, ODOO_MAJOR=e['ODOO_MINOR'].split('.')[0]) for e in version_map]
+    return [dict(e, ODOO_MAJOR=e["ODOO_MINOR"].split(".")[0]) for e in version_map]
 
 
 class ScaffoldingCase(unittest.TestCase):
@@ -200,24 +200,26 @@ class ScaffoldingCase(unittest.TestCase):
             ("/qa/venv/bin/python", "--version"),
         )
         for sub_env in matrix():
-            if int(sub_env['ODOO_MAJOR']) < 13:
-                commands = \
-                    (commands[0],) \
+            if int(sub_env["ODOO_MAJOR"]) < 13:
+                commands = (
+                    (commands[0],)
                     + (
                         ("/qa/node_modules/.bin/eslint", "--version"),
                         ("/qa/venv/bin/flake8", "--version"),
                         ("/qa/venv/bin/pylint", "--version"),
                         ("/qa/venv/bin/python", "-c", "import pylint_odoo"),
-                    ) \
+                    )
                     + commands[1:]
-                if "11.0" != sub_env['ODOO_MINOR']:
-                    commands = \
-                        (commands[0],) \
-                        + (("/qa/node_modules/.bin/eslint", "--env-info"),) \
+                )
+                if "11.0" != sub_env["ODOO_MINOR"]:
+                    commands = (
+                        (commands[0],)
+                        + (("/qa/node_modules/.bin/eslint", "--env-info"),)
                         + commands[1:]
+                    )
 
-            if int(sub_env['ODOO_MAJOR']) < 14:
-                commands += (("test", "-d", "/qa/mqt"), )
+            if int(sub_env["ODOO_MAJOR"]) < 14:
+                commands += (("test", "-d", "/qa/mqt"),)
             self.compose_test(folder, sub_env, *commands)
 
     @prerelease_skip
@@ -450,7 +452,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-f", "custom/dependencies/270-gem.txt"),
                 ("hello-world",),
             )
-            if int(sub_env['ODOO_MAJOR']) < 14:
+            if int(sub_env["ODOO_MAJOR"]) < 14:
                 self.compose_test(
                     dependencies_dir,
                     sub_env,
