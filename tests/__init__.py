@@ -328,7 +328,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/crm"),
                 ("test", "-d", "auto/addons/crm/migrations"),
             )
-        for sub_env in matrix(odoo_skip={"14.0", "15.0"}):
+        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0"}):
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "addons_env_ou"),
                 sub_env,
