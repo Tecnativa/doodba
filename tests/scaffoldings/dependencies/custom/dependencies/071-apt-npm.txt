@@ -1,0 +1,2 @@
+# we need npm for 150-npm-aloha_world-install.txt
+npm
