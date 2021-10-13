@@ -222,7 +222,6 @@ class ScaffoldingCase(unittest.TestCase):
                 commands += (("test", "-d", "/qa/mqt"),)
             self.compose_test(folder, sub_env, *commands)
 
-    @prerelease_skip
     def test_settings(self):
         """Test settings are filled OK"""
         folder = join(SCAFFOLDINGS_DIR, "settings")
@@ -344,8 +343,6 @@ class ScaffoldingCase(unittest.TestCase):
             )
 
     # HACK https://github.com/itpp-labs/misc-addons/issues/1014
-    # TODO Remove decorator
-    @prerelease_skip
     def test_addons_env_double(self):
         """Test double addon reference in addons.yaml"""
         common_tests = (
