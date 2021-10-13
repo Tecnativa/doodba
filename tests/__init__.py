@@ -28,7 +28,7 @@ GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ
 # preparing the pre-release for the next version of Odoo, which hasn't been
 # released yet.
 prerelease_skip = unittest.skipIf(
-    ODOO_VERSIONS & {"14.0", "15.0"}, "Tests not supported in pre-release"
+    ODOO_VERSIONS & {"15.0"}, "Tests not supported in pre-release"
 )
 
 
@@ -191,23 +191,27 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-xc", 'test "$(addons list -cWsale)" == crm'),
             )
 
-    @prerelease_skip
     def test_qa(self):
         """Test that QA tools are in place and work as expected."""
         folder = join(SCAFFOLDINGS_DIR, "settings")
-        commands = (
-            ("./custom/scripts/qa-insider-test",),
-            ("/qa/node_modules/.bin/eslint", "--version"),
-            ("/qa/venv/bin/flake8", "--version"),
-            ("/qa/venv/bin/pylint", "--version"),
-            ("/qa/venv/bin/python", "--version"),
-            ("/qa/venv/bin/python", "-c", "import pylint_odoo"),
-            ("test", "-d", "/qa/mqt"),
-        )
+        commands = (("./custom/scripts/qa-insider-test",),)
         for sub_env in matrix():
+            # Images up to v12 (inclusive) still had QA/NodeJS dependencies.
+            # Check if they are correctly installed.
+            if float(sub_env["ODOO_MINOR"]) < 13:
+                commands += (
+                    ("/qa/node_modules/.bin/eslint", "--version"),
+                    ("/qa/venv/bin/flake8", "--version"),
+                    ("/qa/venv/bin/pylint", "--version"),
+                    ("/qa/venv/bin/python", "-c", "import pylint_odoo"),
+                )
+                if sub_env["ODOO_MINOR"] != "11.0":
+                    commands += (("/qa/node_modules/.bin/eslint", "--env-info"),)
+            commands += (("/qa/venv/bin/python", "--version"),)
+            if float(sub_env["ODOO_MINOR"]) < 14:
+                commands += (("test", "-d", "/qa/mqt"),)
             self.compose_test(folder, sub_env, *commands)
 
-    @prerelease_skip
     def test_settings(self):
         """Test settings are filled OK"""
         folder = join(SCAFFOLDINGS_DIR, "settings")
@@ -301,7 +305,9 @@ class ScaffoldingCase(unittest.TestCase):
     def test_addons_env(self):
         """Test environment variables in addons.yaml"""
         # The test is hacking ODOO_VERSION to pin a commit
-        for sub_env in matrix():
+        # It uses OCA/OpenUpgrade as base for Odoo, which won't work from v14
+        # and onwards as it no longer is a fork from Odoo
+        for sub_env in matrix(odoo={"11.0", "12.0", "13.0"}):
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "addons_env"),
                 sub_env,
@@ -313,10 +319,20 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/crm"),
                 ("test", "-d", "auto/addons/crm/migrations"),
             )
+        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0"}):
+            self.compose_test(
+                join(SCAFFOLDINGS_DIR, "addons_env_ou"),
+                sub_env,
+                # check module from custom repo pattern
+                ("test", "-d", "custom/src/misc-addons"),
+                ("test", "-d", "custom/src/misc-addons/web_debranding"),
+                ("test", "-e", "auto/addons/web_debranding"),
+                # Migrations folder
+                ("test", "-e", "auto/addons/openupgrade_scripts"),
+                ("test", "-d", "auto/addons/openupgrade_scripts/scripts"),
+            )
 
     # HACK https://github.com/itpp-labs/misc-addons/issues/1014
-    # TODO Remove decorator
-    @prerelease_skip
     def test_addons_env_double(self):
         """Test double addon reference in addons.yaml"""
         common_tests = (
@@ -384,8 +400,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("--version",),
             )
 
-    # TODO Remove decorator when base_search_fuzzy is migrated to 14.0
-    @prerelease_skip
     def test_dependencies(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies")
@@ -397,17 +411,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-f", "custom/dependencies/gem.txt"),
                 ("test", "!", "-f", "custom/dependencies/npm.txt"),
                 ("test", "!", "-f", "custom/dependencies/pip.txt"),
-                # It should have base_search_fuzzy available
-                ("test", "-d", "custom/src/server-tools/base_search_fuzzy"),
-                # Patched Werkzeug version
-                (
-                    "bash",
-                    "-xc",
-                    (
-                        'test "$(python -c "import werkzeug; '
-                        'print(werkzeug.__version__)")" == 0.14.1'
-                    ),
-                ),
                 # apt_build.txt
                 ("test", "-f", "custom/dependencies/apt_build.txt"),
                 ("test", "!", "-e", "/usr/sbin/sshd"),
@@ -418,11 +421,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-f", "custom/dependencies/070-apt-bc.txt"),
                 ("test", "-e", "/usr/bin/bc"),
                 # 150-npm-aloha_world-install.txt
-                (
-                    "test",
-                    "-f",
-                    ("custom/dependencies/" "150-npm-aloha_world-install.txt"),
-                ),
+                ("test", "-f", "custom/dependencies/150-npm-aloha_world-install.txt"),
                 ("node", "-e", "require('test-npm-install')"),
                 # 200-pip-without-ext
                 ("test", "-f", "custom/dependencies/200-pip-without-ext"),
@@ -431,6 +430,33 @@ class ScaffoldingCase(unittest.TestCase):
                 # 270-gem.txt
                 ("test", "-f", "custom/dependencies/270-gem.txt"),
                 ("hello-world",),
+            )
+            if float(sub_env["ODOO_MINOR"]) < 14:
+                self.compose_test(
+                    dependencies_dir,
+                    sub_env,
+                    # For odoo versions < 14.0 we make sure we have a patched Werkzeug version
+                    (
+                        "bash",
+                        "-xc",
+                        (
+                            'test "$(python -c "import werkzeug; '
+                            'print(werkzeug.__version__)")" == 0.14.1'
+                        ),
+                    ),
+                )
+
+    # TODO Remove decorator when base_search_fuzzy is migrated to 15.0
+    @prerelease_skip
+    def test_dependencies_base_search_fuzzy(self):
+        """Test dependencies installation."""
+        dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
+        for sub_env in matrix():
+            self.compose_test(
+                dependencies_dir,
+                sub_env,
+                # It should have base_search_fuzzy available
+                ("test", "-d", "custom/src/server-tools/base_search_fuzzy"),
             )
 
     def test_modified_uids(self):
