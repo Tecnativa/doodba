@@ -410,8 +410,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("--version",),
             )
 
-    # TODO Remove decorator when base_search_fuzzy is migrated to 14.0
-    @prerelease_skip
     def test_dependencies(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies")
@@ -423,8 +421,6 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "!", "-f", "custom/dependencies/gem.txt"),
                 ("test", "!", "-f", "custom/dependencies/npm.txt"),
                 ("test", "!", "-f", "custom/dependencies/pip.txt"),
-                # It should have base_search_fuzzy available
-                ("test", "-d", "custom/src/server-tools/base_search_fuzzy"),
                 # apt_build.txt
                 ("test", "-f", "custom/dependencies/apt_build.txt"),
                 ("test", "!", "-e", "/usr/sbin/sshd"),
@@ -435,11 +431,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-f", "custom/dependencies/070-apt-bc.txt"),
                 ("test", "-e", "/usr/bin/bc"),
                 # 150-npm-aloha_world-install.txt
-                (
-                    "test",
-                    "-f",
-                    ("custom/dependencies/" "150-npm-aloha_world-install.txt"),
-                ),
+                ("test", "-f", "custom/dependencies/150-npm-aloha_world-install.txt"),
                 ("node", "-e", "require('test-npm-install')"),
                 # 200-pip-without-ext
                 ("test", "-f", "custom/dependencies/200-pip-without-ext"),
@@ -463,6 +455,19 @@ class ScaffoldingCase(unittest.TestCase):
                         ),
                     ),
                 )
+
+    # TODO Remove decorator when base_search_fuzzy is migrated to 15.0
+    @prerelease_skip
+    def test_dependencies_base_search_fuzzy(self):
+        """Test dependencies installation."""
+        dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
+        for sub_env in matrix():
+            self.compose_test(
+                dependencies_dir,
+                sub_env,
+                # It should have base_search_fuzzy available
+                ("test", "-d", "custom/src/server-tools/base_search_fuzzy"),
+            )
 
     def test_modified_uids(self):
         """tests if we can build an image with a custom uid and gid of odoo"""
