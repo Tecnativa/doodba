@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os.path
 import re
 import sys
 
@@ -18,6 +19,18 @@ if GEOIP_ACCOUNT_ID not in {"", "0"} and GEOIP_LICENSE_KEY not in {"", "0"}:
         "This product includes GeoLite2 data created by MaxMind, "
         "available from https://www.maxmind.com"
     )
+
+    # In devel mode, copy geoip conf to an inspectable dir if the do not exist yet and keep them up to date
+    os.makedirs("/opt/odoo/auto/geoip/", exist_ok=True)
+    if not os.path.exists("/opt/odoo/auto/geoip/GeoIP.conf"):
+        with open("/etc/GeoIP.conf.orig") as fpr, open(
+            "/opt/odoo/auto/geoip/GeoIP.conf", "w"
+        ) as fpw:
+            for line in fpr.readlines():
+                if "DatabaseDirectory " in line:
+                    line = "DatabaseDirectory /opt/odoo/auto/geoip/"
+                fpw.write(line)
+
     # Obtain current GeoIP configuration
     geoip_file = local.path("/opt/odoo/auto/geoip/GeoIP.conf")
     geoip_conf = geoip_file.read()

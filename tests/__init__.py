@@ -549,34 +549,37 @@ class ScaffoldingCase(unittest.TestCase):
         not GEIOP_CREDENTIALS_PROVIDED, "GeoIP credentials missing in environment"
     )
     def test_geoip(self):
-        geoip_dir = join(SCAFFOLDINGS_DIR, "geoip")
-        for sub_env in matrix():
-            self.compose_test(
-                geoip_dir,
-                sub_env,
-                # verify that geoipupdate works after waiting for entrypoint to finish its update
-                (
-                    "bash",
-                    "-c",
-                    "timeout 60s bash -c 'while (ls -l /proc/*/exe 2>&1 | grep geoipupdate); do sleep 1; done' &&"
-                    " geoipupdate",
-                ),
-                # verify that geoip database exists after entrypoint finished its update
-                # using ls and /proc because ps is missing in image for 13.0
-                (
-                    "bash",
-                    "-c",
-                    "timeout 60s bash -c 'while (ls -l /proc/*/exe 2>&1 | grep geoipupdate); do sleep 1; done' &&"
-                    " test -e /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
-                ),
-                # verify that geoip database is configured
-                (
-                    "grep",
-                    "-R",
-                    "geoip_database = /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
-                    "/opt/odoo/auto/odoo.conf",
-                ),
-            )
+        for geoip_dir in (
+            join(SCAFFOLDINGS_DIR, "geoip"),
+            join(SCAFFOLDINGS_DIR, "geoip_devel"),
+        ):
+            for sub_env in matrix():
+                self.compose_test(
+                    geoip_dir,
+                    dict(sub_env, UID=str(os.getuid()), GID=str(os.getgid()),),
+                    # verify that geoipupdate works after waiting for entrypoint to finish its update
+                    (
+                        "bash",
+                        "-c",
+                        "timeout 60s bash -c 'while (ls -l /proc/*/exe 2>&1 | grep geoipupdate); do sleep 1; done' &&"
+                        " geoipupdate",
+                    ),
+                    # verify that geoip database exists after entrypoint finished its update
+                    # using ls and /proc because ps is missing in image for 13.0
+                    (
+                        "bash",
+                        "-c",
+                        "timeout 60s bash -c 'while (ls -l /proc/*/exe 2>&1 | grep geoipupdate); do sleep 1; done' &&"
+                        " test -e /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
+                    ),
+                    # verify that geoip database is configured
+                    (
+                        "grep",
+                        "-R",
+                        "geoip_database = /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
+                        "/opt/odoo/auto/odoo.conf",
+                    ),
+                )
 
     def test_postgres_client_version(self):
         postgres_client_version_dir = join(SCAFFOLDINGS_DIR, "postgres_client_version")
