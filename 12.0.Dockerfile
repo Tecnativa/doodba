@@ -100,6 +100,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
     && chmod -R a+rX /usr/local/lib/python3.5/site-packages/doodbalib \
+    && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
     && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
