@@ -13,6 +13,10 @@ ENV DB_FILTER=.* \
     GEOIP_ACCOUNT_ID="" \
     GEOIP_LICENSE_KEY="" \
     GIT_AUTHOR_NAME=docker-odoo \
+    GIT_AUTHOSHARE=0 \
+    GIT_AUTOSHARE_CACHE_DIR="/home/odoo/.cache/git-autoshare/" \
+    GIT_AUTOSHARE_CONFIG_DIR="/home/odoo/.config/git-autoshare/" \
+    GIT_AUTOSHARE_ORGS_TO_CACHE="OCA,odoo,Tecnativa" \
     INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
     LIST_DB=false \
@@ -126,21 +130,23 @@ RUN build_deps=" \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         'websocket-client~=0.56' \
         astor \
-        git-aggregator \
+        git+https://github.com/Tecnativa/git-aggregator@use-git-autoshare \
+        git+https://github.com/Tecnativa/git-autoshare@bundle-git-script \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
         "pg_activity<2.0.0" \
+        debugpy \
+        geoip2 \
+        inotify \
         phonenumbers \
         plumbum \
         ptvsd \
-        debugpy \
-        pydevd-odoo \
         pudb \
+        pydevd-odoo \
         python-magic \
+        pyyaml \
         watchdog \
         wdb \
-        geoip2 \
-        inotify \
     && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
