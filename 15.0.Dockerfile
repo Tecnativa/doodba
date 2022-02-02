@@ -125,7 +125,7 @@ RUN build_deps=" \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
         debugpy \
-        flanker \
+        flanker[validator] \
         geoip2 \
         git-aggregator \
         inotify \
