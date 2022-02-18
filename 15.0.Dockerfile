@@ -134,6 +134,7 @@ RUN build_deps=" \
         phonenumbers \
         plumbum \
         pudb \
+        pyOpenSSL \
         python-magic \
         watchdog \
         wdb \
