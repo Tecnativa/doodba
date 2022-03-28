@@ -60,7 +60,7 @@ jobs:
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
       - run: poetry install
       # Build images
-      - run: poetry run ./hooks/build
+      - run: poetry run python ./hooks/build
       # Test
       - run: poetry run python -m unittest -v tests
       # Push
