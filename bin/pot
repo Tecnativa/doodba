@@ -3,9 +3,19 @@
 set -e
 addons=$1
 shift
-log INFO Executing Odoo in i18n export mode for addons $addons
-# HACK Odoo needs a *.po file to guess the output format
-ln -sf /dev/stdout /tmp/stdout.po
+languages=$1
+shift
+log INFO Executing Odoo in i18n export mode with languages $languages for addons $addons
 set -x
-exec odoo --stop-after-init -d "$PGDATABASE" --i18n-export /tmp/stdout.po \
-    --modules "$addons" --update "$addons" --workers 0 "$@"
+for l in $(echo $languages | tr "," "\n")
+do
+    for i in $(echo $addons | tr "," "\n")
+    do
+        if [ -d /opt/odoo/auto/addons/$i ]
+        then
+            mkdir -p /opt/odoo/auto/addons/$i/i18n && odoo --stop-after-init -d "$PGDATABASE" \
+                --language $l --i18n-export /opt/odoo/auto/addons/$i/i18n/${l}.po \
+                --modules "$i" --update "$i" --workers 0 "$@"
+        fi
+    done
+done
