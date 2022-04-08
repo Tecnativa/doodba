@@ -56,7 +56,7 @@ RUN apt-get -qq update \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends nodejs \
-    && test ${WKHTMLTOPDF_SKIP} -ne 0 || (curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.stretch_amd64.deb \
+    && test ${WKHTMLTOPDF_SKIP} -ne 0 && ln -s /usr/local/bin/wkhtmltopdf /usr/local/bin/kwkhtmltopdf || (curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.stretch_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
     && apt-get install -yqq --no-install-recommends ./wkhtmltox.deb \
     && rm wkhtmltox.deb \

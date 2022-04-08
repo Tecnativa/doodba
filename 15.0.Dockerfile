@@ -37,7 +37,7 @@ ENV DB_FILTER=.* \
 RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
         curl \
-    && test ${WKHTMLTOPDF_SKIP} -ne 0 || ( curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb \
+    && test ${WKHTMLTOPDF_SKIP} -ne 0 && ln -s /usr/local/bin/wkhtmltopdf /usr/local/bin/kwkhtmltopdf || ( curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
     && rm wkhtmltox.deb \
     && wkhtmltopdf --version) \
