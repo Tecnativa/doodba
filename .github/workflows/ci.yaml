@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         # Test modern Odoo versions with latest Postgres version
-        pg_version: ["12"]
+        pg_version: ["11"]
         odoo_version:
           - "15.0"
           - "14.0"
@@ -42,7 +42,7 @@ jobs:
           - "11.0"
     env:
       # Indicates what's the equivalent to tecnativa/doodba:latest image
-      LATEST_RELEASE: "15.0"
+      LATEST_RELEASE: "13.0"
       # Variables found by default in Docker Hub builder
       DOCKER_REPO: tecnativa/doodba
       DOCKER_TAG: ${{ matrix.odoo_version }}
@@ -65,14 +65,14 @@ jobs:
       - run: poetry run python -m unittest -v tests
       # Push
       - name: push to docker hub
-        if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
+        if: github.repository == 'oondeo/doodba' && github.ref == 'refs/heads/oondeo'
         env:
           REGISTRY_HOST: docker.io
           REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
           REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_LOGIN }}
         run: poetry run ./hooks/push
       - name: push to github container registry
-        if: github.repository == 'Tecnativa/doodba' && github.ref == 'refs/heads/master'
+        if: github.repository == 'oondeo/doodba' && github.ref == 'refs/heads/oondeo'
         env:
           REGISTRY_HOST: ghcr.io
           REGISTRY_PASSWORD: ${{ secrets.BOT_TOKEN }}
