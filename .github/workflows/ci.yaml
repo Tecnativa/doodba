@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - oondeo
   schedule:
     # See https://crontab.guru/weekly
     - cron: 0 0 * * 0
