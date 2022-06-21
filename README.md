@@ -356,7 +356,7 @@ Advanced features:
 
 - You can use any wildcards supported by [Python's glob module][glob].
 
-This example shows these advanced features:
+The following example shows these advanced features:
 
 ```yaml
 # Spanish Localization
