@@ -3,7 +3,6 @@
 import os.path
 
 from doodbalib import AUTO_DIR, CUSTOM_DIR
-
 from plumbum import FG, local
 
 find, xargs, chmod, chown = (
