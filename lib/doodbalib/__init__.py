@@ -159,7 +159,7 @@ def addons_config(filtered=True, strict=False):
         # Other addons fall in between
         if filtered and len(repos) != 1:
             raise AddonsConfigError(
-                u"Addon {} defined in several repos {}".format(addon, repos)
+                "Addon {} defined in several repos {}".format(addon, repos)
             )
         for repo in repos:
             yield addon, repo

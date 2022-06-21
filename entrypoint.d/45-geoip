@@ -5,7 +5,6 @@ import re
 import sys
 
 from doodbalib import logger
-
 from plumbum import BG, local
 from plumbum.cmd import geoipupdate
 

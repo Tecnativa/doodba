@@ -33,6 +33,9 @@ it work anywhere quickly.
 
 You can start working with this straight away with our [template][].
 
+<!-- prettier-ignore-start -->
+<!-- prettier-ignore -->
+
 <!-- toc -->
 
 - [Image usage](#image-usage)
@@ -77,6 +80,8 @@ You can start working with this straight away with our [template][].
 - [Related Projects](#related-projects)
 
 <!-- tocstop -->
+
+<!-- prettier-ignore-end -->
 
 ## Image usage
 

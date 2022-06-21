@@ -123,7 +123,11 @@ class ScaffoldingCase(unittest.TestCase):
                     "-xc",
                     'test "$(addons list -dw private_addon -W dummy_addon)" == base,website',
                 ),
-                ("bash", "-xc", 'test "$(addons list -nd)" == base,iap',),
+                (
+                    "bash",
+                    "-xc",
+                    'test "$(addons list -nd)" == base,iap',
+                ),
                 (
                     "bash",
                     "-xc",
@@ -556,7 +560,11 @@ class ScaffoldingCase(unittest.TestCase):
             for sub_env in matrix():
                 self.compose_test(
                     geoip_dir,
-                    dict(sub_env, UID=str(os.getuid()), GID=str(os.getgid()),),
+                    dict(
+                        sub_env,
+                        UID=str(os.getuid()),
+                        GID=str(os.getgid()),
+                    ),
                     # verify that geoipupdate works after waiting for entrypoint to finish its update
                     (
                         "bash",
@@ -634,7 +642,11 @@ class ScaffoldingCase(unittest.TestCase):
                     "/opt/odoo/auto/addons/addon_alias/__openerp__.py",
                 ),
                 # verify that symlinking outside the src directory doesn't enable changing permission of important stuff
-                ("bash", "-c", '[[ "$(stat -c %U:%G /bin/date)" == "root:root" ]]',),
+                (
+                    "bash",
+                    "-c",
+                    '[[ "$(stat -c %U:%G /bin/date)" == "root:root" ]]',
+                ),
                 # verify that everything in src dir (except symlinks) is accessible by odoo
                 (
                     "bash",
