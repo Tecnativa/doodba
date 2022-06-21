@@ -422,7 +422,7 @@ This folder is full of magic. I'll document it some day. For now, just look at t
 
 Only some notes:
 
-- Will compile your code with [`PYTHONOPTIMIZE=1`][] by default.
+- Will compile your code with [`PYTHONOPTIMIZE=""`][] by default.
 
 - Will remove all code not used from the image by default (not listed in
   `/opt/odoo/custom/src/addons.yaml`), to keep it thin.

@@ -45,9 +45,9 @@ def aggregate(config):
         for _exec in pre_execs:
             try:
                 _exec()
-            except Exception as e:
-                logger.error("Error in %s: %s" % (_exec, e))
-                logger.exception(e)
+            except Exception as err:
+                logger.error("Error in %s: %s" % (_exec, err))
+                logger.exception(err)
                 raise
 
     if ~GID:
