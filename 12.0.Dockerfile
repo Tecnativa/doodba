@@ -1,4 +1,4 @@
-FROM python:3.5-stretch AS base
+FROM python:3.6.9-stretch AS base
 
 EXPOSE 8069 8072
 
@@ -52,7 +52,7 @@ RUN apt-get -qq update \
         zlibc \
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && curl https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3 /dev/stdin \
+    && curl https://bootstrap.pypa.io/pip/3.6.9/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends nodejs \
@@ -91,7 +91,7 @@ RUN pip install \
         inotify \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib
+COPY lib/doodbalib /usr/local/lib/python3.6.9/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
@@ -99,7 +99,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.5/site-packages/doodbalib \
+    && chmod -R a+rX /usr/local/lib/python3.6.9/site-packages/doodbalib \
     && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
@@ -136,7 +136,7 @@ RUN debs="libldap2-dev libsasl2-dev" \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         phonenumbers \
         'websocket-client~=0.53' \
-    && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
+    && (python3 -m compileall -q /usr/local/lib/python3.6.9/ || true) \
     && apt-get purge -yqq $debs \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
