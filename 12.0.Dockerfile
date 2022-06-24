@@ -42,7 +42,7 @@ RUN apt-get -qq update \
         chromium \
         ffmpeg \
         fonts-liberation2 \
-        gettext \
+        gettext-base \
         gnupg2 \
         locales-all \
         nano \
@@ -52,10 +52,10 @@ RUN apt-get -qq update \
         zlibc \
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && curl https://bootstrap.pypa.io/pip/3.6.9/get-pip.py | python3 /dev/stdin \
+    && curl https://bootstrap.pypa.io/pip/3.6/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
     && apt-get update \
-    && apt-get install -yqq --no-install-recommends nodejs \
+    && apt-get install -yqq --no-install-recommends nodejs postgresql-client \
     && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.stretch_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
     && apt-get install -yqq --no-install-recommends ./wkhtmltox.deb \
@@ -75,8 +75,7 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
 WORKDIR /opt/odoo
 RUN pip install \
         astor \
-        # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
-        git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
+        click-odoo-contrib \
         git-aggregator \
         "pg_activity<2.0.0" \
         plumbum \
@@ -92,6 +91,7 @@ RUN pip install \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python3.6.9/site-packages/doodbalib
+COPY lib/doodbalib /usr/local/lib/python3.6/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
@@ -100,6 +100,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
     && chmod -R a+rX /usr/local/lib/python3.6.9/site-packages/doodbalib \
+    && chmod -R a+rX /usr/local/lib/python3.6/site-packages/doodbalib \
     && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
