@@ -599,6 +599,50 @@ not expose the debugging port to attackers**. Usage:
 We found this one to be the most useful tool for downlading code, merging it and placing
 it somewhere.
 
+It can also take advantage of a shared repository cache in your local machine, making
+use of [git-autoshare](https://github.com/acsone/git-autoshare).
+
+To do so, you must map a local folder on the host machine to the container in the
+aggregation process and set `GIT_AUTOSHARE=1` in the container.
+
+The folder that will store the cache in the container will be
+`/home/odoo/.cache/git-autoshare/`, but you can change it by providing a different value
+through the `GIT_AUTOSHARE_CACHE_DIR` environment variable. Then, to map the local cache
+folder to the container, you can add the following line to the `volumes` section of the
+`odoo` service in the `docker-compose.yaml` file:
+
+```yaml
+- ~/.cache/git-autoshare/:/home/odoo/.cache/git-autoshare/
+```
+
+This will allow you to re-use the same cache for other git operations in the host
+machine, if you have `git-autoshare` configured.
+
+`git-autoshare` will also need a configuration file, which should be placed in
+`/home/odoo/.config/git-autoshare/repos.yml` (or another directory by changing the
+`GIT_AUTOSHARE_CONFIG_DIR` environment variable). You can check the documentation for
+more details, but you can either map a local file to the container containing this
+configuration, or pass a comma-separated list of Github Organizations through the
+`GIT_AUTOSHARE_ORGS_TO_CACHE` environment variable, which will make Doodba generate that
+file automatically with the following structure:
+
+```
+GIT_AUTOSHARE_ORGS_TO_CACHE=Tecnativa,odoo,OCA
+```
+
+`/home/odoo/.config/git-autoshare/repos.yml`:
+
+```
+github.com:
+    "*":
+        orgs:
+            - odoo
+            - OCA
+            - Tecnativa
+```
+
+This will generate a cache for all repos in those 3 Github Organizations.
+
 ### `autoaggregate`
 
 This little script wraps `git-aggregator` to make it work fine and automatically with

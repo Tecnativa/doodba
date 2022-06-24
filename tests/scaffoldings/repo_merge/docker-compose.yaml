@@ -10,6 +10,7 @@ services:
     environment:
       PYTHONOPTIMIZE: ""
       UNACCENT: "false"
+      GIT_AUTOSHARE: "${GIT_AUTOSHARE:-0}"
     entrypoint: "" # we are not using odoo but only checking the repo state here, this skips starting the db
     volumes:
       - filestore:/var/lib/odoo:z

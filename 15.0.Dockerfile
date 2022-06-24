@@ -6,12 +6,18 @@ ARG GEOIP_UPDATER_VERSION=4.3.0
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd'
 ENV DB_FILTER=.* \
+    DEBUGPY_ARGS="--listen 0.0.0.0:6899 --wait-for-client" \
+    DEBUGPY_ENABLE=0 \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
     EMAIL=https://hub.docker.com/r/tecnativa/odoo \
     GEOIP_ACCOUNT_ID="" \
     GEOIP_LICENSE_KEY="" \
     GIT_AUTHOR_NAME=docker-odoo \
+    GIT_AUTHOSHARE=0 \
+    GIT_AUTOSHARE_CACHE_DIR="/home/odoo/.cache/git-autoshare/" \
+    GIT_AUTOSHARE_CONFIG_DIR="/home/odoo/.config/git-autoshare/" \
+    GIT_AUTOSHARE_ORGS_TO_CACHE="OCA,odoo,Tecnativa" \
     INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
     LIST_DB=false \
@@ -19,8 +25,6 @@ ENV DB_FILTER=.* \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
     PIP_NO_CACHE_DIR=0 \
-    DEBUGPY_ARGS="--listen 0.0.0.0:6899 --wait-for-client" \
-    DEBUGPY_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
     PYTHONOPTIMIZE="" \
@@ -126,7 +130,8 @@ RUN build_deps=" \
         pydevd-odoo \
         flanker[validator] \
         geoip2 \
-        git-aggregator \
+        git+https://github.com/Tecnativa/git-aggregator@use-git-autoshare \
+        git+https://github.com/Tecnativa/git-autoshare@bundle-git-script \
         inotify \
         pdfminer.six \
         pg_activity \
@@ -135,6 +140,7 @@ RUN build_deps=" \
         pudb \
         pyOpenSSL \
         python-magic \
+        pyyaml \
         watchdog \
         wdb \
     && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \

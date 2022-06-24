@@ -726,6 +726,39 @@ class ScaffoldingCase(unittest.TestCase):
                 ("autoaggregate",),
             )
 
+    def test_aggregate_autoshare(self):
+        symlink_dir = join(SCAFFOLDINGS_DIR, "repo_merge")
+        for sub_env in matrix(odoo_skip={"11.0", "12.0"}):
+            self.compose_test(
+                symlink_dir,
+                dict(
+                    sub_env,
+                    UID=str(os.getuid()),
+                    GID=str(os.getgid()),
+                    GIT_AUTOSHARE="1",
+                ),
+                # Ensure no cache exists prior to 1st aggregation
+                ("rm", "-rf", "/home/odoo/.cache/git-autoshare/github.com"),
+                ("test", "!", "-d", "/home/odoo/.cache/git-autoshare/github.com/ocb"),
+                # The git-autoshare config file should have been correctly generated
+                ("test", "-f", "/home/odoo/.config/git-autoshare/repos.yml"),
+                ("autoaggregate",),
+                # Cache should have been generated
+                ("test", "-d", "/home/odoo/.cache/git-autoshare/github.com/ocb"),
+                # Cloned repo should reference to cache
+                (
+                    "test",
+                    "-f",
+                    "/opt/odoo/custom/src/odoo/.git/objects/info/alternates",
+                ),
+                (
+                    "test",
+                    "(cat /opt/odoo/custom/src/odoo/.git/objects/info/alternates)",
+                    "=",
+                    "/home/odoo/.cache/git-autoshare/github.com/ocb/objects",
+                ),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

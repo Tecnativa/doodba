@@ -15,6 +15,7 @@ services:
       UID: "${UID:-1000}"
       GID: "${GID:-1000}"
       UMASK: "$UMASK"
+      GIT_AUTOSHARE: "${GIT_AUTOSHARE:-0}"
     user: root
     entrypoint: "" # we are only calling autoaggregate inside the tests
     volumes:

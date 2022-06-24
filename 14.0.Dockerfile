@@ -12,6 +12,10 @@ ENV DB_FILTER=.* \
     GEOIP_ACCOUNT_ID="" \
     GEOIP_LICENSE_KEY="" \
     GIT_AUTHOR_NAME=docker-odoo \
+    GIT_AUTHOSHARE=0 \
+    GIT_AUTOSHARE_CACHE_DIR="/home/odoo/.cache/git-autoshare/" \
+    GIT_AUTOSHARE_CONFIG_DIR="/home/odoo/.config/git-autoshare/" \
+    GIT_AUTOSHARE_ORGS_TO_CACHE="OCA,odoo,Tecnativa" \
     INITIAL_LANG="" \
     LC_ALL=C.UTF-8 \
     LIST_DB=false \
@@ -127,7 +131,8 @@ RUN build_deps=" \
         debugpy \
         pydevd-odoo \
         geoip2 \
-        git-aggregator \
+        git+https://github.com/Tecnativa/git-aggregator@use-git-autoshare \
+        git+https://github.com/Tecnativa/git-autoshare@bundle-git-script \
         inotify \
         pdfminer.six \
         pg_activity \
@@ -136,6 +141,7 @@ RUN build_deps=" \
         pudb \
         pyOpenSSL \
         python-magic \
+        pyyaml \
         watchdog \
         wdb \
     && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \
