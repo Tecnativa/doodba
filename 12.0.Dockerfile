@@ -152,16 +152,19 @@ LABEL org.label-schema.schema-version="$VERSION" \
       org.label-schema.vcs-ref="$VCS_REF" \
       org.label-schema.vcs-url="https://github.com/Tecnativa/doodba"
 
+# fix inotify
+RUN echo 'fs.inotify.max_user_watches=524288' >> /etc/sysctl.conf
+
 # Onbuild version, with all the magic
 FROM base AS onbuild
 
 # Enable setting custom uids for odoo user during build of scaffolds
-ONBUILD ARG UID=1000
-ONBUILD ARG GID=1000
+ONBUILD ARG DOODBA_UID
+ONBUILD ARG DOODBA_GID
 
 # Enable Odoo user and filestore
-ONBUILD RUN groupadd -g $GID odoo -o \
-    && useradd -l -md /home/odoo -s /bin/false -u $UID -g $GID odoo \
+ONBUILD RUN groupadd -g $DOODBA_GID odoo -o \
+    && useradd -l -md /home/odoo -s /bin/false -u ${DOODBA_UID} -g ${DOODBA_GID} odoo \
     && mkdir -p /var/lib/odoo \
     && chown -R odoo:odoo /var/lib/odoo /qa/artifacts \
     && chmod a=rwX /qa/artifacts \
