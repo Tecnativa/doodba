@@ -31,6 +31,3 @@ workflows:
       - utils-docker-bazel-linux:
           context:
             - Albatross-DockerHub
-          post-steps:
-            - module-pipeline-succeeded:
-                module: "utils/docker/bazel-linux"
