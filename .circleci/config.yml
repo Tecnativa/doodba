@@ -1,32 +1,38 @@
 version: 2.1
+
+parameters:
+  run_workflow_build:
+    default: true
+    type: boolean
+
 jobs:
-  build:
+  update-doodba-base-image-job:
     docker:
       - image: cimg/base:2022.01
     resource_class: small
     steps:
-      - setup_remote_docker:
-          version: 20.10.11
-      - run:
-          name: Docker login
-          command: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
-      - checkout
-      - run:
-          name: Build image
-          command: |
-            ls -la
-            docker build -t baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild -f 12.0.Dockerfile .
       - when:
           condition:
             equal: [master, << pipeline.git.branch >>]
           steps:
+            - setup_remote_docker:
+                version: 20.10.11
+            - run:
+                name: Docker login
+                command: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
+            - checkout
+            - run:
+                name: Build image
+                command: |
+                  docker build -t baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild -f 12.0.Dockerfile .
             - run:
                 name: Push to DockerHub
                 command: |
                   docker push baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild
 workflows:
-  build-workflow:
+  update-doodba-base-image-workflow:
+    when: << pipeline.parameters.run_workflow_build >>
     jobs:
-      - build:
+      - update-doodba-base-image-job:
           context:
             - Kaertech-DockerHub
