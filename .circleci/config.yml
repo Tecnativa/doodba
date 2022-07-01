@@ -1,9 +1,9 @@
 version: 2.1
 
-parameters:
-  run_workflow_build:
-    default: true
-    type: boolean
+# parameters:
+#   run_workflow_build:
+#     default: true
+#     type: boolean
 
 jobs:
   update-doodba-base-image-job:
@@ -31,7 +31,7 @@ jobs:
                   docker push baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild
 workflows:
   update-doodba-base-image-workflow:
-    when: << pipeline.parameters.run_workflow_build >>
+    # when: << pipeline.parameters.run_workflow_build >>
     jobs:
       - update-doodba-base-image-job:
           context:
