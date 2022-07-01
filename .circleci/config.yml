@@ -27,6 +27,7 @@ jobs:
                   docker build -t baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild -f 12.0.Dockerfile .
             - run:
                 name: Push to DockerHub
+                # name: Push to DockerHub
                 command: |
                   docker push baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild
 workflows:
