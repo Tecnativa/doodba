@@ -1,12 +1,6 @@
 version: 2.1
-
-# parameters:
-#   run_workflow_build:
-#     default: true
-#     type: boolean
-
 jobs:
-  update-doodba-base-image-job:
+  build:
     docker:
       - image: cimg/base:2022.01
     resource_class: small
@@ -20,6 +14,7 @@ jobs:
       - run:
           name: Build image
           command: |
+            ls -la
             docker build -t baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild -f 12.0.Dockerfile .
       - when:
           condition:
@@ -30,9 +25,8 @@ jobs:
                 command: |
                   docker push baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild
 workflows:
-  update-doodba-base-image-workflow:
-    # when: << pipeline.parameters.run_workflow_build >>
+  build-workflow:
     jobs:
-      - update-doodba-base-image-job:
+      - build:
           context:
             - Kaertech-DockerHub
