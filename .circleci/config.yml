@@ -13,6 +13,7 @@ jobs:
       - run:
           name: Build image
           command: |
+            ls -la
             docker build -t baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild -f 12.0.Dockerfile .
       - when:
           condition:
