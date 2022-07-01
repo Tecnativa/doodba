@@ -17,14 +17,14 @@ jobs:
           name: Docker login
           command: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
       - checkout
+      - run:
+          name: Build image
+          command: |
+            docker build -t baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild -f 12.0.Dockerfile .
       - when:
           condition:
             equal: [master, << pipeline.git.branch >>]
           steps:
-            - run:
-                name: Build image
-                command: |
-                  docker build -t baracodadailyhealthtech/kaertech_doodba-base:12.0-onbuild -f 12.0.Dockerfile .
             - run:
                 name: Push to DockerHub
                 command: |
