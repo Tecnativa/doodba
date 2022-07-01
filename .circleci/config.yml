@@ -10,7 +10,7 @@ jobs:
       - run:
           name: Docker login
           command: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASS
-      - checkout:
+      - checkout
       - run:
           name: Build image
           command: |
