@@ -755,6 +755,20 @@ class ScaffoldingCase(unittest.TestCase):
                 ("autoaggregate",),
             )
 
+    def test_entrypoint_python(self):
+        symlink_dir = join(SCAFFOLDINGS_DIR, "entrypoint")
+        for sub_env in matrix():
+            self.compose_test(
+                symlink_dir,
+                dict(sub_env, UID=str(os.getuid()), GID=str(os.getgid())),
+                # we verify that customizing entrypoint with python files work by writing to
+                # /tmp/customize_entrypoint.mark.txt with 60-customize_entrypoint.py
+                (
+                    "cat",
+                    "/tmp/customize_entrypoint.mark.txt",
+                ),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
