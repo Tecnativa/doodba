@@ -450,8 +450,6 @@ class ScaffoldingCase(unittest.TestCase):
                     ),
                 )
 
-    # TODO Remove decorator when base_search_fuzzy is migrated to 15.0
-    @prerelease_skip
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
