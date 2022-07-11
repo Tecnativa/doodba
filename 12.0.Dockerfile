@@ -159,8 +159,8 @@ RUN echo 'fs.inotify.max_user_watches=524288' >> /etc/sysctl.conf
 FROM base AS onbuild
 
 # Enable setting custom uids for odoo user during build of scaffolds
-ONBUILD ARG DOODBA_UID
-ONBUILD ARG DOODBA_GID
+ONBUILD ARG DOODBA_UID=1000
+ONBUILD ARG DOODBA_GID=1000
 
 # Enable Odoo user and filestore
 ONBUILD RUN groupadd -g $DOODBA_GID odoo -o \
