@@ -227,7 +227,6 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && sync
 ONBUILD ARG DB_VERSION=latest
 ONBUILD RUN /opt/odoo/common/build && sync
-ONBUILD RUN chown -R odoo:odoo /opt/odoo/auto /opt/odoo/custom
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo
 # HACK Special case for Werkzeug
