@@ -82,7 +82,7 @@ RUN pip install \
         astor \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
-        git-aggregator \
+        "git-aggregator<3.0.0" \
         "pg_activity<2.0.0" \
         plumbum \
         ptvsd \
