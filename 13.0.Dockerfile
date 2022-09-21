@@ -127,7 +127,7 @@ RUN build_deps=" \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         'websocket-client~=0.56' \
         astor \
-        git-aggregator \
+        "git-aggregator<3.0.0" \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
         "pg_activity<2.0.0" \

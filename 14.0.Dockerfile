@@ -127,7 +127,7 @@ RUN build_deps=" \
         debugpy \
         pydevd-odoo \
         geoip2 \
-        git-aggregator \
+        "git-aggregator<3.0.0" \
         inotify \
         pdfminer.six \
         pg_activity \

@@ -126,7 +126,7 @@ RUN build_deps=" \
         pydevd-odoo \
         flanker[validator] \
         geoip2 \
-        git-aggregator \
+        "git-aggregator<3.0.0" \
         inotify \
         pdfminer.six \
         pg_activity \
