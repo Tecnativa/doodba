@@ -399,7 +399,7 @@ server-tools:
 # Custom repositories
 ENV:
   DEFAULT_REPO_PATTERN: https://github.com/Tecnativa/{}.git
-  ODOO_VERSION: 15.0-new-feature
+  ODOO_VERSION: 16.0-new-feature
 some-repo: # Cloned from https://github.com/Tecnativa/some-repo.git branch 15.0-new-feature
   - some_custom_module
 ```
