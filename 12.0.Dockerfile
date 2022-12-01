@@ -50,7 +50,7 @@ RUN apt-get -qq update \
         telnet \
         vim \
         zlibc \
-    && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
+    && echo 'deb http://apt-archive.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && curl https://bootstrap.pypa.io/pip/3.6/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
