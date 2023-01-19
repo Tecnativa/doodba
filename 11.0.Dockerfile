@@ -6,7 +6,7 @@ ARG GIT_VERSION=2.37.6
 # skip libssl-dev as it's already installed by other packages and should not be removed after git install
 ARG GIT_BUILD_DEPENDENCIES="make dh-autoreconf libexpat1-dev libz-dev"
 ARG GIT_RUNTIME_DEPENDENCIES="libcurl4-gnutls-dev"
-ARG GEOIP_UPDATER_VERSION=4.1.5
+ARG GEOIP_UPDATER_VERSION=4.10.0
 ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
