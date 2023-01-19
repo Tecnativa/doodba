@@ -2,6 +2,10 @@ FROM python:3.8-slim-buster AS base
 
 EXPOSE 8069 8072
 
+ARG GIT_VERSION=2.37.6
+# skip libssl-dev as it's already installed by other packages and should not be removed after git install
+ARG GIT_BUILD_DEPENDENCIES="make dh-autoreconf libexpat1-dev libz-dev"
+ARG GIT_RUNTIME_DEPENDENCIES="libcurl4-gnutls-dev"
 ARG GEOIP_UPDATER_VERSION=4.3.0
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd'
@@ -44,7 +48,6 @@ RUN apt-get -qq update \
         ffmpeg \
         fonts-liberation2 \
         gettext \
-        git \
         gnupg2 \
         locales-all \
         nano \
@@ -53,12 +56,25 @@ RUN apt-get -qq update \
         telnet \
         vim \
         zlibc \
+        $GIT_BUILD_DEPENDENCIES \
+        $GIT_RUNTIME_DEPENDENCIES \
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
     && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && curl --silent -L --output "git-${GIT_VERSION}.tar.gz" "https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz" \
+    && tar xf "git-${GIT_VERSION}.tar.gz" \
+    && rm "git-${GIT_VERSION}.tar.gz" \
+    && cd git-${GIT_VERSION} \
+    && make configure \
+    && ./configure --prefix=/usr \
+    && make all \
+    && make install \
+    && cd .. \
+    && rm -Rf "git-${GIT_VERSION}" \
+    && apt-get remove -y $GIT_BUILD_DEPENDENCIES \
     && apt-get autopurge -yqq \
     && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
