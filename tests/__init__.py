@@ -10,7 +10,7 @@ import unittest
 from itertools import product
 from os import environ
 from os.path import dirname, join
-from subprocess import Popen
+from subprocess import Popen, check_output
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -726,6 +726,40 @@ class ScaffoldingCase(unittest.TestCase):
                 # test that permissions are set in a way that enables a second autoaggregation after the first one
                 # e.g. when used in dev we update the source code sometimes/daily
                 ("autoaggregate",),
+            )
+
+    def test_git_version(self):
+        smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
+        # make sure image is built before getting expected git version from image layers (history)
+        for sub_env in matrix():
+            self.compose_test(smallest_dir, sub_env, ("id",))
+
+        # detect expected git version from image layers
+        if "COMPOSE_PROJECT_NAME" in os.environ:
+            image_name = f'{os.environ["COMPOSE_PROJECT_NAME"]}_odoo:latest'
+        else:
+            image_name = "smallest_odoo:latest"
+        image_layers = check_output(["docker", "image", "history", image_name]).split(
+            b"\n"
+        )
+        git_version_layer = [
+            layer for layer in image_layers if b"ARG GIT_VERSION=" in layer
+        ][0]
+        git_version = [
+            c for c in git_version_layer.split(b" ") if c.startswith(b"GIT_VERSION=")
+        ][0].split(b"=")[1]
+        expected_git_version = f"git version {git_version.decode('utf-8')}"
+
+        # verify that the git used inside the container matches the expected version
+        for sub_env in matrix():
+            self.compose_test(
+                smallest_dir,
+                sub_env,
+                (
+                    "bash",
+                    "-c",
+                    f'set -x; test "$(git --version)" == "{expected_git_version}"',
+                ),
             )
 
 
