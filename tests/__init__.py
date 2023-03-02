@@ -16,8 +16,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
-ODOO_VERSIONS = frozenset(environ.get("DOCKER_TAG", "11.0 12.0 13.0 14.0 15.0").split())
-PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "13").split())
+ODOO_VERSIONS = frozenset(
+    environ.get("DOCKER_TAG", "11.0 12.0 13.0 14.0 15.0 16.0").split()
+)
+PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "14").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
     "GEOIP_ACCOUNT_ID", False
@@ -28,7 +30,7 @@ GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ
 # preparing the pre-release for the next version of Odoo, which hasn't been
 # released yet.
 prerelease_skip = unittest.skipIf(
-    ODOO_VERSIONS & {"15.0"}, "Tests not supported in pre-release"
+    ODOO_VERSIONS & {"16.0"}, "Tests not supported in pre-release"
 )
 
 
@@ -123,7 +125,11 @@ class ScaffoldingCase(unittest.TestCase):
                     "-xc",
                     'test "$(addons list -dw private_addon -W dummy_addon)" == base,website',
                 ),
-                ("bash", "-xc", 'test "$(addons list -nd)" == base,iap',),
+                (
+                    "bash",
+                    "-xc",
+                    'test "$(addons list -nd)" == base,iap',
+                ),
                 (
                     "bash",
                     "-xc",
@@ -446,7 +452,7 @@ class ScaffoldingCase(unittest.TestCase):
                     ),
                 )
 
-    # TODO Remove decorator when base_search_fuzzy is migrated to 15.0
+    # TODO Remove decorator when base_search_fuzzy is migrated to 16.0
     @prerelease_skip
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
@@ -556,7 +562,11 @@ class ScaffoldingCase(unittest.TestCase):
             for sub_env in matrix():
                 self.compose_test(
                     geoip_dir,
-                    dict(sub_env, UID=str(os.getuid()), GID=str(os.getgid()),),
+                    dict(
+                        sub_env,
+                        UID=str(os.getuid()),
+                        GID=str(os.getgid()),
+                    ),
                     # verify that geoipupdate works after waiting for entrypoint to finish its update
                     (
                         "bash",
@@ -634,7 +644,11 @@ class ScaffoldingCase(unittest.TestCase):
                     "/opt/odoo/auto/addons/addon_alias/__openerp__.py",
                 ),
                 # verify that symlinking outside the src directory doesn't enable changing permission of important stuff
-                ("bash", "-c", '[[ "$(stat -c %U:%G /bin/date)" == "root:root" ]]',),
+                (
+                    "bash",
+                    "-c",
+                    '[[ "$(stat -c %U:%G /bin/date)" == "root:root" ]]',
+                ),
                 # verify that everything in src dir (except symlinks) is accessible by odoo
                 (
                     "bash",

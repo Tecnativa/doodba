@@ -24,7 +24,7 @@ ENV DB_FILTER=.* \
     DEBUGPY_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
-    PYTHONOPTIMIZE=1 \
+    PYTHONOPTIMIZE="" \
     UNACCENT=true \
     WAIT_DB=true \
     WDB_NO_BROWSER_AUTO_OPEN=True \
@@ -98,8 +98,6 @@ ARG ODOO_VERSION=14.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 
 # Install Odoo hard & soft dependencies, and Doodba utilities
-# TODO: Add back pydevd-odoo once
-# https://github.com/trinhanhngoc/pydevd-odoo/issues/3 is fixed
 RUN build_deps=" \
         build-essential \
         libfreetype6-dev \
@@ -129,8 +127,9 @@ RUN build_deps=" \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
         debugpy \
+        pydevd-odoo \
         geoip2 \
-        git-aggregator \
+        "git-aggregator<3.0.0" \
         inotify \
         pdfminer.six \
         pg_activity \

@@ -11,6 +11,9 @@ import click_odoo
 def main(env):
     """Set report.url in the database to be pointing at localhost."""
     env["ir.config_parameter"].set_param("report.url", "http://localhost:8069")
+    env["ir.config_parameter"].set_param(
+        "database.expiration_date", "3000-01-30 00:00:00"
+    )
     env.cr.commit()
 
 

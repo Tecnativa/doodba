@@ -33,6 +33,9 @@ it work anywhere quickly.
 
 You can start working with this straight away with our [template][].
 
+<!-- prettier-ignore-start -->
+<!-- prettier-ignore -->
+
 <!-- toc -->
 
 - [Image usage](#image-usage)
@@ -77,6 +80,8 @@ You can start working with this straight away with our [template][].
 - [Related Projects](#related-projects)
 
 <!-- tocstop -->
+
+<!-- prettier-ignore-end -->
 
 ## Image usage
 
@@ -356,7 +361,7 @@ Advanced features:
 
 - You can use any wildcards supported by [Python's glob module][glob].
 
-This example shows these advanced features:
+The following example shows these advanced features:
 
 ```yaml
 # Spanish Localization
@@ -394,7 +399,7 @@ server-tools:
 # Custom repositories
 ENV:
   DEFAULT_REPO_PATTERN: https://github.com/Tecnativa/{}.git
-  ODOO_VERSION: 15.0-new-feature
+  ODOO_VERSION: 16.0-new-feature
 some-repo: # Cloned from https://github.com/Tecnativa/some-repo.git branch 15.0-new-feature
   - some_custom_module
 ```
@@ -422,7 +427,7 @@ This folder is full of magic. I'll document it some day. For now, just look at t
 
 Only some notes:
 
-- Will compile your code with [`PYTHONOPTIMIZE=1`][] by default.
+- Will compile your code with [`PYTHONOPTIMIZE=""`][] by default.
 
 - Will remove all code not used from the image by default (not listed in
   `/opt/odoo/custom/src/addons.yaml`), to keep it thin.

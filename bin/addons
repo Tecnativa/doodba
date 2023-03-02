@@ -139,6 +139,6 @@ else:
     if args.test:
         command += ["--test-enable", "--workers", "0"]
         if os.environ.get("PGDATABASE"):
-            command += ["--db-filter", u"^{}$".format(os.environ.get("PGDATABASE"))]
+            command += ["--db-filter", "^{}$".format(os.environ.get("PGDATABASE"))]
     logger.info("Executing %s", " ".join(command))
     check_call(command)

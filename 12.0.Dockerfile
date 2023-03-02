@@ -27,7 +27,7 @@ ENV DB_FILTER=.* \
     DEBUGPY_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
-    PYTHONOPTIMIZE=1 \
+    PYTHONOPTIMIZE="" \
     UNACCENT=true \
     WAIT_DB=true \
     WDB_NO_BROWSER_AUTO_OPEN=True \
@@ -51,7 +51,9 @@ RUN apt-get -qq update \
         telnet \
         vim \
         zlibc \
-    && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
+        apt-transport-https \
+        ca-certificates \
+    && echo 'deb https://apt-archive.postgresql.org/pub/repos/apt stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && curl https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
@@ -78,7 +80,7 @@ RUN pip install \
         astor \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
-        git-aggregator \
+        "git-aggregator<3.0.0" \
         "pg_activity<2.0.0" \
         plumbum \
         ptvsd \
