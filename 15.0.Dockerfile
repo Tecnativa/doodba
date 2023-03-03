@@ -78,6 +78,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
     && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
     && sync
+RUN ln -s /usr/local/bin/kwkhtmltopdf /usr/local/bin/wkhtmltopdf || true
 
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa

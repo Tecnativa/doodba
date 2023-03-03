@@ -79,7 +79,6 @@ RUN pip install \
     wdb \
     simplejson \
     geoip2 \
-    psycopg2==2.7.3.1 \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/site-packages/doodbalib
@@ -98,6 +97,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
     && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
     && sync
+RUN ln -s /usr/local/bin/kwkhtmltopdf /usr/local/bin/wkhtmltopdf || true
 
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
@@ -157,6 +157,7 @@ RUN build_deps=" \
     wdb \
     geoip2 \
     inotify \
+    && pip install psycopg2==2.7.3.1 \
     && (python -m compileall -q /usr/local/lib/python2.7/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
