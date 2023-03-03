@@ -56,6 +56,7 @@ jobs:
       # Other variables to configure tests and execution environment
       DOCKER_BUILDKIT: 1
       PG_VERSIONS: ${{ matrix.pg_version }}
+      WKHTMLTOPDF: ""
     steps:
       # Prepare
       - uses: actions/checkout@v2
