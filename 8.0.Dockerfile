@@ -79,6 +79,7 @@ RUN pip install \
     wdb \
     simplejson \
     geoip2 \
+    psycopg2==2.7.3.1 \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python2.7/site-packages/doodbalib

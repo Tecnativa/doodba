@@ -39,11 +39,11 @@ jobs:
             odoo_version: "12.0"
           - pg_version: "13"
             odoo_version: "11.0"
-          - pg_version: "10"
+          - pg_version: "13"
             odoo_version: "10.0"
-          - pg_version: "10"
+          - pg_version: "13"
             odoo_version: "9.0"
-          - pg_version: "10"
+          - pg_version: "13"
             odoo_version: "8.0"
 
     env:
