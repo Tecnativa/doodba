@@ -284,6 +284,8 @@ class ScaffoldingCase(unittest.TestCase):
             ODOO_PREFIX + ("--init", "base"),
             # Auto updater must work
             ("click-odoo-update",),
+            # Auto updater must work, ignoring core addons
+            ("click-odoo-update", "--ignore-core-addons"),
             # Needed tools exist
             ("curl", "--version"),
             ("git", "--version"),

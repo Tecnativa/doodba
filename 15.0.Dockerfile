@@ -120,8 +120,7 @@ RUN build_deps=" \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         'websocket-client~=0.56' \
         astor \
-        # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
-        git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
+        click-odoo-contrib \
         debugpy \
         pydevd-odoo \
         flanker[validator] \
