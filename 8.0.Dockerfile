@@ -111,7 +111,7 @@ RUN virtualenv --system-site-packages /qa/venv \
     && mkdir -p /qa/artifacts \
     && git clone --depth 1 $MQT /qa/mqt
 
-ARG ODOO_SOURCE=OCA/OCB
+ARG ODOO_SOURCE=OCA/OpenUpgrade
 ARG ODOO_VERSION=8.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 

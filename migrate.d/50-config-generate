@@ -1,0 +1,5 @@
+#!/bin/bash
+
+log INFO Generating $OPENERP_SERVER file. Overriding any existing...
+
+config-generate

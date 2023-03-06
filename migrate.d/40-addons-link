@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+from glob import iglob
+
+from doodbalib import ADDONS_DIR, ADDONS_YAML, SRC_DIR, addons_config, logger
+
+logger.info("Linking all addons from %s in %s", ADDONS_YAML, ADDONS_DIR)
+
+# Remove all links in addons dir
+for link in iglob(os.path.join(ADDONS_DIR, "*")):
+    os.remove(link)
+# Add new links
+for addon, repo in addons_config():
+    src = os.path.relpath(os.path.join(SRC_DIR, repo, addon), ADDONS_DIR)
+    dst = os.path.join(ADDONS_DIR, addon)
+    os.symlink(src, dst)
+    logger.debug("Linked %s in %s", src, dst)

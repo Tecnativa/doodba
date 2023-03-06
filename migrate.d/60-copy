@@ -1,0 +1,16 @@
+#!/bin/bash
+
+ODOO_MOUNTPOINT="${ODOO_MOUNTPOINT:/mnt/odoo}"
+
+if [ ! -d "/var/lib/odoo/filestore/${ODOO_VERSION}" ]
+then
+    log INFO Creating /var/lib/odoo/filestore/${ODOO_VERSION}
+    if [ -d "/var/lib/odoo/filestore/${OPENUPGRADE_OLD_DB}" ]
+    then
+        cp -a /var/lib/odoo/filestore/${OPENUPGRADE_OLD_DB} /var/lib/odoo/filestore/${PGDATABASE}
+        psql -e "CREATE DATABASE ${PGDATABASE} WITH TEMPLATE ${OPENUPGRADE_OLD_DB} OWNER ${PGUSER}";
+    else
+        cp -a ${ODOO_MOUNTPOINT}/filestore/${OPENUPGRADE_BASE_DB} /var/lib/odoo/filestore/${PGDATABASE}
+        psql -e "CREATE DATABASE ${PGDATABASE} WITH TEMPLATE ${OPENUPGRADE_BASE_DB} OWNER ${PGUSER}";
+    fi
+fi
