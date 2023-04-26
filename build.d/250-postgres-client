@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-apt-get update
 if [[ "$DB_VERSION" != "latest" ]] ; then
     apt-get install -yqq postgresql-client-$DB_VERSION
 else
