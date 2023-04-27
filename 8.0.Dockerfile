@@ -1,11 +1,11 @@
 FROM python:2.7-stretch AS base
-
+# docker build . -t qubiq/doodba:8.0 -f ./8.0.Dockerfile 
 EXPOSE 8069 8072
 
 ARG GEOIP_UPDATER_VERSION=4.1.5
 ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
-ARG WKHTMLTOPDF_CHECKSUM='2583399a865d7604726da166ee7cec656b87ae0a6016e6bce7571dcd3045f98b'
+ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
 ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
@@ -45,6 +45,7 @@ RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://securit
         fontconfig libfreetype6 libxml2 libxslt1.1 libjpeg62-turbo zlib1g \
         fonts-liberation \
         #libfreetype6 liblcms2-2 libopenjpeg5 libtiff5 tk tcl libpq5 \ THIS LINE WAS COMMENTED. liboopenjpeg5 is missing
+        libpng-dev libpng16-16\
         libfreetype6 liblcms2-2  libtiff5 tk tcl libpq5 \
         libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 \
         locales-all zlibc \
@@ -55,7 +56,7 @@ RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://securit
     && apt-get install -yqq nodejs \
     && curl -SLo fonts-liberation2.deb http://ftp.debian.org/debian/pool/main/f/fonts-liberation2/fonts-liberation2_2.00.1-3_all.deb \
     && dpkg --install fonts-liberation2.deb \
-    && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.jessie_amd64.deb \
+    && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.stretch_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
     && (dpkg --install wkhtmltox.deb || true) \
     && apt-get install -yqq --no-install-recommends --fix-broken \
@@ -67,8 +68,8 @@ RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://securit
     && rm -Rf /var/lib/apt/lists/*
 
 # Special case to get latest PostgreSQL client in 250-postgres-client
-RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
-    && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+# RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
+#     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
 
 # Special case to get latest Less and PhantomJS
 RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
