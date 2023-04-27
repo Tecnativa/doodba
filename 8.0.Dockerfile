@@ -44,7 +44,7 @@ RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://securit
         python ruby-compass \
         fontconfig libfreetype6 libxml2 libxslt1.1 libjpeg62-turbo zlib1g \
         fonts-liberation \
-        #libfreetype6 liblcms2-2 libopenjpeg5 libtiff5 tk tcl libpq5 \
+        #libfreetype6 liblcms2-2 libopenjpeg5 libtiff5 tk tcl libpq5 \ THIS LINE WAS COMMENTED. liboopenjpeg5 is missing
         libfreetype6 liblcms2-2  libtiff5 tk tcl libpq5 \
         libldap-2.4-2 libsasl2-2 libx11-6 libxext6 libxrender1 \
         locales-all zlibc \
