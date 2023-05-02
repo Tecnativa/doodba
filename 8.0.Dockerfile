@@ -96,9 +96,9 @@ RUN pip install \
         geoip2 \
     && sync
 COPY bin-deprecated/* bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python2.7/dist-packages/doodbalib
-RUN ln -s /usr/local/lib/python2.7/dist-packages/doodbalib \
-    /usr/local/lib/python2.7/dist-packages/odoobaselib
+COPY lib/doodbalib /usr/local/lib/python2.7/site-packages/doodbalib
+RUN ln -s /usr/local/lib/python2.7/site-packages/doodbalib \
+    /usr/local/lib/python2.7/site-packages/odoobaselib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
@@ -106,13 +106,14 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python2.7/dist-packages/doodbalib \
+    && chmod -R a+rX /usr/local/lib/python2.7/site-packages/doodbalib \
+    && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
     && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
     && sync
 
-# Doodba-QA dependencies in a separate virtualenv
+#Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
 RUN virtualenv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
@@ -120,7 +121,7 @@ RUN virtualenv --system-site-packages /qa/venv \
         click \
         coverage \
         flake8 \
-        pylint-odoo \
+        git+https://github.com/OCA/pylint-odoo.git@refs/pull/329/head \
         six \
     && npm install --loglevel error --prefix /qa 'eslint@<6' \
     && deactivate \
@@ -130,10 +131,21 @@ RUN virtualenv --system-site-packages /qa/venv \
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
+
 ARG ODOO_SOURCE=OCA/OCB
-ARG ODOO_VERSION=10.0
+ARG ODOO_VERSION=8.0
 ENV ODOO_VERSION="$ODOO_VERSION"
-RUN install.sh
+#RUN install.sh
+RUN debs="libldap2-dev libsasl2-dev" \
+    && apt-get update \
+    && apt-get install -yqq --no-install-recommends $debs \
+    && pip install \
+        -r https://raw.githubusercontent.com/odoo/odoo/8.0/requirements.txt \
+    # && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
+    # && apt-get purge -yqq $debs \
+    && rm -Rf /var/lib/apt/lists/* /tmp/*
+
+
 RUN pip install pg_activity
 
 # Metadata
