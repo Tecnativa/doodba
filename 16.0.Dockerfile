@@ -38,7 +38,9 @@ RUN apt-get -qq update \
         curl \
     && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
+    && curl -SLo libssl1.1.deb http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1n-0+deb11u5_amd64.deb \
     && apt-get install -yqq --no-install-recommends \
+        ./libssl1.1.deb \
         ./wkhtmltox.deb \
         chromium \
         ffmpeg \
@@ -125,7 +127,7 @@ RUN build_deps=" \
         pydevd-odoo \
         flanker[validator] \
         geoip2 \
-        "git-aggregator<3.0.0" \
+        "git-aggregator<=4.0.0" \
         inotify \
         pdfminer.six \
         pg_activity \
