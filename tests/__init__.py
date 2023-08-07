@@ -30,7 +30,7 @@ GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ
 # preparing the pre-release for the next version of Odoo, which hasn't been
 # released yet.
 prerelease_skip = unittest.skipIf(
-    ODOO_VERSIONS & {"16.0"}, "Tests not supported in pre-release"
+    ODOO_VERSIONS & {""}, "Tests not supported in pre-release"
 )
 
 
@@ -454,8 +454,6 @@ class ScaffoldingCase(unittest.TestCase):
                     ),
                 )
 
-    # TODO Remove decorator when base_search_fuzzy is migrated to 16.0
-    @prerelease_skip
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
