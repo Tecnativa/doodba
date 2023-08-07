@@ -1,7 +1,7 @@
 # This installs gcc among other things
 build-essential
 # This is the basic need to build any python extensions on v11-
-python-dev
 python3-dev
+python-dev-is-python3
 # Just to test it is removed after building
 openssh-server
