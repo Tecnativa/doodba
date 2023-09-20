@@ -63,6 +63,9 @@ jobs:
       - run: pip install poetry
       - name: Patch $PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      # override pyyaml to 5.3.1 as PIP_CONSTRAINT does not work for poetry
+      # to get rid of AttributeError: cython_sources when installing pyyaml
+      - run: poetry add pyyaml==5.3.1
       - run: poetry install
       # Build images
       - run: poetry run ./hooks/build
