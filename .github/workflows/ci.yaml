@@ -11,10 +11,12 @@ on:
 
 jobs:
   pre-commit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
+        with:
+          python-version: "3.9"
       - name: Set PY
         run:
           echo "PY=$(python -c 'import hashlib,
@@ -27,7 +29,7 @@ jobs:
       - uses: pre-commit/action@v1.0.1
 
   build-test-push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: pre-commit
     strategy:
       fail-fast: false
@@ -42,8 +44,10 @@ jobs:
         include:
           # Older odoo versions don't support latest postgres because of the adapter
           - pg_version: "13"
-            odoo_version: "12.0"
+            odoo_version: "13.0"
           - pg_version: "13"
+            odoo_version: "12.0"
+          - pg_version: "12"
             odoo_version: "11.0"
     env:
       # Indicates what's the equivalent to tecnativa/doodba:latest image
@@ -59,6 +63,8 @@ jobs:
       # Prepare
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
+        with:
+          python-version: "3.9"
       # Install dev and test dependencies
       - run: pip install poetry
       - name: Patch $PATH
