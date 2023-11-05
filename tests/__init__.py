@@ -16,14 +16,13 @@ logging.basicConfig(level=logging.DEBUG)
 
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
-ODOO_VERSIONS = frozenset(
-    environ.get("DOCKER_TAG", "11.0 12.0 13.0 14.0 15.0 16.0").split()
-)
-PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "14").split())
+ODOO_VERSIONS = frozenset(environ.get("DOCKER_TAG", "17.0").split())
+PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "15").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
     "GEOIP_ACCOUNT_ID", False
 )
+
 
 # This decorator skips tests that will fail until some branches and/or addons
 # are migrated to the next release. It is used in situations where Doodba is
@@ -454,7 +453,7 @@ class ScaffoldingCase(unittest.TestCase):
                     ),
                 )
 
-    # TODO Remove decorator when base_search_fuzzy is migrated to 16.0
+    # TODO: Remove decorator when base_search_fuzzy is migrated to 17.0
     @prerelease_skip
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
