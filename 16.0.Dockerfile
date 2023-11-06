@@ -2,13 +2,17 @@ FROM python:3.10-slim-bookworm AS base
 
 EXPOSE 8069 8072
 
-ARG GEOIP_UPDATER_VERSION=4.3.0
+ARG TARGETARCH
+ARG GEOIP_UPDATER_VERSION=6.0.0
 ARG WKHTMLTOPDF_VERSION=0.12.6.1
-ARG WKHTMLTOPDF_CHECKSUM='98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d'
+ARG WKHTMLTOPDF_AMD64_CHECKSUM='98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d'
+ARG WKHTMLTOPDF_ARM64_CHECKSUM="b6606157b27c13e044d0abbe670301f88de4e1782afca4f9c06a5817f3e03a9c"
+ARG WKHTMLTOPDF_URL="https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}-3/wkhtmltox_${WKHTMLTOPDF_VERSION}-3.bookworm_${TARGETARCH}.deb"
 ARG LAST_SYSTEM_UID=499
 ARG LAST_SYSTEM_GID=499
 ARG FIRST_UID=500
 ARG FIRST_GID=500
+
 ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
@@ -35,16 +39,27 @@ ENV DB_FILTER=.* \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost
 
+
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 RUN echo "LAST_SYSTEM_UID=$LAST_SYSTEM_UID\nLAST_SYSTEM_GID=$LAST_SYSTEM_GID\nFIRST_UID=$FIRST_UID\nFIRST_GID=$FIRST_GID" >> /etc/adduser.conf \
-    && echo "SYS_UID_MAX   $LAST_SYSTEM_UID\nSYS_GID_MAX   $LAST_SYSTEM_GID" >> /etc/login.defs \
-    && sed -i -E "s/^UID_MIN\s+[0-9]+.*/UID_MIN   $FIRST_UID/;s/^GID_MIN\s+[0-9]+.*/GID_MIN   $FIRST_GID/" /etc/login.defs \
+    && echo "SYS_UID_MAX $LAST_SYSTEM_UID\nSYS_GID_MAX $LAST_SYSTEM_GID" >> /etc/login.defs \
+    && sed -i -E "s/^UID_MIN\s+[0-9]+.*/UID_MIN $FIRST_UID/;s/^GID_MIN\s+[0-9]+.*/GID_MIN $FIRST_GID/" /etc/login.defs \
     && useradd --system -u $LAST_SYSTEM_UID -s /usr/sbin/nologin -d / systemd-network \
     && apt-get -qq update \
-    && apt-get install -yqq --no-install-recommends \
-        curl \
-    && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}-3/wkhtmltox_${WKHTMLTOPDF_VERSION}-3.bookworm_amd64.deb \
+    && apt-get install -yqq --no-install-recommends curl \
+    && if [ "$TARGETARCH" = "arm64" ]; then \
+        WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_ARM64_CHECKSUM; \
+    elif [ "$TARGETARCH" = "amd64" ]; then \
+        WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_AMD64_CHECKSUM; \
+    else \
+        echo "Unsupported architecture: $TARGETARCH" >&2; \
+        exit 1; \
+    fi \
+    && curl -SLo wkhtmltox.deb ${WKHTMLTOPDF_URL} \
+    && echo "Downloading wkhtmltopdf from: ${WKHTMLTOPDF_URL}" \
+    && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
+    && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
     && apt-get install -yqq --no-install-recommends \
         ./wkhtmltox.deb \
@@ -63,9 +78,9 @@ RUN echo "LAST_SYSTEM_UID=$LAST_SYSTEM_UID\nLAST_SYSTEM_GID=$LAST_SYSTEM_GID\nFI
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bookworm-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
-    && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
+    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
+    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
     && apt-get autopurge -yqq \
     && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
@@ -124,8 +139,14 @@ RUN build_deps=" \
     " \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $build_deps \
-    && pip install \
-        -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    && curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    &&  \
+        if [ "$TARGETARCH" = "arm64" ]; then \
+        echo "Upgrading odoo requirements.txt with gevent==21.12.0 and greenlet==1.1.0 (minimum version compatible with arm64)" && \
+        sed -i 's/gevent==[0-9\.]*/gevent==21.12.0/' requirements.txt && \
+        sed -i 's/greenlet==[0-9\.]*/greenlet==1.1.0/' requirements.txt; \
+    fi \
+    && pip install -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
         click-odoo-contrib \

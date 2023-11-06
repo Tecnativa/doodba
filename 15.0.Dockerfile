@@ -2,9 +2,11 @@ FROM python:3.8-slim-bullseye AS base
 
 EXPOSE 8069 8072
 
-ARG GEOIP_UPDATER_VERSION=4.3.0
+ARG TARGETARCH
+ARG GEOIP_UPDATER_VERSION=6.0.0
 ARG WKHTMLTOPDF_VERSION=0.12.5
-ARG WKHTMLTOPDF_CHECKSUM='dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd'
+ARG WKHTMLTOPDF_AMD64_CHECKSUM='dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd'
+ARG WKHTMLTOPDF_ARM64_CHECKSUM="3344e3a72f4cb4c1218cf48ac5fa9e88bef62aa7fa6f2295be7d5bc1fef100b1"
 ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
@@ -35,8 +37,25 @@ ENV DB_FILTER=.* \
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
-        curl \
-    && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb \
+        curl; \
+    if [ "$TARGETARCH" = "arm64" ]; then \
+        if [ "$WKHTMLTOPDF_VERSION" != "0.12.6.1" ]; then \
+            echo "Error: WKHTMLTOPDF_VERSION must be exactly 0.12.6.1 for arm builds. Forcing version to 0.12.6.1"; \
+            export WKHTMLTOPDF_VERSION="0.12.6.1";\
+        fi; \
+        WKHTMLTOPDF_URL="https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}-2/wkhtmltox_${WKHTMLTOPDF_VERSION}-2.bullseye_${TARGETARCH}.deb" \
+        WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_ARM64_CHECKSUM; \
+    elif [ "$TARGETARCH" = "amd64" ]; then \
+        WKHTMLTOPDF_URL="https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_${TARGETARCH}.deb" \
+        WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_AMD64_CHECKSUM; \
+    else \
+        echo "Unsupported architecture: $TARGETARCH" >&2; \
+        exit 1; \
+    fi \
+    && curl -SLo wkhtmltox.deb ${WKHTMLTOPDF_URL} \
+    && echo "Downloading wkhtmltopdf from: ${WKHTMLTOPDF_URL}" \
+    && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
+    && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
     && apt-get install -yqq --no-install-recommends \
         ./wkhtmltox.deb \
@@ -55,9 +74,9 @@ RUN apt-get -qq update \
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
-    && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
+    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
+    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
     && apt-get autopurge -yqq \
     && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
@@ -116,8 +135,14 @@ RUN build_deps=" \
     " \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $build_deps \
-    && pip install \
-        -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    && curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    &&  \
+        if [ "$TARGETARCH" = "arm64" ]; then \
+        echo "Upgrading odoo requirements.txt with gevent==21.12.0 and greenlet==1.1.0 (minimum versions compatible with arm64)" && \
+        sed -i 's/gevent==[0-9\.]*/gevent==21.12.0/' requirements.txt && \
+        sed -i 's/greenlet==[0-9\.]*/greenlet==1.1.0/' requirements.txt; \
+    fi \
+    && pip install -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
         click-odoo-contrib \
