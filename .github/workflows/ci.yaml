@@ -35,22 +35,22 @@ jobs:
       fail-fast: false
       matrix:
         # Test modern Odoo versions with latest Postgres version
-        pg_version: ["15"]
         odoo_version: ["17.0"]
+        pg_version: ["15"]
         python_version: ["3.10"]
         include:
           # Older odoo versions don't support latest postgres and Python versions
-          - pg_version: "14"
-            odoo_version: "15.0"
+          - odoo_version: "16.0"
+            pg_version: "14"
+            python_version: "3.10"
+          - odoo_version: "15.0"
+            pg_version: "14"
             python_version: "3.9"
-          - pg_version: "14"
-            odoo_version: "14.0"
+          - odoo_version: "14.0"
+            pg_version: "14"
             python_version: "3.9"
-          - pg_version: "14"
-            odoo_version: "13.0"
-            python_version: "3.9"
-          - pg_version: "13"
-            odoo_version: "13.0"
+          - odoo_version: "13.0"
+            pg_version: "14"
             python_version: "3.9"
     env:
       # Indicates what's the equivalent to tecnativa/doodba:latest image
