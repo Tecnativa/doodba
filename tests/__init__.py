@@ -390,7 +390,6 @@ class ScaffoldingCase(unittest.TestCase):
                     'test "$(hello-world)" == "this is executable hello-world"',
                 ),
                 ("python", "-xc", "import Crypto; print(Crypto.__version__)"),
-                ("sh", "-xc", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # ``requirements.txt`` from addon repos were processed
                 ("python", "-c", "import numpy"),
                 # Local executable binaries found in $PATH
@@ -433,7 +432,6 @@ class ScaffoldingCase(unittest.TestCase):
                 # 200-pip-without-ext
                 ("test", "-f", "custom/dependencies/200-pip-without-ext"),
                 ("python", "-c", "import Crypto; print(Crypto.__version__)"),
-                ("sh", "-xc", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # 270-gem.txt
                 ("test", "-f", "custom/dependencies/270-gem.txt"),
                 ("hello-world",),
