@@ -1,3 +1,5 @@
 # This line should be ignored
 busybox
 ruby
+ninja-build
+patchelf

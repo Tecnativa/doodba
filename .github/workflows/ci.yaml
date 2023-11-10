@@ -38,6 +38,20 @@ jobs:
         odoo_version: ["17.0"]
         pg_version: ["15"]
         python_version: ["3.10"]
+        include:
+          # Older odoo versions don't support latest postgres and Python versions
+          - odoo_version: "16.0"
+            pg_version: "14"
+            python_version: "3.10"
+          - odoo_version: "15.0"
+            pg_version: "14"
+            python_version: "3.9"
+          - odoo_version: "14.0"
+            pg_version: "14"
+            python_version: "3.9"
+          - odoo_version: "13.0"
+            pg_version: "14"
+            python_version: "3.9"
     env:
       # Indicates what's the equivalent to tecnativa/doodba:latest image
       LATEST_RELEASE: "17.0"
@@ -54,8 +68,6 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python_version }}
-      - name: DF
-        run: df -h
       # Install dev and test dependencies
       - run: pip install poetry
       - name: Patch $PATH
