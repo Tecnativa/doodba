@@ -2,7 +2,11 @@ FROM python:3.5-stretch AS base
 
 EXPOSE 8069 8072
 
-ARG GEOIP_UPDATER_VERSION=4.1.5
+ARG GIT_VERSION=2.37.6
+# skip libssl-dev as it's already installed by other packages and should not be removed after git install
+ARG GIT_BUILD_DEPENDENCIES="make dh-autoreconf libexpat1-dev libz-dev"
+ARG GIT_RUNTIME_DEPENDENCIES="libcurl4-gnutls-dev"
+ARG GEOIP_UPDATER_VERSION=4.10.0
 ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
@@ -55,6 +59,8 @@ RUN apt-get -qq update \
         zlibc \
         apt-transport-https \
         ca-certificates \
+        $GIT_BUILD_DEPENDENCIES \
+        $GIT_RUNTIME_DEPENDENCIES \
     && echo 'deb https://apt-archive.postgresql.org/pub/repos/apt stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && curl https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3 /dev/stdin \
@@ -69,6 +75,17 @@ RUN apt-get -qq update \
     && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
+    && curl --silent -L --output "git-${GIT_VERSION}.tar.gz" "https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz" \
+    && tar xf "git-${GIT_VERSION}.tar.gz" \
+    && rm "git-${GIT_VERSION}.tar.gz" \
+    && cd git-${GIT_VERSION} \
+    && make configure \
+    && ./configure --prefix=/usr \
+    && make all \
+    && make install \
+    && cd .. \
+    && rm -Rf "git-${GIT_VERSION}" \
+    && apt-get remove -y $GIT_BUILD_DEPENDENCIES \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
 # Special case to get latest Less
