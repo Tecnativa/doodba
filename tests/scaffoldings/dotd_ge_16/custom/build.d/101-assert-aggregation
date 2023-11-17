@@ -1,0 +1,4 @@
+#!/bin/bash
+# Git aggregation is performed at step 100
+set -ex
+test -d /opt/odoo/custom/src/odoo

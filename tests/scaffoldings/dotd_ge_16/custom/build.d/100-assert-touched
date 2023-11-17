@@ -1,0 +1,3 @@
+#!/bin/bash
+set -ex
+test -f /home/odoo/created-at-build
