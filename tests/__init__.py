@@ -90,10 +90,9 @@ class ScaffoldingCase(unittest.TestCase):
             finally:
                 self.popen(("docker-compose", "down", "-v"), cwd=workdir, env=full_env)
 
-    def test_addons_filtered(self):
-        """Test addons filtering with ``ONLY`` keyword in ``addons.yaml``."""
-        project_dir = join(SCAFFOLDINGS_DIR, "dotd")
-        for sub_env in matrix():
+    def _check_addons(self, scaffolding_dir, odoo_skip):
+        project_dir = join(SCAFFOLDINGS_DIR, scaffolding_dir)
+        for sub_env in matrix(odoo_skip=odoo_skip):
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
@@ -195,6 +194,14 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-xc", 'test "$(addons list -c)" == crm,sale'),
                 ("bash", "-xc", 'test "$(addons list -cWsale)" == crm'),
             )
+
+    def test_addons_filtered_lt_16(self):
+        """Test addons filtering with ``ONLY`` keyword in ``addons.yaml`` for versions < 16"""
+        self._check_addons("dotd", {"16.0", "17.0"})
+
+    def test_addons_filtered_ge_16(self):
+        """Test addons filtering with ``ONLY`` keyword in ``addons.yaml`` for versions >= 16"""
+        self._check_addons("dotd_ge_16", {"11.0", "12.0", "13.0", "14.0", "15.0"})
 
     def test_qa(self):
         """Test that QA tools are in place and work as expected."""
@@ -365,11 +372,10 @@ class ScaffoldingCase(unittest.TestCase):
                 ("grep", "-q", "12.0.2.0.0", "auto/addons/rma/__manifest__.py"),
             )
 
-    def test_dotd(self):
-        """Test environment with common ``*.d`` directories."""
-        for sub_env in matrix():
+    def _check_dotd(self, scaffolding_dir, odoo_skip):
+        for sub_env in matrix(odoo_skip=odoo_skip):
             self.compose_test(
-                join(SCAFFOLDINGS_DIR, "dotd"),
+                join(SCAFFOLDINGS_DIR, scaffolding_dir),
                 sub_env,
                 # ``custom/build.d`` was properly executed
                 ("test", "-f", "/home/odoo/created-at-build"),
@@ -406,10 +412,17 @@ class ScaffoldingCase(unittest.TestCase):
                 ("--version",),
             )
 
-    def test_dependencies(self):
-        """Test dependencies installation."""
-        dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies")
-        for sub_env in matrix():
+    def test_dotd_lt_16(self):
+        """Test environment with common ``*.d`` directories for versions < 16."""
+        self._check_dotd("dotd", {"16.0", "17.0"})
+
+    def test_dotd_ge_16(self):
+        """Test environment with common ``*.d`` directories for versions >= 16."""
+        self._check_dotd("dotd_ge_16", {"11.0", "12.0", "13.0", "14.0", "15.0"})
+
+    def _check_dependencies(self, scaffolding_dir, odoo_skip):
+        dependencies_dir = join(SCAFFOLDINGS_DIR, scaffolding_dir)
+        for sub_env in matrix(odoo_skip=odoo_skip):
             self.compose_test(
                 dependencies_dir,
                 sub_env,
@@ -450,6 +463,16 @@ class ScaffoldingCase(unittest.TestCase):
                         ),
                     ),
                 )
+
+    def test_dependencies_lt_16(self):
+        """Test dependencies installation for versions < 16"""
+        self._check_dependencies("dependencies", {"16.0", "17.0"})
+
+    def test_dependencies_ge_16(self):
+        """Test dependencies installation for versions >= 16"""
+        self._check_dependencies(
+            "dependencies_ge_16", {"11.0", "12.0", "13.0", "14.0", "15.0"}
+        )
 
     # TODO: Remove decorator when base_search_fuzzy is migrated to 17.0
     @prerelease_skip

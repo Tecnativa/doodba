@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Dependencies are processed at step 200
+set -ex
+which busybox
+hello-world
+node -e "require('test-npm-install')"
+python -c "import numpy, Crypto"

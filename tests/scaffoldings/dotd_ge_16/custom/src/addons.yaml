@@ -1,0 +1,20 @@
+other-doodba/odoo/src/private:
+  - absent_addon
+  - dummy_addon
+  - product
+enterprise:
+  - make_odoo_rich
+---
+ONLY:
+  PGDATABASE:
+    - limited_core
+odoo/addons:
+  - crm
+  - sale
+
+---
+ONLY:
+  PGDATABASE:
+    - limited_private
+    - limited_core
+private: []

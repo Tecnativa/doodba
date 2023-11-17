@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Add ruby as a conditional dependency."""
+
+import os
+
+from doodbalib import ODOO_VERSION
+
+if float(ODOO_VERSION) >= 13:
+    # These Doodba versions still can use the ruby gem autoinstaller, but
+    # need ruby to be manually installed because it is not in the base image
+    # by default (it was until Odoo 12.0)
+    with open("/opt/odoo/custom/dependencies/000-apt-ruby.txt", "w") as fd:
+        fd.writelines(["ruby"])

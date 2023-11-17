@@ -1,0 +1,3 @@
+#!/bin/bash
+set -ex
+touch /home/odoo/created-at-entrypoint
