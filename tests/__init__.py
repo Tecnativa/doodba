@@ -306,6 +306,8 @@ class ScaffoldingCase(unittest.TestCase):
             ("bash", "-xc", 'test "$(which geoipupdate)" != ""'),
             ("test", "!", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
             ("bash", "-xc", "! geoipupdate"),
+            # Ensure /root/.ssh/ has not been mangled
+            ("bash", "-c", "[[ ! -d ~root/.ssh/ssh ]]"),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix():
