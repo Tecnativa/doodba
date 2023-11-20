@@ -123,9 +123,7 @@ RUN build_deps=" \
         click-odoo-contrib \
         debugpy \
         pydevd-odoo \
-        redis \
-        dnsq \
-        git+https://github.com/mailgun/flanker.git@v0.9.15#egg=flanker \
+        git+https://github.com/mailgun/flanker.git@v0.9.15#egg=flanker[validator] \
         geoip2 \
         "git-aggregator<3.0.0" \
         inotify \
