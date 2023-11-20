@@ -125,7 +125,7 @@ RUN build_deps=" \
         pydevd-odoo \
         git+https://github.com/mailgun/flanker.git@v0.9.15#egg=flanker \
         geoip2 \
-        "git-aggregator<3.0.0" \
+        "git-aggregator==4.0" \
         inotify \
         pdfminer.six \
         pg_activity \
