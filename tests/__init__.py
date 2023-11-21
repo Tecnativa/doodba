@@ -491,32 +491,35 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_modified_uids(self):
         """tests if we can build an image with a custom uid and gid of odoo"""
-        uids_dir = join(SCAFFOLDINGS_DIR, "uids_1001")
-        for sub_env in matrix():
-            self.compose_test(
-                uids_dir,
-                sub_env,
-                # verify that odoo user has the given ids
-                ("bash", "-xc", 'test "$(id -u)" == "1001"'),
-                ("bash", "-xc", 'test "$(id -g)" == "1002"'),
-                ("bash", "-xc", 'test "$(id -u -n)" == "odoo"'),
-                # all those directories need to belong to odoo (user or group odoo)
-                (
-                    "bash",
-                    "-xc",
-                    'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"',
-                ),
-                (
-                    "bash",
-                    "-xc",
-                    'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"',
-                ),
-                (
-                    "bash",
-                    "-xc",
-                    'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
-                ),
-            )
+        for expected_uid, expected_gid, uids_dir in [
+            (1001, 1002, join(SCAFFOLDINGS_DIR, "uids_1001")),
+            (998, 998, join(SCAFFOLDINGS_DIR, "uids_998")),
+        ]:
+            for sub_env in matrix():
+                self.compose_test(
+                    uids_dir,
+                    sub_env,
+                    # verify that odoo user has the given ids
+                    ("bash", "-xc", 'test "$(id -u)" == "%s"' % expected_uid),
+                    ("bash", "-xc", 'test "$(id -g)" == "%s"' % expected_gid),
+                    ("bash", "-xc", 'test "$(id -u -n)" == "odoo"'),
+                    # all those directories need to belong to odoo (user or group odoo)
+                    (
+                        "bash",
+                        "-xc",
+                        'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"',
+                    ),
+                    (
+                        "bash",
+                        "-xc",
+                        'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"',
+                    ),
+                    (
+                        "bash",
+                        "-xc",
+                        'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
+                    ),
+                )
 
     def test_uids_mac_os(self):
         """tests if we can build an image with a custom uid and gid of odoo"""
