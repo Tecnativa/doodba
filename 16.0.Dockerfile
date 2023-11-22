@@ -230,7 +230,7 @@ ONBUILD COPY --chown=root:odoo $LOCAL_CUSTOM_DIR /opt/odoo/custom
 
 # https://docs.python.org/3/library/logging.html#levels
 ONBUILD ARG LOG_LEVEL=INFO
-ONBUILD RUN [[ -d ~root/.ssh ]] && rm -r ~root/.ssh; \
+ONBUILD RUN [ -d ~root/.ssh ] && rm -r ~root/.ssh; \
             mkdir -p /opt/odoo/custom/ssh \
             && ln -s /opt/odoo/custom/ssh ~root/.ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
