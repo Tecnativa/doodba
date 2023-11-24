@@ -3,8 +3,8 @@ FROM python:3.10-slim-bookworm AS base
 EXPOSE 8069 8072
 
 ARG GEOIP_UPDATER_VERSION=4.3.0
-ARG WKHTMLTOPDF_VERSION=0.13.0
-ARG WKHTMLTOPDF_CHECKSUM='8feeb4d814263688d6e6fe28e03b541be5ca94f39c6e1ef8ff4c88dd8fb9443a'
+ARG WKHTMLTOPDF_VERSION=0.12.6.1
+ARG WKHTMLTOPDF_CHECKSUM='98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d'
 ARG LAST_SYSTEM_UID=499
 ARG LAST_SYSTEM_GID=499
 ARG FIRST_UID=500
@@ -44,7 +44,7 @@ RUN echo -e "LAST_SYSTEM_UID=$LAST_SYSTEM_UID\nLAST_SYSTEM_GID=$LAST_SYSTEM_GID\
     && apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
         curl \
-    && curl -SLo wkhtmltox.deb https://github.com/odoo/wkhtmltopdf/releases/download/nightly/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.nightly.bookworm_amd64.deb \
+    && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}-3/wkhtmltox_${WKHTMLTOPDF_VERSION}-3.bookworm_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
     && apt-get install -yqq --no-install-recommends \
         ./wkhtmltox.deb \
