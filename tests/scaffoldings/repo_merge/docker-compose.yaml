@@ -6,6 +6,7 @@ services:
       args:
         COMPILE: "false"
         ODOO_VERSION: $ODOO_MINOR
+        PIP_INSTALL_ODOO: "false" # ensure build.d/700-odoo-install does not fail
         WITHOUT_DEMO: "false"
     environment:
       PYTHONOPTIMIZE: ""
