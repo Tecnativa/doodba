@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -rf /tmp/fake-odoo
 mkdir /tmp/fake-odoo
 cd /tmp/fake-odoo
 
