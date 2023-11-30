@@ -721,8 +721,8 @@ class ScaffoldingCase(unittest.TestCase):
                     UID=str(os.getuid()),
                     GID=str(os.getgid()),
                 ),
-                # prepare repos.yaml to be non fast forward
-                ("/opt/odoo/custom/build.d/099-git_merge_no_ff",),
+                # create a fake odoo git repo to ensure a merge commit is created
+                ("/opt/odoo/custom/build.d/099-create-fake-odoo",),
                 # autoaggregate as odoo:odoo to check if merges also work
                 ("autoaggregate",),
                 (

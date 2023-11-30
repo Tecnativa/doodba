@@ -3,10 +3,7 @@
   defaults:
     depth: $DEPTH_MERGE
   remotes:
-    ocb: https://github.com/OCA/OCB.git
-  target: ocb $ODOO_VERSION
+    local: /tmp/fake-odoo
   merges:
-    # $ODOO_VERSION^1 gets replaced by commit sha that is one behind $ODOO_VERSION in OCB repo by 099-git_merge_no_ff
-    # in this test, to force gitaggregate creating a merge request
-    - ocb $ODOO_VERSION^1
-    - ocb $ODOO_VERSION
+    - local branch1
+    - local branch2
