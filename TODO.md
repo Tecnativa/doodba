@@ -1,4 +1,5 @@
-* TESTS
+- test migration
+- TESTS
 
 ```python
 #!/usr/bin/env python3

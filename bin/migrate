@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import argparse
 import os
 import subprocess
 import sys
-import argparse
 from logging import DEBUG, INFO, WARNING
 
 from doodbalib import logger, which
@@ -43,11 +43,14 @@ if (
 ):
     logger.error("OPENUPGRADE_BASE_VERSION and OPENUPGRADE_TARGET_VERSION must be set")
     sys.exit(1)
+
 # find variables in parameters
 unknown = []
 try:
     parser = argparse.ArgumentParser(
-        prog="openupgrade", description="Upgrade Odoo Database", epilog="Openupgrade script"
+        prog="openupgrade",
+        description="Upgrade Odoo Database",
+        epilog="Openupgrade script",
     )
     parser.add_argument(
         "-d",
@@ -55,7 +58,7 @@ try:
         required=True,
     )
     args, unknown = parser.parse_known_args(extra_command[1:])
-    if not os.environ.get("OPENUPGRADE_BASE_DB",""):
+    if not os.environ.get("OPENUPGRADE_BASE_DB", ""):
         os.environ["OPENUPGRADE_BASE_DB"] = args.database
     # os.environ["OPENUPGRADE_OLD_DB"] = (
     #     args.database
@@ -63,12 +66,14 @@ try:
     #     + os.environ["OPENUPGRADE_BASE_VERSION"].replace(".", "_")
     # )
 
-    if not os.environ.get("PGDATABASE",""):
+    if not os.environ.get("PGDATABASE", ""):
         os.environ["PGDATABASE"] = (
-            os.environ["OPENUPGRADE_BASE_DB"] + "_openupgrade_" + os.environ["ODOO_VERSION"].replace(".", "_")
+            os.environ["OPENUPGRADE_BASE_DB"]
+            + "_openupgrade_"
+            + os.environ["ODOO_VERSION"].replace(".", "_")
         )
 except Exception as e:
-    logger.log(WARNING,e)    
+    logger.log(WARNING, e)
 
 extra_command = [extra_command[0], "-d", os.environ["PGDATABASE"]] + unknown
 

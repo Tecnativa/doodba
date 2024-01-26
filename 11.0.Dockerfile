@@ -236,5 +236,6 @@ ONBUILD ARG DB_VERSION=latest
 ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo
+
 # HACK Special case for Werkzeug
 ONBUILD RUN pip install --user Werkzeug==0.14.1

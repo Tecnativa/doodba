@@ -45,19 +45,19 @@ jobs:
             python_version: "3.10"
           - odoo_version: "15.0"
             pg_version: "14"
-            python_version: "3.9"
+            python_version: "3.8"
           - odoo_version: "14.0"
             pg_version: "14"
-            python_version: "3.9"
+            python_version: "3.8"
           - odoo_version: "13.0"
             pg_version: "14"
-            python_version: "3.9"
+            python_version: "3.6"
           - odoo_version: "12.0"
             pg_version: "13"
             python_version: "3.5"
           - odoo_version: "11.0"
             pg_version: "13"
-            python_version: "2.7"
+            python_version: "3.5"
           - odoo_version: "10.0"
             pg_version: "13"
             python_version: "2.7"
@@ -68,7 +68,6 @@ jobs:
             pg_version: "13"
             python_version: "2.7"
 
-            
     env:
       # Indicates what's the equivalent to tecnativa/doodba:latest image
       LATEST_RELEASE: "17.0"
