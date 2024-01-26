@@ -37,6 +37,7 @@ ENV DB_FILTER=.* \
 
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
+# TODO: move to archive http://archive.debian.org/debian-security/dists/buster/updates/
 RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
     curl \
