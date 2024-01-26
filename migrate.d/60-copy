@@ -10,7 +10,7 @@ then
         log INFO Backing up ${PGDATABASE} to ${PGDATABASE}$(date +%Y%m%d%H%M)
         cp -a /var/lib/odoo/filestore/${PGDATABASE} /var/lib/odoo/filestore/${PGDATABASE}$(date +%Y%m%d%H%M)
         psql -e "CREATE DATABASE ${PGDATABASE}$(date +%Y%m%d%H%M) WITH TEMPLATE ${PGDATABASE} OWNER ${PGUSER}"
-    fi    
+    fi
     if [ -d "/var/lib/odoo/filestore/${OPENUPGRADE_BASE_DB}" ]
     then
         cp -a /var/lib/odoo/filestore/${OPENUPGRADE_BASE_DB} /var/lib/odoo/filestore/${PGDATABASE}
@@ -18,6 +18,7 @@ then
         exit 0
     fi
     if [ -d "${ODOO_MOUNTPOINT}/filestore/${OPENUPGRADE_BASE_DB}" ]
+        log INFO Using ${ODOO_MOUNTPOINT}/filestore/${OPENUPGRADE_BASE_DB}
         cp -a ${ODOO_MOUNTPOINT}/filestore/${OPENUPGRADE_BASE_DB} /var/lib/odoo/filestore/${PGDATABASE}
         psql -e "CREATE DATABASE ${PGDATABASE} WITH TEMPLATE ${OPENUPGRADE_BASE_DB} OWNER ${PGUSER}"
         exit 0
