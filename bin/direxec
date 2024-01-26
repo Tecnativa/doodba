@@ -25,7 +25,7 @@ except OSError:
 # Run scripts
 for executable, folder in sorted(files):
     command = os.path.join(folder, executable)
-    if os.access(command, os.X_OK):
+    if os.access(command, os.X_OK) and not os.path.isdir(command):
         logger.debug("Executing %s", command)
         subprocess.check_call(command)
 

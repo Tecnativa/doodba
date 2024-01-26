@@ -16,14 +16,13 @@ logging.basicConfig(level=logging.DEBUG)
 
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
-ODOO_VERSIONS = frozenset(
-    environ.get("DOCKER_TAG", "11.0 12.0 13.0 14.0 15.0 16.0").split()
-)
-PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "14").split())
+ODOO_VERSIONS = frozenset(environ.get("DOCKER_TAG", "17.0").split())
+PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "15").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
     "GEOIP_ACCOUNT_ID", False
 )
+
 
 # This decorator skips tests that will fail until some branches and/or addons
 # are migrated to the next release. It is used in situations where Doodba is
@@ -91,10 +90,9 @@ class ScaffoldingCase(unittest.TestCase):
             finally:
                 self.popen(("docker-compose", "down", "-v"), cwd=workdir, env=full_env)
 
-    def test_addons_filtered(self):
-        """Test addons filtering with ``ONLY`` keyword in ``addons.yaml``."""
-        project_dir = join(SCAFFOLDINGS_DIR, "dotd")
-        for sub_env in matrix():
+    def _check_addons(self, scaffolding_dir, odoo_skip):
+        project_dir = join(SCAFFOLDINGS_DIR, scaffolding_dir)
+        for sub_env in matrix(odoo_skip=odoo_skip):
             self.compose_test(
                 project_dir,
                 dict(sub_env, DBNAME="prod"),
@@ -197,6 +195,14 @@ class ScaffoldingCase(unittest.TestCase):
                 ("bash", "-xc", 'test "$(addons list -cWsale)" == crm'),
             )
 
+    def test_addons_filtered_lt_16(self):
+        """Test addons filtering with ``ONLY`` keyword in ``addons.yaml`` for versions < 16"""
+        self._check_addons("dotd", {"16.0", "17.0"})
+
+    def test_addons_filtered_ge_16(self):
+        """Test addons filtering with ``ONLY`` keyword in ``addons.yaml`` for versions >= 16"""
+        self._check_addons("dotd_ge_16", {"11.0", "12.0", "13.0", "14.0", "15.0"})
+
     def test_qa(self):
         """Test that QA tools are in place and work as expected."""
         folder = join(SCAFFOLDINGS_DIR, "settings")
@@ -284,6 +290,8 @@ class ScaffoldingCase(unittest.TestCase):
             ODOO_PREFIX + ("--init", "base"),
             # Auto updater must work
             ("click-odoo-update",),
+            # Auto updater must work, ignoring core addons
+            ("click-odoo-update", "--ignore-core-addons"),
             # Needed tools exist
             ("curl", "--version"),
             ("git", "--version"),
@@ -298,6 +306,8 @@ class ScaffoldingCase(unittest.TestCase):
             ("bash", "-xc", 'test "$(which geoipupdate)" != ""'),
             ("test", "!", "-e", "/usr/share/GeoIP/GeoLite2-City.mmdb"),
             ("bash", "-xc", "! geoipupdate"),
+            # Ensure /root/.ssh/ has not been mangled
+            ("bash", "-c", "[[ ! -d ~root/.ssh/ssh ]]"),
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix():
@@ -325,7 +335,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/crm"),
                 ("test", "-d", "auto/addons/crm/migrations"),
             )
-        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0"}):
+        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0", "17.0"}):
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "addons_env_ou"),
                 sub_env,
@@ -364,11 +374,10 @@ class ScaffoldingCase(unittest.TestCase):
                 ("grep", "-q", "12.0.2.0.0", "auto/addons/rma/__manifest__.py"),
             )
 
-    def test_dotd(self):
-        """Test environment with common ``*.d`` directories."""
-        for sub_env in matrix():
+    def _check_dotd(self, scaffolding_dir, odoo_skip):
+        for sub_env in matrix(odoo_skip=odoo_skip):
             self.compose_test(
-                join(SCAFFOLDINGS_DIR, "dotd"),
+                join(SCAFFOLDINGS_DIR, scaffolding_dir),
                 sub_env,
                 # ``custom/build.d`` was properly executed
                 ("test", "-f", "/home/odoo/created-at-build"),
@@ -389,7 +398,6 @@ class ScaffoldingCase(unittest.TestCase):
                     'test "$(hello-world)" == "this is executable hello-world"',
                 ),
                 ("python", "-xc", "import Crypto; print(Crypto.__version__)"),
-                ("sh", "-xc", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # ``requirements.txt`` from addon repos were processed
                 ("python", "-c", "import numpy"),
                 # Local executable binaries found in $PATH
@@ -406,10 +414,17 @@ class ScaffoldingCase(unittest.TestCase):
                 ("--version",),
             )
 
-    def test_dependencies(self):
-        """Test dependencies installation."""
-        dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies")
-        for sub_env in matrix():
+    def test_dotd_lt_16(self):
+        """Test environment with common ``*.d`` directories for versions < 16."""
+        self._check_dotd("dotd", {"16.0", "17.0"})
+
+    def test_dotd_ge_16(self):
+        """Test environment with common ``*.d`` directories for versions >= 16."""
+        self._check_dotd("dotd_ge_16", {"11.0", "12.0", "13.0", "14.0", "15.0"})
+
+    def _check_dependencies(self, scaffolding_dir, odoo_skip):
+        dependencies_dir = join(SCAFFOLDINGS_DIR, scaffolding_dir)
+        for sub_env in matrix(odoo_skip=odoo_skip):
             self.compose_test(
                 dependencies_dir,
                 sub_env,
@@ -432,7 +447,6 @@ class ScaffoldingCase(unittest.TestCase):
                 # 200-pip-without-ext
                 ("test", "-f", "custom/dependencies/200-pip-without-ext"),
                 ("python", "-c", "import Crypto; print(Crypto.__version__)"),
-                ("sh", "-xc", "rst2html.py --version | grep 'Docutils 0.14'"),
                 # 270-gem.txt
                 ("test", "-f", "custom/dependencies/270-gem.txt"),
                 ("hello-world",),
@@ -452,12 +466,22 @@ class ScaffoldingCase(unittest.TestCase):
                     ),
                 )
 
-    # TODO Remove decorator when base_search_fuzzy is migrated to 16.0
+    def test_dependencies_lt_16(self):
+        """Test dependencies installation for versions < 16"""
+        self._check_dependencies("dependencies", {"16.0", "17.0"})
+
+    def test_dependencies_ge_16(self):
+        """Test dependencies installation for versions >= 16"""
+        self._check_dependencies(
+            "dependencies_ge_16", {"11.0", "12.0", "13.0", "14.0", "15.0"}
+        )
+
+    # TODO: Remove decorator when base_search_fuzzy is migrated to 17.0
     @prerelease_skip
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
-        for sub_env in matrix():
+        for sub_env in matrix(odoo_skip={"17.0"}):
             self.compose_test(
                 dependencies_dir,
                 sub_env,
@@ -467,32 +491,35 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_modified_uids(self):
         """tests if we can build an image with a custom uid and gid of odoo"""
-        uids_dir = join(SCAFFOLDINGS_DIR, "uids_1001")
-        for sub_env in matrix():
-            self.compose_test(
-                uids_dir,
-                sub_env,
-                # verify that odoo user has the given ids
-                ("bash", "-xc", 'test "$(id -u)" == "1001"'),
-                ("bash", "-xc", 'test "$(id -g)" == "1002"'),
-                ("bash", "-xc", 'test "$(id -u -n)" == "odoo"'),
-                # all those directories need to belong to odoo (user or group odoo)
-                (
-                    "bash",
-                    "-xc",
-                    'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"',
-                ),
-                (
-                    "bash",
-                    "-xc",
-                    'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"',
-                ),
-                (
-                    "bash",
-                    "-xc",
-                    'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
-                ),
-            )
+        for expected_uid, expected_gid, uids_dir in [
+            (1001, 1002, join(SCAFFOLDINGS_DIR, "uids_1001")),
+            (998, 998, join(SCAFFOLDINGS_DIR, "uids_998")),
+        ]:
+            for sub_env in matrix():
+                self.compose_test(
+                    uids_dir,
+                    sub_env,
+                    # verify that odoo user has the given ids
+                    ("bash", "-xc", 'test "$(id -u)" == "%s"' % expected_uid),
+                    ("bash", "-xc", 'test "$(id -g)" == "%s"' % expected_gid),
+                    ("bash", "-xc", 'test "$(id -u -n)" == "odoo"'),
+                    # all those directories need to belong to odoo (user or group odoo)
+                    (
+                        "bash",
+                        "-xc",
+                        'test "$(stat -c \'%U:%G\' /var/lib/odoo)" == "odoo:odoo"',
+                    ),
+                    (
+                        "bash",
+                        "-xc",
+                        'test "$(stat -c \'%U:%G\' /opt/odoo/auto/addons)" == "root:odoo"',
+                    ),
+                    (
+                        "bash",
+                        "-xc",
+                        'test "$(stat -c \'%U:%G\' /opt/odoo/custom/src)" == "root:odoo"',
+                    ),
+                )
 
     def test_uids_mac_os(self):
         """tests if we can build an image with a custom uid and gid of odoo"""
@@ -694,8 +721,8 @@ class ScaffoldingCase(unittest.TestCase):
                     UID=str(os.getuid()),
                     GID=str(os.getgid()),
                 ),
-                # prepare repos.yaml to be non fast forward
-                ("/opt/odoo/custom/build.d/099-git_merge_no_ff",),
+                # create a fake odoo git repo to ensure a merge commit is created
+                ("/opt/odoo/custom/build.d/099-create-fake-odoo",),
                 # autoaggregate as odoo:odoo to check if merges also work
                 ("autoaggregate",),
                 (
@@ -726,6 +753,20 @@ class ScaffoldingCase(unittest.TestCase):
                 # test that permissions are set in a way that enables a second autoaggregation after the first one
                 # e.g. when used in dev we update the source code sometimes/daily
                 ("autoaggregate",),
+            )
+
+    def test_entrypoint_python(self):
+        symlink_dir = join(SCAFFOLDINGS_DIR, "entrypoint")
+        for sub_env in matrix():
+            self.compose_test(
+                symlink_dir,
+                dict(sub_env, UID=str(os.getuid()), GID=str(os.getgid())),
+                # we verify that customizing entrypoint with python files work by writing to
+                # /tmp/customize_entrypoint.mark.txt with 60-customize_entrypoint.py
+                (
+                    "cat",
+                    "/tmp/customize_entrypoint.mark.txt",
+                ),
             )
 
 

@@ -1,0 +1,30 @@
+version: "2.1"
+services:
+  odoo:
+    build:
+      context: ./
+      args:
+        LOG_LEVEL: DEBUG
+        ODOO_VERSION: $ODOO_MINOR
+    tty: true
+    environment:
+      PGUSER: another_odoo
+      PGPASSWORD: anotherodoopassword
+      PGHOST: postgresql
+      PGDATABASE: ${DBNAME:-prod}
+    depends_on:
+      - postgresql
+    volumes:
+      - filestore:/var/lib/odoo:z
+
+  postgresql:
+    image: tecnativa/postgres-autoconf:${DB_VERSION}-alpine
+    environment:
+      POSTGRES_USER: another_odoo
+      POSTGRES_PASSWORD: anotherodoopassword
+    volumes:
+      - db:/var/lib/postgresql/data:z
+
+volumes:
+  db:
+  filestore:

@@ -6,14 +6,28 @@ services:
       args:
         COMPILE: "false"
         ODOO_VERSION: $ODOO_MINOR
-        PIP_INSTALL_ODOO: "false" # ensure build.d/700-odoo-install does not fail
+        PIP_INSTALL_ODOO: "false"
         WITHOUT_DEMO: "false"
+        UID: 998
+        GID: 998
+
+    tty: true
+    depends_on:
+      - db
     environment:
       PYTHONOPTIMIZE: ""
       UNACCENT: "false"
-    entrypoint: "" # we are not using odoo but only checking the repo state here, this skips starting the db
     volumes:
       - filestore:/var/lib/odoo:z
 
+  db:
+    image: postgres:${DB_VERSION}-alpine
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoopassword
+    volumes:
+      - db:/var/lib/postgresql/data:z
+
 volumes:
+  db:
   filestore:

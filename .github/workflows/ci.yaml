@@ -11,44 +11,67 @@ on:
 
 jobs:
   pre-commit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
       - name: Set PY
         run:
           echo "PY=$(python -c 'import hashlib,
           sys;print(hashlib.sha256(sys.version.encode()+sys.executable.encode()).hexdigest())')"
           >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+      - uses: pre-commit/action@v3.0.0
 
   build-test-push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: pre-commit
     strategy:
       fail-fast: false
       matrix:
         # Test modern Odoo versions with latest Postgres version
-        pg_version: ["14"]
-        odoo_version:
-          - "16.0"
-          - "15.0"
-          - "14.0"
+        odoo_version: ["17.0"]
+        pg_version: ["15"]
+        python_version: ["3.10"]
         include:
-          # Older odoo versions don't support latest postgres because of the adapter
-          - pg_version: "13"
-            odoo_version: "12.0"
-          - pg_version: "13"
-            odoo_version: "11.0"
-          - pg_version: "13"
-            odoo_version: "10.0"
-          - pg_version: "13"
-            odoo_version: "9.0"
-          - pg_version: "13"
-            odoo_version: "8.0"
+          # Older odoo versions don't support latest postgres and Python versions
+          - odoo_version: "16.0"
+            pg_version: "14"
+            python_version: "3.10"
+          - odoo_version: "15.0"
+            pg_version: "14"
+            python_version: "3.9"
+          - odoo_version: "14.0"
+            pg_version: "14"
+            python_version: "3.9"
+          - odoo_version: "13.0"
+            pg_version: "14"
+            python_version: "3.9"
+          - odoo_version: "12.0"
+            pg_version: "13"
+            python_version: "3.5"
+          - odoo_version: "11.0"
+            pg_version: "13"
+            python_version: "2.7"
+          - odoo_version: "10.0"
+            pg_version: "13"
+            python_version: "2.7"
+          - odoo_version: "9.0"
+            pg_version: "13"
+            python_version: "2.7"
+          - odoo_version: "8.0"
+            pg_version: "13"
+            python_version: "2.7"
 
+            
     env:
-      # Indicates what's the equivalent to oondeo/doodba:latest image
-      LATEST_RELEASE: "13.0"
+      # Indicates what's the equivalent to tecnativa/doodba:latest image
+      LATEST_RELEASE: "17.0"
       # Variables found by default in Docker Hub builder
       DOCKER_REPO: oondeo/doodba
       DOCKER_TAG: ${{ matrix.odoo_version }}
@@ -59,12 +82,17 @@ jobs:
       WKHTMLTOPDF: ""
     steps:
       # Prepare
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python_version }}
       # Install dev and test dependencies
       - run: pip install poetry
       - name: Patch $PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      # override pyyaml to 5.3.1 as PIP_CONSTRAINT does not work for poetry
+      # to get rid of AttributeError: cython_sources when installing pyyaml
+      - run: poetry add pyyaml==5.3.1
       - run: poetry install
       # Build images
       - run: poetry run ./hooks/build

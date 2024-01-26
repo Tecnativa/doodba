@@ -1,0 +1,19 @@
+#!/bin/bash
+rm -rf /tmp/fake-odoo
+mkdir /tmp/fake-odoo
+cd /tmp/fake-odoo
+
+git init
+touch odoo-bin
+git add odoo-bin
+git commit -m odoo-bin
+
+git checkout -b branch1
+touch 1.txt
+git add 1.txt
+git commit -m 1.txt
+
+git checkout -b branch2 HEAD~1
+touch 2.txt
+git add 2.txt
+git commit -m 2.txt
