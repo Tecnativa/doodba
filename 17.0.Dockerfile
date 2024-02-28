@@ -49,7 +49,6 @@ RUN echo -e "LAST_SYSTEM_UID=$LAST_SYSTEM_UID\nLAST_SYSTEM_GID=$LAST_SYSTEM_GID\
     && apt-get install -yqq --no-install-recommends \
         ./wkhtmltox.deb \
         chromium \
-        ffmpeg \
         fonts-liberation2 \
         gettext \
         git \
@@ -60,6 +59,11 @@ RUN echo -e "LAST_SYSTEM_UID=$LAST_SYSTEM_UID\nLAST_SYSTEM_GID=$LAST_SYSTEM_GID\
         openssh-client \
         telnet \
         vim
+#Temporal fix
+RUN curl -LO http://ftp.debian.org/debian/pool/main/f/ffmpeg/ffmpeg_4.3.6-0+deb11u1_amd64.deb \
+    && dpkg -i ffmpeg-doc_4.3.6-0+deb11u1_all.deb \
+    || apt-get -f install -y \
+    && rm -rf ffmpeg-doc_4.3.6-0+deb11u1_all.deb
 RUN echo 'deb http://apt.postgresql.org/pub/repos/apt/ bookworm-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
