@@ -68,6 +68,7 @@ COPY bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python3.8/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
+RUN rm common/conf.d/70-geoip.conf
 COPY entrypoint.d common/entrypoint.d
 RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
