@@ -769,6 +769,47 @@ class ScaffoldingCase(unittest.TestCase):
                 ),
             )
 
+    def test_screencasts(self):
+        test_artifacts_dir = join(SCAFFOLDINGS_DIR, "test_artifacts")
+        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0", "14.0"}):
+            self.compose_test(
+                test_artifacts_dir,
+                dict(sub_env, UID=str(os.getuid()), GID=str(os.getgid())),
+                # remove artifacts from previous tests
+                (
+                    "find",
+                    "/opt/odoo/auto/test-artifacts",
+                    "-type",
+                    "f",
+                    "-exec",
+                    "rm",
+                    "-v",
+                    "{}",
+                    ";",
+                ),
+                # install odoo base module
+                (
+                    "odoo",
+                    "-i",
+                    "base",
+                    "--stop-after-init",
+                ),
+                # run odoo test for screencast
+                (
+                    "odoo",
+                    "--test-tags",
+                    ".test_screencasts",
+                    "--stop-after-init",
+                ),
+                # verify screencast is saved in container
+                (
+                    "grep",
+                    "-Rl",
+                    ".",
+                    "/opt/odoo/auto/test-artifacts",
+                ),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

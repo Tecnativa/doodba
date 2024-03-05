@@ -1,0 +1,33 @@
+version: "2.1"
+services:
+  odoo:
+    build:
+      context: ./
+      args:
+        COMPILE: "false"
+        ODOO_VERSION: $ODOO_MINOR
+        WITHOUT_DEMO: "false"
+        # enable creating test artifact directories with correct permissions
+        UID: "${UID:-1000}"
+        GID: "${GID:-1000}"
+    tty: true
+    depends_on:
+      - db
+    environment:
+      PYTHONOPTIMIZE: ""
+      UNACCENT: "false"
+    volumes:
+      - filestore:/var/lib/odoo:z
+      - ./test-artifacts:/opt/odoo/auto/test-artifacts:z
+
+  db:
+    image: postgres:${DB_VERSION}-alpine
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoopassword
+    volumes:
+      - db:/var/lib/postgresql/data:z
+
+volumes:
+  db:
+  filestore:
