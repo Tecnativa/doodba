@@ -587,6 +587,26 @@ class ScaffoldingCase(unittest.TestCase):
             join(SCAFFOLDINGS_DIR, "geoip_devel"),
         ):
             for sub_env in matrix():
+                if float(sub_env.get("ODOO_MINOR")) < 17.0:
+                    # in Odoo versions lower than 17.0 we have only one GeoIP database config parameter
+                    expected_geoip_config_lines = (
+                        "geoip_database = /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
+                    )
+                else:
+                    # starting with Odoo 17.0 we expect GeoIP city db and country db to be configured
+                    expected_geoip_config_lines = (
+                        "geoip_city_db = /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
+                        "geoip_country_db = /opt/odoo/auto/geoip/GeoLite2-Country.mmdb",
+                    )
+                test_config_lines = (
+                    (
+                        "grep",
+                        "-R",
+                        line,
+                        "/opt/odoo/auto/odoo.conf",
+                    )
+                    for line in expected_geoip_config_lines
+                )
                 self.compose_test(
                     geoip_dir,
                     dict(
@@ -610,12 +630,7 @@ class ScaffoldingCase(unittest.TestCase):
                         " test -e /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
                     ),
                     # verify that geoip database is configured
-                    (
-                        "grep",
-                        "-R",
-                        "geoip_database = /opt/odoo/auto/geoip/GeoLite2-City.mmdb",
-                        "/opt/odoo/auto/odoo.conf",
-                    ),
+                    *test_config_lines,
                 )
 
     def test_postgres_client_version(self):

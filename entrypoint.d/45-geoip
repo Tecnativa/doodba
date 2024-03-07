@@ -19,7 +19,7 @@ if GEOIP_ACCOUNT_ID not in {"", "0"} and GEOIP_LICENSE_KEY not in {"", "0"}:
         "available from https://www.maxmind.com"
     )
 
-    # In devel mode, copy geoip conf to an inspectable dir if the do not exist yet and keep them up to date
+    # copy geoip conf to an inspectable dir (devel mode) if they do not exist yet and keep them up to date
     os.makedirs("/opt/odoo/auto/geoip/", exist_ok=True)
     if not os.path.exists("/opt/odoo/auto/geoip/GeoIP.conf"):
         with open("/etc/GeoIP.conf.orig") as fpr, open(
@@ -27,6 +27,7 @@ if GEOIP_ACCOUNT_ID not in {"", "0"} and GEOIP_LICENSE_KEY not in {"", "0"}:
         ) as fpw:
             for line in fpr.readlines():
                 if "DatabaseDirectory " in line:
+                    # save databases in /opt/odoo/auto/geoip/
                     line = "DatabaseDirectory /opt/odoo/auto/geoip/"
                 fpw.write(line)
 
