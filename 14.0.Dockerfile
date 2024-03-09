@@ -3,6 +3,7 @@ FROM python:3.8-slim-buster AS base
 EXPOSE 8069 8072
 
 ARG GEOIP_UPDATER_VERSION=4.3.0
+ARG WKHTMLTOPDF_SKIP=0
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd'
 ENV DB_FILTER=.* \
@@ -36,10 +37,11 @@ ENV DB_FILTER=.* \
 RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
         curl \
-    && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb \
+    && test ${WKHTMLTOPDF_SKIP} -ne 0 && ln -s /usr/local/bin/wkhtmltopdf /usr/local/bin/kwkhtmltopdf || (curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
+    && rm wkhtmltox.deb \
+    && wkhtmltopdf --version) \    
     && apt-get install -yqq --no-install-recommends \
-        ./wkhtmltox.deb \
         chromium \
         ffmpeg \
         fonts-liberation2 \
