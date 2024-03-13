@@ -51,6 +51,7 @@ try:
         prog="openupgrade",
         description="Upgrade Odoo Database",
         epilog="Openupgrade script",
+        exit_on_error=False
     )
     parser.add_argument(
         "-d",
