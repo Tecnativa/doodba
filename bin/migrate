@@ -13,7 +13,7 @@ from doodbalib import logger, which
 mode = os.path.basename(__file__)
 
 dir_odoo = "/opt/odoo"
-dir_common = os.path.join(dir_odoo, "common", "%s.d" % mode)
+dir_common = os.path.join(dir_odoo, "common", "entrypoint.d")
 dir_custom = os.path.join(dir_odoo, "custom", "%s.d" % mode)
 
 # Allow to omit 1st command and default to `odoo`
@@ -51,7 +51,7 @@ try:
         prog="openupgrade",
         description="Upgrade Odoo Database",
         epilog="Openupgrade script",
-        exit_on_error=False
+        exit_on_error=False,
     )
     parser.add_argument(
         "-d",
@@ -79,7 +79,11 @@ except Exception as e:
 extra_command = [extra_command[0], "-d", os.environ["PGDATABASE"]] + unknown
 
 # Find scripts
-files = [(d, dir_common) for d in os.listdir(dir_common)]
+files = []
+try:
+    files += [(d, dir_common) for d in os.listdir(dir_common)]
+except OSError:
+    pass
 try:
     files += [(d, dir_custom) for d in os.listdir(dir_custom)]
 except OSError:
