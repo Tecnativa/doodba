@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from plumbum.cmd import docker  # noqa pylint: disable=import-error
+
+# Prune all
+docker("image", "system", "prune", "--volumes", "-f")

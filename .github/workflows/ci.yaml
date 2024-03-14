@@ -112,3 +112,6 @@ jobs:
           REGISTRY_PASSWORD: ${{ secrets.BOT_TOKEN }}
           REGISTRY_USERNAME: ${{ secrets.BOT_LOGIN }}
         run: poetry run ./hooks/push
+      - name: prune docker
+        if: github.repository == 'oondeo/doodba' && github.ref == 'refs/heads/oondeo'
+        run: poetry run ./hooks/prune
