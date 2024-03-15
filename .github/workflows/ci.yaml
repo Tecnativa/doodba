@@ -77,7 +77,7 @@ jobs:
       - run: poetry add pyyaml==5.3.1
       - run: poetry install
       # Build images
-      - run: poetry run ./hooks/build
+      - run: poetry run python ./hooks/build
       # Test
       - run: poetry run python -m unittest -v tests
       # Push
