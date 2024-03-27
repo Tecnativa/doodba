@@ -123,7 +123,7 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.BOT_LOGIN }}
           password: ${{ secrets.BOT_TOKEN }}
-      - name: Build and push
+      - name: Build base image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -134,13 +134,29 @@ jobs:
             'refs/heads/master' }}
           tags: |
             ${{ env.DOCKER_REPO }}:${{ matrix.odoo_version }}
-            ${{ env.DOCKER_REPO }}:${{ matrix.odoo_version }}-onbuild
             ${{ env.GHCR_HOST }}/${{ env.DOCKER_REPO }}${{ env.DOCKER_REPO_SUFFIX }}:${{ matrix.odoo_version }}
-            ${{ env.GHCR_HOST }}/${{ env.DOCKER_REPO }}${{ env.DOCKER_REPO_SUFFIX }}:${{ matrix.odoo_version }}-onbuild
             ${{ matrix.odoo_version == env.LATEST_RELEASE && format('{0}:latest', env.DOCKER_REPO) || '' }}
-            ${{ matrix.odoo_version == env.LATEST_RELEASE && format('{0}:latest-onbuild', env.DOCKER_REPO) || '' }}
             ${{ matrix.odoo_version == env.LATEST_RELEASE && format('{0}/{1}{2}:latest', env.GHCR_HOST, env.DOCKER_REPO, env.DOCKER_REPO_SUFFIX) || '' }}
+          target: base
+          build-args: |
+            VCS_REF=${{ github.sha }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            ODOO_VERSION=${{ matrix.odoo_version }}
+      - name: Build onbuild image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./${{ matrix.odoo_version }}.Dockerfile
+          platforms: ${{ matrix.platforms }}
+          push:
+            ${{ github.repository == 'tecnativa/doodba' && github.ref ==
+            'refs/heads/master' }}
+          tags: |
+            ${{ env.DOCKER_REPO }}:${{ matrix.odoo_version }}-onbuild
+            ${{ env.GHCR_HOST }}/${{ env.DOCKER_REPO }}${{ env.DOCKER_REPO_SUFFIX }}:${{ matrix.odoo_version }}-onbuild
+            ${{ matrix.odoo_version == env.LATEST_RELEASE && format('{0}:latest-onbuild', env.DOCKER_REPO) || '' }}
             ${{ matrix.odoo_version == env.LATEST_RELEASE && format('{0}/{1}{2}:latest-onbuild', env.GHCR_HOST, env.DOCKER_REPO, env.DOCKER_REPO_SUFFIX) || '' }}
+          target: onbuild
           build-args: |
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ env.BUILD_DATE }}
