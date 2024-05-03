@@ -130,6 +130,9 @@ def addons_config(filtered=True, strict=False):
                 try:
                     odoo_version_float = float(ODOO_VERSION)
                     skip_coa_17 = odoo_version_float >= 17 and addon_name == 'l10n_generic_coa'
+                    skip_coa_17 = (
+                        odoo_version_float >= 17 and addon_name == "l10n_generic_coa"
+                    )
                 except Exception:
                     pass
                 manifests = (os.path.join(addon, m) for m in MANIFESTS)
