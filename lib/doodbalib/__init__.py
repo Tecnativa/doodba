@@ -125,17 +125,23 @@ def addons_config(filtered=True, strict=False):
             for addon in found:
                 if not os.path.isdir(addon):
                     continue
+                addon_name = os.path.basename(addon)
+                skip_coa_17 = False
+                try:
+                    odoo_version_float = float(ODOO_VERSION)
+                    skip_coa_17 = odoo_version_float >= 17 and addon_name == 'l10n_generic_coa'
+                except Exception:
+                    pass
                 manifests = (os.path.join(addon, m) for m in MANIFESTS)
-                if not any(os.path.isfile(m) for m in manifests):
+                if not any(os.path.isfile(m) for m in manifests) and not skip_coa_17:
                     missing_manifest.add(addon)
                     logger.debug(
                         "Skipping '%s' as it is not a valid Odoo " "module", addon
                     )
                     continue
                 logger.debug("Registering addon %s", addon)
-                addon = os.path.basename(addon)
-                config.setdefault(addon, set())
-                config[addon].add(repo)
+                config.setdefault(addon_name, set())
+                config[addon_name].add(repo)
     # Fail now if running in strict mode
     if strict:
         error = []
