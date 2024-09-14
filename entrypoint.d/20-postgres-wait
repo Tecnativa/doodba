@@ -6,6 +6,16 @@ fi
 
 log INFO Waiting until postgres is listening at $PGHOST...
 while true; do
-    psql --list > /dev/null 2>&1 && break
+    # If your postgres connection has minimal permissions, you should
+    # have at least an empty PGDATABASE and rights on this
+    # databases. The following will then succeed:
+    [ -n "$PGDATABASE" ] && echo "SELECT 1;" | psql "$PGDATABASE" > /dev/null 2>&1 && break
+
+    # if previous check failed (if PGDATABASE is set, but not yet
+    # created), you are in a more common scenario where odoo is
+    # expected to manage databases, and it should have the permissions
+    # to create it and will attempt to do it. In that case, you'll
+    # probably also have the permissions to list the databases.
+    psql -l > /dev/null 2>&1 && break
     sleep 1
 done
