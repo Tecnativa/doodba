@@ -4,6 +4,7 @@ mkdir /tmp/fake-odoo
 cd /tmp/fake-odoo
 
 git init
+git config --system --add safe.directory /tmp/fake-odoo/.git
 touch odoo-bin
 git add odoo-bin
 git commit -m odoo-bin
