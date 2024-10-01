@@ -3,6 +3,7 @@ FROM python:3.10-slim-bookworm AS base
 EXPOSE 8069 8072
 
 ARG GEOIP_UPDATER_VERSION=4.3.0
+ARG WKHTMLTOPDF="./wkhtmltox.deb"
 ARG WKHTMLTOPDF_VERSION=0.12.6.1
 ARG WKHTMLTOPDF_CHECKSUM='98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d'
 ARG LAST_SYSTEM_UID=499
@@ -85,7 +86,6 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
     && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
     && sync
-RUN ln -s /usr/local/bin/kwkhtmltopdf /usr/local/bin/wkhtmltopdf || true
 
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
