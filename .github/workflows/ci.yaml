@@ -28,7 +28,7 @@ jobs:
           key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
       - uses: pre-commit/action@v3.0.0
 
-  build-test-push:
+  test:
     runs-on: ubuntu-22.04
     needs: pre-commit
     strategy:
@@ -69,12 +69,6 @@ jobs:
             python_version: "3.9"
 
     env:
-      # Indicates what's the equivalent to tecnativa/doodba:latest image
-      LATEST_RELEASE: "17.0"
-      # Variables found by default in Docker Hub builder
-      DOCKER_REPO: oondeo/doodba
-      DOCKER_TAG: ${{ matrix.odoo_version }}
-      GIT_SHA1: ${{ github.sha }}
       # Other variables to configure tests and execution environment
       DOCKER_BUILDKIT: 1
       PG_VERSIONS: ${{ matrix.pg_version }}
@@ -93,25 +87,94 @@ jobs:
       # to get rid of AttributeError: cython_sources when installing pyyaml
       - run: poetry add pyyaml==5.3.1
       - run: poetry install
-      # Build images
-      - run: poetry run ./hooks/build
-      # Test, cannot mantain tests to older versions
-      # - run: poetry run python -m unittest -v tests
-      # Push
-      - name: push to docker hub
-        if: github.repository == 'oondeo/doodba' && github.ref == 'refs/heads/oondeo'
-        env:
-          REGISTRY_HOST: docker.io
-          REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
-          REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_LOGIN }}
-        run: poetry run ./hooks/push
-      - name: push to github container registry
-        if: github.repository == 'oondeo/doodba' && github.ref == 'refs/heads/oondeo'
-        env:
-          REGISTRY_HOST: ghcr.io
-          REGISTRY_PASSWORD: ${{ secrets.BOT_TOKEN }}
-          REGISTRY_USERNAME: ${{ secrets.BOT_LOGIN }}
-        run: poetry run ./hooks/push
-      - name: prune docker
-        if: github.repository == 'oondeo/doodba' && github.ref == 'refs/heads/oondeo'
-        run: poetry run ./hooks/prune
+      # Test
+      - run: poetry run python -m unittest -v tests
+
+  build-push:
+    runs-on: ubuntu-22.04
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test modern Odoo versions with latest Postgres version
+        odoo_version: ["17.0"]
+        platforms: ["linux/amd64,linux/arm64"]
+        include:
+          # Older odoo versions don't support latest postgres and Python versions
+          - odoo_version: "16.0"
+            platforms: "linux/amd64,linux/arm64"
+          - odoo_version: "15.0"
+            platforms: "linux/amd64,linux/arm64"
+          - odoo_version: "14.0"
+            platforms: "linux/amd64,linux/arm64"
+          - odoo_version: "13.0"
+            platforms: "linux/amd64"
+    env:
+      # Indicates what's the equivalent to tecnativa/doodba:latest image
+      LATEST_RELEASE: "17.0"
+      # Define the docker hub repository location and github container registry host
+      DOCKER_REPO: oondeo/doodba
+      GHCR_HOST: ghcr.io
+    steps:
+      # Set build date as env variable to be used later
+      - name: Set build date
+        run: echo "BUILD_DATE=$(date '+%Y-%m-%dT%H:%M:%S.%N%:z')" >> $GITHUB_ENV
+      # Prepare
+      - uses: actions/checkout@v4
+      # Setup QEMU
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      # Setup buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        if: github.repository == 'oondeo/doodba' && github.ref == 'refs/heads/master'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_LOGIN }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        if: github.repository == 'oondeo/doodba' && github.ref == 'refs/heads/master'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.BOT_LOGIN }}
+          password: ${{ secrets.BOT_TOKEN }}
+      - name: Build base image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./${{ matrix.odoo_version }}.Dockerfile
+          platforms: ${{ matrix.platforms }}
+          push:
+            ${{ github.repository == 'oondeo/doodba' && github.ref ==
+            'refs/heads/master' }}
+          tags: |
+            ${{ env.DOCKER_REPO }}:${{ matrix.odoo_version }}
+            ${{ env.GHCR_HOST }}/${{ env.DOCKER_REPO }}${{ env.DOCKER_REPO_SUFFIX }}:${{ matrix.odoo_version }}
+            ${{ matrix.odoo_version == env.LATEST_RELEASE && format('{0}:latest', env.DOCKER_REPO) || '' }}
+            ${{ matrix.odoo_version == env.LATEST_RELEASE && format('{0}/{1}{2}:latest', env.GHCR_HOST, env.DOCKER_REPO, env.DOCKER_REPO_SUFFIX) || '' }}
+          target: base
+          build-args: |
+            VCS_REF=${{ github.sha }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            ODOO_VERSION=${{ matrix.odoo_version }}
+      - name: Build onbuild image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./${{ matrix.odoo_version }}.Dockerfile
+          platforms: ${{ matrix.platforms }}
+          push:
+            ${{ github.repository == 'oondeo/doodba' && github.ref ==
+            'refs/heads/master' }}
+          tags: |
+            ${{ env.DOCKER_REPO }}:${{ matrix.odoo_version }}-onbuild
+            ${{ env.GHCR_HOST }}/${{ env.DOCKER_REPO }}${{ env.DOCKER_REPO_SUFFIX }}:${{ matrix.odoo_version }}-onbuild
+            ${{ matrix.odoo_version == env.LATEST_RELEASE && format('{0}:latest-onbuild', env.DOCKER_REPO) || '' }}
+            ${{ matrix.odoo_version == env.LATEST_RELEASE && format('{0}/{1}{2}:latest-onbuild', env.GHCR_HOST, env.DOCKER_REPO, env.DOCKER_REPO_SUFFIX) || '' }}
+          target: onbuild
+          build-args: |
+            VCS_REF=${{ github.sha }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            ODOO_VERSION=${{ matrix.odoo_version }}
