@@ -60,6 +60,7 @@ jobs:
       DOCKER_BUILDKIT: 1
       PG_VERSIONS: ${{ matrix.pg_version }}
       ODOO_MINOR: ${{ matrix.odoo_version }}
+      DOCKER_TAG: ${{ matrix.odoo_version }}
     steps:
       # Prepare
       - uses: actions/checkout@v4
