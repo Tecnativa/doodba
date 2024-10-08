@@ -35,11 +35,14 @@ jobs:
       fail-fast: false
       matrix:
         # Test modern Odoo versions with latest Postgres version
-        odoo_version: ["17.0"]
-        pg_version: ["15"]
+        odoo_version: ["18.0"]
+        pg_version: ["16"]
         python_version: ["3.10"]
         include:
           # Older odoo versions don't support latest postgres and Python versions
+          - odoo_version: "17.0"
+            pg_version: "15"
+            python_version: "3.10"
           - odoo_version: "16.0"
             pg_version: "14"
             python_version: "3.10"
@@ -73,6 +76,8 @@ jobs:
       DOCKER_BUILDKIT: 1
       PG_VERSIONS: ${{ matrix.pg_version }}
       WKHTMLTOPDF: ""
+      ODOO_MINOR: ${{ matrix.odoo_version }}
+      DOCKER_TAG: ${{ matrix.odoo_version }}
     steps:
       # Prepare
       - uses: actions/checkout@v4
@@ -97,10 +102,12 @@ jobs:
       fail-fast: false
       matrix:
         # Test modern Odoo versions with latest Postgres version
-        odoo_version: ["17.0"]
+        odoo_version: ["18.0"]
         platforms: ["linux/amd64,linux/arm64"]
         include:
           # Older odoo versions don't support latest postgres and Python versions
+          - odoo_version: "17.0"
+            platforms: "linux/amd64,linux/arm64"
           - odoo_version: "16.0"
             platforms: "linux/amd64,linux/arm64"
           - odoo_version: "15.0"
@@ -111,7 +118,7 @@ jobs:
             platforms: "linux/amd64"
     env:
       # Indicates what's the equivalent to tecnativa/doodba:latest image
-      LATEST_RELEASE: "17.0"
+      LATEST_RELEASE: "18.0"
       # Define the docker hub repository location and github container registry host
       DOCKER_REPO: oondeo/doodba
       GHCR_HOST: ghcr.io
