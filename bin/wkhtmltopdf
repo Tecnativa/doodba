@@ -6,6 +6,7 @@
 from __future__ import print_function
 
 import os
+import subprocess
 import sys
 
 import requests
@@ -29,7 +30,9 @@ def wkhtmltopdf(args):
     url = os.getenv("KWKHTMLTOPDF_SERVER_URL")
 
     if url == "":
-        raise UsageError("KWKHTMLTOPDF_SERVER_URL not set")
+        # raise UsageError("KWKHTMLTOPDF_SERVER_URL not set")
+        subprocess.Popen("/usr/bin/wkhtmltopdf " + " ".join(args))
+        return
     elif url == "MOCK":
         print("wkhtmltopdf 0.12.5 (mock)")
         return

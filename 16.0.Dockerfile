@@ -4,6 +4,7 @@ EXPOSE 8069 8072
 
 ARG TARGETARCH
 ARG GEOIP_UPDATER_VERSION=6.0.0
+ARG WKHTMLTOPDF="./wkhtmltox.deb"
 ARG WKHTMLTOPDF_VERSION=0.12.6.1
 ARG WKHTMLTOPDF_AMD64_CHECKSUM='98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d'
 ARG WKHTMLTOPDF_ARM64_CHECKSUM="b6606157b27c13e044d0abbe670301f88de4e1782afca4f9c06a5817f3e03a9c"
@@ -61,7 +62,8 @@ RUN echo "LAST_SYSTEM_UID=$LAST_SYSTEM_UID\nLAST_SYSTEM_GID=$LAST_SYSTEM_GID\nFI
     && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
     && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
-    && apt-get install -yqq --no-install-recommends "$WKHTMLTOPDF" \
+    && apt-get install -yqq --no-install-recommends \
+        "$WKHTMLTOPDF" \
         chromium \
         ffmpeg \
         fonts-liberation2 \
