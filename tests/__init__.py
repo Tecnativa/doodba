@@ -197,7 +197,7 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_addons_filtered_lt_16(self):
         """Test addons filtering with ``ONLY`` keyword in ``addons.yaml`` for versions < 16"""
-        self._check_addons("dotd", {"16.0", "17.0"})
+        self._check_addons("dotd", {"16.0", "17.0", "18.0"})
 
     def test_addons_filtered_ge_16(self):
         """Test addons filtering with ``ONLY`` keyword in ``addons.yaml`` for versions >= 16"""
@@ -335,7 +335,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/crm"),
                 ("test", "-d", "auto/addons/crm/migrations"),
             )
-        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0", "17.0"}):
+        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0", "18.0"}):
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "addons_env_ou"),
                 sub_env,
@@ -416,7 +416,7 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_dotd_lt_16(self):
         """Test environment with common ``*.d`` directories for versions < 16."""
-        self._check_dotd("dotd", {"16.0", "17.0"})
+        self._check_dotd("dotd", {"16.0", "17.0", "18.0"})
 
     def test_dotd_ge_16(self):
         """Test environment with common ``*.d`` directories for versions >= 16."""
@@ -468,7 +468,7 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_dependencies_lt_16(self):
         """Test dependencies installation for versions < 16"""
-        self._check_dependencies("dependencies", {"16.0", "17.0"})
+        self._check_dependencies("dependencies", {"16.0", "17.0", "18.0"})
 
     def test_dependencies_ge_16(self):
         """Test dependencies installation for versions >= 16"""
@@ -481,7 +481,7 @@ class ScaffoldingCase(unittest.TestCase):
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
-        for sub_env in matrix(odoo_skip={"17.0"}):
+        for sub_env in matrix(odoo_skip={"17.0", "18.0"}):
             self.compose_test(
                 dependencies_dir,
                 sub_env,

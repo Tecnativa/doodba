@@ -35,11 +35,14 @@ jobs:
       fail-fast: false
       matrix:
         # Test modern Odoo versions with latest Postgres version
-        odoo_version: ["17.0"]
-        pg_version: ["15"]
+        odoo_version: ["18.0"]
+        pg_version: ["16"]
         python_version: ["3.10"]
         include:
           # Older odoo versions don't support latest postgres and Python versions
+          - odoo_version: "17.0"
+            pg_version: "15"
+            python_version: "3.10"
           - odoo_version: "16.0"
             pg_version: "14"
             python_version: "3.10"
@@ -103,6 +106,10 @@ jobs:
       DOCKER_REPO: tecnativa/doodba
       GHCR_HOST: ghcr.io
     steps:
+      - name: Clean Docker system before build
+        run: |
+          docker system prune -af || true
+          docker builder prune -af || true
       # Set build date as env variable to be used later
       - name: Set build date
         run: echo "BUILD_DATE=$(date '+%Y-%m-%dT%H:%M:%S.%N%:z')" >> $GITHUB_ENV
@@ -165,3 +172,7 @@ jobs:
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ env.BUILD_DATE }}
             ODOO_VERSION=${{ matrix.odoo_version }}
+      - name: Clean Docker system after build
+        run: |
+          docker system prune -af || true
+          docker builder prune -af || true
