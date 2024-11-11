@@ -141,11 +141,8 @@ RUN build_deps=" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $build_deps \
     && curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
-    &&  \
-        if [ "$TARGETARCH" = "arm64" ]; then \
-        echo "Upgrading odoo requirements.txt with gevent==21.12.0 (minimum version compatible with arm64)" && \
-        sed -i 's/gevent==[0-9\.]*/gevent==21.12.0/' requirements.txt; \
-    fi \
+    # disable gevent version recommendation from odoo and use 22.10.2 used in debian bookworm as python3-gevent
+    && sed -i -E "s/(gevent==)21\.8\.0( ; sys_platform != 'win32' and python_version == '3.10')/\122.10.2\2/;s/(greenlet==)1.1.2( ; sys_platform != 'win32' and python_version == '3.10')/\12.0.2\2/" requirements.txt \
     && pip install -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
