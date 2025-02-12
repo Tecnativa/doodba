@@ -82,6 +82,13 @@ parser.add_argument(
     help="Addons to include always.",
 )
 parser.add_argument(
+    "--force-with",
+    action="append",
+    dest="force_with",
+    default=[],
+    help="Addons to enforce on dependencies.",
+)
+parser.add_argument(
     "-W", "--without", action="append", default=[], help="Addons to exclude always."
 )
 
@@ -94,6 +101,8 @@ if addons & without:
     sys.exit("Cannot include and exclude the same addon!")
 if args.dependencies and args.fullpath:
     sys.exit("Unsupported combination of --dependencies and --fullpath")
+if args.force_with and not args.dependencies:
+    sys.exit("Force With only makes sense combined with --dependencies")
 try:
     for addon, repo in addons_config(strict=args.explicit):
         if addon in without:
@@ -124,7 +133,7 @@ except AddonsConfigError as error:
     sys.exit(error.message)
 # Use dependencies instead, if requested
 if args.dependencies:
-    addons = dependencies - addons
+    addons = (dependencies - addons).union(set(args.force_with))
 addons -= without
 
 # Do the required action
