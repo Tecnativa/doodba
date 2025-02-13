@@ -434,7 +434,9 @@ class ScaffoldingCase(unittest.TestCase):
                 # ``custom/entrypoint.d`` was properly executed
                 ("test", "-f", "/home/odoo/created-at-entrypoint"),
                 # ``custom/conf.d`` was properly concatenated
-                ("grep", "test-conf", "auto/odoo.conf"),
+                ("grep", "conf_d_test", "auto/odoo.conf"),
+                # ``CUSTOM_CONF_DIR`` was properly concatenated
+                ("grep", "custom_conf_dir_test", "auto/odoo.conf"),
                 # ``custom/dependencies`` were installed
                 ("test", "!", "-e", "/usr/sbin/sshd"),
                 ("test", "!", "-e", "/var/lib/apt/lists/lock"),
