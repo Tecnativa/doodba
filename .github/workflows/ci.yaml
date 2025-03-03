@@ -18,10 +18,9 @@ jobs:
         with:
           python-version: "3.9"
       - name: Set PY
-        run:
+        run: |
           echo "PY=$(python -c 'import hashlib,
-          sys;print(hashlib.sha256(sys.version.encode()+sys.executable.encode()).hexdigest())')"
-          >> $GITHUB_ENV
+          sys;print(hashlib.sha256(sys.version.encode()+sys.executable.encode()).hexdigest())')" >> $GITHUB_ENV
       - uses: actions/cache@v3
         with:
           path: ~/.cache/pre-commit
@@ -78,7 +77,104 @@ jobs:
       # Test
       - run: poetry run python -m unittest -v tests
 
-  build-push:
+  build-push-pr:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test modern Odoo versions with latest Postgres version
+        odoo_version: ["18.0"]
+        platforms: ["linux/amd64,linux/arm64"]
+        include:
+          # Older odoo versions don't support latest postgres and Python versions
+          - odoo_version: "17.0"
+            platforms: "linux/amd64,linux/arm64"
+          - odoo_version: "16.0"
+            platforms: "linux/amd64,linux/arm64"
+          - odoo_version: "15.0"
+            platforms: "linux/amd64,linux/arm64"
+          - odoo_version: "14.0"
+            platforms: "linux/amd64,linux/arm64"
+          - odoo_version: "13.0"
+            platforms: "linux/amd64"
+    env:
+      # Indicates what's the equivalent to tecnativa/doodba:latest image
+      LATEST_RELEASE: "18.0"
+      DOCKER_REPO: tecnativa/doodba
+      GHCR_HOST: ghcr.io
+    steps:
+      - name: Clean Docker system before build
+        run: |
+          docker system prune -af || true
+          docker builder prune -af || true
+      # Set build date as env variable to be used later
+      - name: Set build date
+        run: echo "BUILD_DATE=$(date '+%Y-%m-%dT%H:%M:%S.%N%:z')" >> $GITHUB_ENV
+      # Prepare
+      - uses: actions/checkout@v4
+      # Setup QEMU
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Reset QEMU
+        if: ${{ matrix.odoo_version == '15.0' }}
+        run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      # Setup buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        if: github.repository == 'tecnativa/doodba'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_LOGIN }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        if: github.repository == 'tecnativa/doodba'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.BOT_LOGIN }}
+          password: ${{ secrets.BOT_TOKEN }}
+      - name: Build base image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./${{ matrix.odoo_version }}.Dockerfile
+          platforms: ${{ matrix.platforms }}
+          push: true
+          tags: |
+            ${{ env.DOCKER_REPO }}:${{ matrix.odoo_version }}-pr-${{ github.event.pull_request.number }}-test
+            ${{ env.GHCR_HOST }}/${{ env.DOCKER_REPO }}${{ env.DOCKER_REPO_SUFFIX }}:${{ matrix.odoo_version }}-pr-${{ github.event.pull_request.number }}-test
+          target: base
+          build-args: |
+            VCS_REF=${{ github.sha }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            ODOO_VERSION=${{ matrix.odoo_version }}
+      - name: Build onbuild image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./${{ matrix.odoo_version }}.Dockerfile
+          platforms: ${{ matrix.platforms }}
+          push: true
+          tags: |
+            ${{ env.DOCKER_REPO }}:${{ matrix.odoo_version }}-onbuild-pr-${{ github.event.pull_request.number }}-test
+            ${{ env.GHCR_HOST }}/${{ env.DOCKER_REPO }}${{ env.DOCKER_REPO_SUFFIX }}:${{ matrix.odoo_version }}-onbuild-pr-${{ github.event.pull_request.number }}-test
+          target: onbuild
+          build-args: |
+            VCS_REF=${{ github.sha }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            ODOO_VERSION=${{ matrix.odoo_version }}
+      - name: Clean Docker system after build
+        run: |
+          docker system prune -af || true
+          docker builder prune -af || true
+
+  build-push-official:
+    if: github.repository == 'tecnativa/doodba' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-24.04
     needs: test
     strategy:
@@ -125,13 +221,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub
-        if: github.repository == 'tecnativa/doodba' && github.ref == 'refs/heads/master'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_LOGIN }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Login to GitHub Container Registry
-        if: github.repository == 'tecnativa/doodba' && github.ref == 'refs/heads/master'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
