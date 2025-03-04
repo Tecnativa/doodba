@@ -78,9 +78,7 @@ jobs:
       - run: poetry run python -m unittest -v tests
 
   build-push-pr:
-    if: >
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     needs: test
     strategy:
@@ -126,13 +124,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub
-        if: github.repository == 'tecnativa/doodba'
+        if:
+          github.repository == 'tecnativa/doodba' &&
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_LOGIN }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Login to GitHub Container Registry
-        if: github.repository == 'tecnativa/doodba'
+        if:
+          github.repository == 'tecnativa/doodba' &&
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -144,7 +146,9 @@ jobs:
           context: .
           file: ./${{ matrix.odoo_version }}.Dockerfile
           platforms: ${{ matrix.platforms }}
-          push: true
+          push:
+            ${{ github.repository == 'tecnativa/doodba' &&
+            github.event.pull_request.head.repo.full_name == github.repository }}
           tags: |
             ${{ env.DOCKER_REPO }}:${{ matrix.odoo_version }}-pr-${{ github.event.pull_request.number }}-test
             ${{ env.GHCR_HOST }}/${{ env.DOCKER_REPO }}${{ env.DOCKER_REPO_SUFFIX }}:${{ matrix.odoo_version }}-pr-${{ github.event.pull_request.number }}-test
@@ -159,7 +163,9 @@ jobs:
           context: .
           file: ./${{ matrix.odoo_version }}.Dockerfile
           platforms: ${{ matrix.platforms }}
-          push: true
+          push:
+            ${{ github.repository == 'tecnativa/doodba' &&
+            github.event.pull_request.head.repo.full_name == github.repository }}
           tags: |
             ${{ env.DOCKER_REPO }}:${{ matrix.odoo_version }}-onbuild-pr-${{ github.event.pull_request.number }}-test
             ${{ env.GHCR_HOST }}/${{ env.DOCKER_REPO }}${{ env.DOCKER_REPO_SUFFIX }}:${{ matrix.odoo_version }}-onbuild-pr-${{ github.event.pull_request.number }}-test
