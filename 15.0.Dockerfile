@@ -57,7 +57,7 @@ RUN apt-get -qq update \
     && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
     && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
-    && dpkg -i wkhtmltox.deb || apt-get -y install -f \
+    && (dpkg -i wkhtmltox.deb || apt-get -y install -f) \
     && apt-get install -yqq --no-install-recommends \
         chromium \
         ffmpeg \
