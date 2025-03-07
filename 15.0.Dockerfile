@@ -57,7 +57,7 @@ RUN apt-get -qq update \
     && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
     && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
-    && dpkg -i wkhtmltox.deb || apt-get -y install -f \
+    && (dpkg -i wkhtmltox.deb || apt-get -y install -f) \
     && apt-get install -yqq --no-install-recommends \
         chromium \
         ffmpeg \
@@ -166,8 +166,8 @@ RUN build_deps=" \
     && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \
     # generate flanker cached tables during install when /usr/local/lib/ is still intended to be written to
     # https://github.com/Tecnativa/doodba/issues/486
-    && python3 -c 'from flanker.addresslib import address' >/dev/null 2>&1
-RUN apt-get purge -yqq $build_deps \
+    && python3 -c 'from flanker.addresslib import address' >/dev/null 2>&1 \
+    && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
