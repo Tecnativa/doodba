@@ -1,4 +1,3 @@
-version: "2.1"
 services:
   odoo:
     build:
@@ -17,7 +16,7 @@ services:
       PYTHONOPTIMIZE: ""
       UNACCENT: "false"
     volumes:
-      - filestore:/var/lib/odoo:z
+      - filestore:/var/lib/odoo
       - ./test-artifacts:/opt/odoo/auto/test-artifacts:z
 
   db:
@@ -26,7 +25,7 @@ services:
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: odoopassword
     volumes:
-      - db:/var/lib/postgresql/data:z
+      - db:/var/lib/postgresql/data
 
 volumes:
   db:

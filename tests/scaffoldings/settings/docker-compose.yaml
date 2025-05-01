@@ -1,4 +1,3 @@
-version: "2.1"
 services:
   odoo:
     build:
@@ -20,7 +19,7 @@ services:
     depends_on:
       - postgresql
     volumes:
-      - filestore:/var/lib/odoo:z
+      - filestore:/var/lib/odoo
 
   postgresql:
     image: postgres:${DB_VERSION}-alpine
@@ -29,7 +28,7 @@ services:
       POSTGRES_PASSWORD: anotherodoopassword
     command: -p 15432
     volumes:
-      - db:/var/lib/postgresql/data:z
+      - db:/var/lib/postgresql/data
 
   mailhog:
     image: mailhog/mailhog
