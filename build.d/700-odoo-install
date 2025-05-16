@@ -7,6 +7,7 @@ log INFO Installing Odoo from $src
 # For development you could want to avoid installing Odoo to speed up build
 if [ "$PIP_INSTALL_ODOO" == true ]; then
     args="--no-cache-dir"
+    pip install $args psycopg2-binary
     pip install $args --editable $src --config-setting=editable_mode=compat
 else
     log WARNING Blindly symlinking odoo executable
