@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Run tests for this base image.
 
@@ -28,9 +27,12 @@ GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ
 # are migrated to the next release. It is used in situations where Doodba is
 # preparing the pre-release for the next version of Odoo, which hasn't been
 # released yet.
+# prerelease_skip = unittest.skipIf(
+#     ODOO_VERSIONS & {"16.0"}, "Tests not supported in pre-release"
+# )
 prerelease_skip = unittest.skipIf(
-    ODOO_VERSIONS & {"16.0"}, "Tests not supported in pre-release"
-)
+    False, "Tests not supported in pre-release"
+)  # No pre-releases to test
 
 
 def matrix(
@@ -54,7 +56,7 @@ def matrix(
 class ScaffoldingCase(unittest.TestCase):
     def setUp(self):
         super().setUp()
-        self.compose_run = ("docker-compose", "run", "--rm", "odoo")
+        self.compose_run = ("docker", "compose", "run", "--rm", "odoo")
 
     def popen(self, *args, **kwargs):
         """Shortcut to open a subprocess and ensure it works."""
@@ -62,7 +64,7 @@ class ScaffoldingCase(unittest.TestCase):
         self.assertFalse(Popen(*args, **kwargs).wait())
 
     def compose_test(self, workdir, sub_env, *commands):
-        """Execute commands in a docker-compose environment.
+        """Execute commands in a docker compose environment.
 
         :param workdir:
             Path where the docker compose commands will be executed. It should
@@ -70,10 +72,10 @@ class ScaffoldingCase(unittest.TestCase):
 
         :param dict sub_env:
             Specific environment variables that will be appended to current
-            ones to execute the ``docker-compose`` tests.
+            ones to execute the ``docker compose`` tests.
 
             You can set in this dict a ``COMPOSE_FILE`` key to choose different
-            docker-compose files in the same directory.
+            docker compose files in the same directory.
 
         :param tuple()... commands:
             List of commands to be tested in the odoo container.
@@ -81,14 +83,16 @@ class ScaffoldingCase(unittest.TestCase):
         full_env = dict(environ, **sub_env)
         with self.subTest(PWD=workdir, **sub_env):
             try:
-                self.popen(("docker-compose", "build"), cwd=workdir, env=full_env)
+                self.popen(("docker", "compose", "build"), cwd=workdir, env=full_env)
                 for command in commands:
                     with self.subTest(command=command):
                         self.popen(
                             self.compose_run + command, cwd=workdir, env=full_env
                         )
             finally:
-                self.popen(("docker-compose", "down", "-v"), cwd=workdir, env=full_env)
+                self.popen(
+                    ("docker", "compose", "down", "-v"), cwd=workdir, env=full_env
+                )
 
     def _check_addons(self, scaffolding_dir, odoo_skip):
         project_dir = join(SCAFFOLDINGS_DIR, scaffolding_dir)
@@ -315,9 +319,6 @@ class ScaffoldingCase(unittest.TestCase):
                 smallest_dir, sub_env, *commands, ("python", "-c", "import watchdog")
             )
 
-    # HACK https://github.com/itpp-labs/misc-addons/issues/1014
-    # TODO Remove decorator
-    @prerelease_skip
     def test_addons_env(self):
         """Test environment variables in addons.yaml"""
         # The test is hacking ODOO_VERSION to pin a commit
@@ -335,7 +336,7 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/crm"),
                 ("test", "-d", "auto/addons/crm/migrations"),
             )
-        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0", "18.0"}):
+        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0"}):
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "addons_env_ou"),
                 sub_env,
@@ -476,12 +477,12 @@ class ScaffoldingCase(unittest.TestCase):
             "dependencies_ge_16", {"11.0", "12.0", "13.0", "14.0", "15.0"}
         )
 
-    # TODO: Remove decorator when base_search_fuzzy is migrated to 17.0
-    @prerelease_skip
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
-        for sub_env in matrix(odoo_skip={"17.0", "18.0"}):
+        # TODO: Remove 18.0 from the matrix skip when 'base_search_fuzzy'
+        # is available for that version
+        for sub_env in matrix(odoo_skip={"18.0"}):
             self.compose_test(
                 dependencies_dir,
                 sub_env,
@@ -790,12 +791,15 @@ class ScaffoldingCase(unittest.TestCase):
             self.compose_test(
                 test_artifacts_dir,
                 dict(sub_env, UID=str(os.getuid()), GID=str(os.getgid())),
-                # remove artifacts from previous tests
+                # remove artifacts from previous tests (ignores .gitkeep)
                 (
                     "find",
                     "/opt/odoo/auto/test-artifacts",
                     "-type",
                     "f",
+                    "!",
+                    "-name",
+                    ".gitkeep",
                     "-exec",
                     "rm",
                     "-v",

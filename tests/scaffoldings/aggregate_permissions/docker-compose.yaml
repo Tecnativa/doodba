@@ -1,4 +1,3 @@
-version: "2.1"
 services:
   odoo:
     build:
@@ -19,7 +18,7 @@ services:
     entrypoint: "" # we are calling autoaggregate inside the tests
     volumes:
       - ./custom/src/:/opt/odoo/custom/src:rw,z
-      - filestore:/var/lib/odoo:z
+      - filestore:/var/lib/odoo
 
 volumes:
   filestore:

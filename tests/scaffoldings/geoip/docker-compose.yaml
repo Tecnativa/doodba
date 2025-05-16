@@ -1,4 +1,3 @@
-version: "2.1"
 services:
   odoo:
     build:
@@ -20,7 +19,7 @@ services:
       GEOIP_ACCOUNT_ID: $GEOIP_ACCOUNT_ID
       GEOIP_LICENSE_KEY: $GEOIP_LICENSE_KEY
     volumes:
-      - filestore:/var/lib/odoo:z
+      - filestore:/var/lib/odoo
 
   db:
     image: postgres:${DB_VERSION}-alpine
@@ -28,7 +27,7 @@ services:
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: odoopassword
     volumes:
-      - db:/var/lib/postgresql/data:z
+      - db:/var/lib/postgresql/data
 
 volumes:
   db:
