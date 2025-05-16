@@ -6,7 +6,7 @@ description = "Docker Odoo Base, a highly opinionated image ready to put Odoo in
 authors = ["Tecnativa"]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 
 [tool.poetry.group.dev.dependencies]
 plumbum = "^1.6.9"
