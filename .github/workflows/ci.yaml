@@ -11,7 +11,7 @@ on:
 
 jobs:
   pre-commit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -28,7 +28,7 @@ jobs:
       - uses: pre-commit/action@v3.0.1
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: pre-commit
     strategy:
       fail-fast: false
@@ -79,7 +79,7 @@ jobs:
 
   build-push-pr:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: test
     strategy:
       fail-fast: false
@@ -181,7 +181,7 @@ jobs:
 
   build-push-official:
     if: github.repository == 'tecnativa/doodba' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: test
     strategy:
       fail-fast: false
