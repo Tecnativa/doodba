@@ -54,6 +54,27 @@ def matrix(
 
 
 class ScaffoldingCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # We build the “onbuild” images with the latest changes for
+        # testing instead of relying on the latest published ones.
+        for ODOO_VER in ODOO_VERSIONS:
+            print(f"Building ${ODOO_VER}-onbuild image...")
+            Popen(
+                (
+                    "docker",
+                    "build",
+                    "-t",
+                    f"tecnativa/doodba:{ODOO_VER}-onbuild",
+                    "-f",
+                    f"{ODOO_VER}.Dockerfile",
+                    "--target",
+                    "onbuild",
+                    ".",
+                ),
+                cwd=os.getcwd(),
+            ).wait()
+
     def setUp(self):
         super().setUp()
         self.compose_run = ("docker", "compose", "run", "--rm", "odoo")
