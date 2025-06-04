@@ -32,9 +32,12 @@ ENV DB_FILTER=.* \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost
+# Installs UV 7.10
+COPY --from=ghcr.io/astral-sh/uv@sha256:8cb222a0ab487c56ca1368c9f6c221b7fb008a0e4bb81ee623ef1f9d7b08fb6c /uv /uvx /bin/
 
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
+
 RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
         curl; \
@@ -102,9 +105,9 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
 
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
-RUN python -m venv --system-site-packages /qa/venv \
+RUN uv venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
-    && pip install \
+    && uv pip install \
         click \
         coverage \
     && deactivate \
@@ -140,7 +143,7 @@ RUN build_deps=" \
     && curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && echo "Setting gevent and greenlet versions to 21.12.0 and 1.1.0 (compatible with Debian Bullseye)" \
     && sed -i -E "s/(gevent==)[0-9\.]+/\121.12.0/; s/(greenlet==)[0-9\.]+/\11.1.0/" requirements.txt \
-    && pip install -r requirements.txt \
+    && uv pip install -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
         click-odoo-contrib \

@@ -36,6 +36,8 @@ ENV DB_FILTER=.* \
 
 # Debian stretch was moved to archive (and stretch-updates does not exist in archive)
 RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://security.debian.org,http://archive.debian.org,g;s,\(.*stretch-updates\),#\1,' /etc/apt/sources.list
+# Installs UV 7.10
+COPY --from=ghcr.io/astral-sh/uv@sha256:8cb222a0ab487c56ca1368c9f6c221b7fb008a0e4bb81ee623ef1f9d7b08fb6c /uv /uvx /bin/
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
@@ -57,7 +59,6 @@ RUN apt-get -qq update \
         ca-certificates \
     && echo 'deb https://apt-archive.postgresql.org/pub/repos/apt stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && curl https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends nodejs \
@@ -84,7 +85,7 @@ RUN gem install --no-rdoc --no-ri --no-update-sources execjs --version '<2.9.1' 
 
 # Other facilities
 WORKDIR /opt/odoo
-RUN pip install \
+RUN uv pip install --system \
         astor \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
@@ -122,11 +123,9 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
 
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
-RUN python -m venv --system-site-packages /qa/venv \
+RUN uv venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
-    # HACK: Upgrade pip: higher version needed to install pyproject.toml based packages
-    && pip install -U pip \
-    && pip install --no-cache-dir \
+    && uv pip install --no-cache-dir \
         click \
         coverage \
         flake8 \
@@ -146,7 +145,7 @@ ENV ODOO_VERSION="$ODOO_VERSION"
 RUN debs="libldap2-dev libsasl2-dev" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $debs \
-    && pip install \
+    && uv pip install --system \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
     && apt-get purge -yqq $debs \
