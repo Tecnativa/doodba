@@ -1,17 +1,19 @@
-[tool.poetry]
+[project]
 name = "doodba"
 version = "0.0.0"
-package-mode = false
 description = "Docker Odoo Base, a highly opinionated image ready to put Odoo inside it, but without Odoo"
-authors = ["Tecnativa"]
+authors = [{ name = "Tecnativa" }]
+requires-python = "~=3.9"
 
-[tool.poetry.dependencies]
-python = "^3.9"
+[dependency-groups]
+dev = [
+    "plumbum>=1.6.9,<2",
+    "pre-commit>=2.9.3,<3",
+]
 
-[tool.poetry.group.dev.dependencies]
-plumbum = "^1.6.9"
-pre-commit = "^2.9.3"
+[tool.uv]
+package = false
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
