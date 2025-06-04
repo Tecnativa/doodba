@@ -70,12 +70,15 @@ jobs:
         with:
           version: latest
       # Install dev and test dependencies
-      - run: pip install poetry
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.10"
+          checksum: ff2ef46298963fee8104ccb3c0a4ecbc97c057ac6a0bc5fec7636c855384252e
       - name: Patch $PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - run: poetry install
+      - run: uv sync
       # Test
-      - run: poetry run python -m unittest -v tests
+      - run: uv run python -m unittest -v tests
 
   build-push-pr:
     if: github.event_name == 'pull_request'
