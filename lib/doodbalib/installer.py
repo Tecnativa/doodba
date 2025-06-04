@@ -2,6 +2,7 @@
 from collections import OrderedDict
 from os.path import exists
 from subprocess import check_call
+from sys import version_info
 
 from doodbalib import logger
 
@@ -97,7 +98,12 @@ class NpmInstaller(Installer):
 
 
 class PipInstaller(Installer):
-    _install_command = ["pip", "install", "--no-cache-dir", "-r"]
+    @property
+    def _install_command(self):
+        if version_info >= (3, 8):
+            return ["uv", "pip", "install", "--system", "--no-cache-dir", "-r"]
+        else:
+            return ["pip", "install", "--no-cache-dir", "-r"]
 
     def requirements(self):
         """Pip will use its ``--requirements`` feature."""

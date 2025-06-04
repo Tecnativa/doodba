@@ -27,11 +27,16 @@ ENV DB_FILTER=.* \
     PUDB_RDB_PORT=6899 \
     PYTHONOPTIMIZE="" \
     UNACCENT=true \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_NO_MANAGED_PYTHON=1 \
     WAIT_DB=true \
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost
+
+COPY --from=ghcr.io/astral-sh/uv /uv /uvx /bin/
 
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
@@ -103,9 +108,9 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
 
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
-RUN python -m venv --system-site-packages /qa/venv \
+RUN uv venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
-    && pip install \
+    && uv pip install \
         click \
         coverage \
         six \
@@ -142,11 +147,11 @@ RUN build_deps=" \
     && curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && echo "Setting gevent and greenlet versions to 21.12.0 and 1.1.0 (compatible with Debian Buster)" \
     && sed -i -E "s/(gevent==)[0-9\.]+/\121.12.0/; s/(greenlet==)[0-9\.]+/\11.1.0/" requirements.txt \
-    && pip install -r requirements.txt \
+    && uv pip install --system -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
-        git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
+        git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing-updated \
         debugpy \
         pydevd-odoo \
         geoip2 \
