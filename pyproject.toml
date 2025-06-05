@@ -3,7 +3,11 @@ name = "doodba"
 version = "0.0.0"
 package-mode = false
 description = "Docker Odoo Base, a highly opinionated image ready to put Odoo inside it, but without Odoo"
-authors = ["Tecnativa"]
+authors = [{ name = "Tecnativa" }]
+requires-python = "~=3.9"
+dependencies = [
+    "pydevd-pycharm>=252.18003.35",
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"

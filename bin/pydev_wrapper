@@ -1,0 +1,7 @@
+import pydevd
+import argparse
+parser = argparse.ArgumentParser(description="Wrapper arround pydevd_pycharm")
+parser.add_argument('--host', type=str, required=True, help='Debug Host')
+parser.add_argument('--port', type=str, required=True, help='Debug Port')
+args = parser.parse_args()
+pydevd.settrace(args["host"], port=args["port"],suspend=False, stdoutToServer=True, stderrToServer=True)

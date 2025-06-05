@@ -28,6 +28,8 @@ ENV DB_FILTER=.* \
     PIP_NO_CACHE_DIR=0 \
     DEBUGPY_ARGS="--listen 0.0.0.0:6899 --wait-for-client" \
     DEBUGPY_ENABLE=0 \
+    PYDEV_ARGS="--client 0.0.0.0 --port 6988" \
+    PYDEV_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
     PUDB_RDB_PORT=6899 \
     PYTHONOPTIMIZE="" \
@@ -150,7 +152,9 @@ RUN build_deps=" \
         astor \
         click-odoo-contrib \
         debugpy \
+        pydevd \
         pydevd-odoo \
+        pydevd-pycharm \
         git+https://github.com/mailgun/flanker.git@v0.9.15#egg=flanker[validator] \
         geoip2 \
         "git-aggregator==4.0" \
