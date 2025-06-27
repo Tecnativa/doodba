@@ -1,4 +1,3 @@
-version: "2.1"
 services:
   odoo:
     build:
@@ -15,7 +14,7 @@ services:
     depends_on:
       - postgresql
     volumes:
-      - filestore:/var/lib/odoo:z
+      - filestore:/var/lib/odoo
 
   postgresql:
     image: tecnativa/postgres-autoconf:${DB_VERSION}-alpine
@@ -23,7 +22,7 @@ services:
       POSTGRES_USER: another_odoo
       POSTGRES_PASSWORD: anotherodoopassword
     volumes:
-      - db:/var/lib/postgresql/data:z
+      - db:/var/lib/postgresql/data
 
 volumes:
   db:

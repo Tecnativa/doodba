@@ -88,6 +88,8 @@ COPY lib/doodbalib /usr/local/lib/python3.8/site-packages/doodbalib
 COPY build.d common/build.d
 COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
+RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
+    && mv /opt/odoo/common/conf.d/60-geoip-lt17.conf /opt/odoo/common/conf.d/60-geoip.conf
 RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
@@ -139,12 +141,8 @@ RUN build_deps=" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $build_deps \
     && curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
-    &&  \
-        if [ "$TARGETARCH" = "arm64" ]; then \
-        echo "Upgrading odoo requirements.txt with gevent==21.12.0 and greenlet==1.1.0 (minimum versions compatible with arm64)" && \
-        sed -i 's/gevent==[0-9\.]*/gevent==21.12.0/' requirements.txt && \
-        sed -i 's/greenlet==[0-9\.]*/greenlet==1.1.0/' requirements.txt; \
-    fi \
+    && echo "Setting gevent and greenlet versions to 21.12.0 and 1.1.0 (compatible with Debian Buster)" \
+    && sed -i -E "s/(gevent==)[0-9\.]+/\121.12.0/; s/(greenlet==)[0-9\.]+/\11.1.0/" requirements.txt \
     && pip install -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
