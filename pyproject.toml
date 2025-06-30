@@ -1,17 +1,62 @@
-[tool.poetry]
+[project]
 name = "doodba"
 version = "0.0.0"
-package-mode = false
 description = "Docker Odoo Base, a highly opinionated image ready to put Odoo inside it, but without Odoo"
-authors = ["Tecnativa"]
+authors = [{ name = "Tecnativa" }]
+requires-python = ">=3.9, <4"
 
-[tool.poetry.dependencies]
-python = "^3.9"
+[dependency-groups]
+dev = [
+    "plumbum>=1.6.9,<2",
+    "pre-commit>=2.9.3,<3",
+    "pre-commit-uv>=3.8.0",
+    "tox>=4.27.0",
+    "tox-uv>=1.26.1",
+]
 
-[tool.poetry.group.dev.dependencies]
-plumbum = "^1.6.9"
-pre-commit = "^2.9.3"
+[tool.uv]
+package = false
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+
+[tool.tox]
+requires = ["tox>=4.19"]
+no_package = true
+env_list = "odoo{13-18}"
+
+[tool.tox.env_run_base]
+commands = [["python","-m","unittest","-v","tests",]]
+
+
+
+[tool.tox.env.odoo13]
+base_python  = ["python3.9"]
+set_env = { DOCKER_TAG = "13.0", PG_VERSIONS = "14" }
+
+[tool.tox.env.odoo14]
+base_python  = ["python3.9"]
+set_env = { DOCKER_TAG = "14.0", PG_VERSIONS = "14" }
+
+[tool.tox.env.odoo15]
+base_python  = ["python3.9"]
+set_env = { DOCKER_TAG = "15.0", PG_VERSIONS = "14" }
+
+[tool.tox.env.odoo16]
+base_python  = ["python3.10"]
+set_env = { DOCKER_TAG = "16.0", PG_VERSIONS = "14" }
+
+[tool.tox.env.odoo17]
+base_python  = ["python3.10"]
+set_env = { DOCKER_TAG = "17.0", PG_VERSIONS = "15" }
+
+[tool.tox.env.odoo18]
+base_python  = ["python3.10"]
+set_env = { DOCKER_TAG = "18.0", PG_VERSIONS = "16" }
+
+# odoo 11 and 12 are deprecated and aren't even tested in CI
+[tool.tox.env.odoo11]
+base_python  = ["python3.9"]
+set_env = { DOCKER_TAG = "11.0", PG_VERSIONS = "13" }
+
+[tool.tox.env.odoo12]
+base_python  = ["python3.9"]
+set_env = { DOCKER_TAG = "12.0", PG_VERSIONS = "13" }
