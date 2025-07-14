@@ -139,7 +139,9 @@ RUN build_deps=" \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yqq --no-install-recommends $build_deps \
     && curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && echo "Setting gevent and greenlet versions to 21.12.0 and 1.1.0 (compatible with Debian Bullseye)" \
-    && sed -i -E "s/(gevent==)[0-9\.]+/\121.12.0/; s/(greenlet==)[0-9\.]+/\11.1.0/" requirements.txt \
+    && sed -i -E "s/(gevent==)[0-9\.]+/\121.12.0/; \
+             s/(greenlet==)[0-9\.]+/\11.1.0/; \
+             s/(reportlab==)[0-9\.]+/reportlab==3.6.13/" requirements.txt \
     && pip install -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
