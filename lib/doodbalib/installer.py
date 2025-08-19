@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import shutil
 from collections import OrderedDict
 from os.path import exists
 from subprocess import check_call
@@ -97,7 +98,12 @@ class NpmInstaller(Installer):
 
 
 class PipInstaller(Installer):
-    _install_command = ["pip", "install", "--no-cache-dir", "-r"]
+    @property
+    def _install_command(self):
+        if shutil.which("uv"):
+            return ["uv", "pip", "install", "--system", "--no-cache-dir", "-r"]
+        else:
+            return ["pip", "install", "--no-cache-dir", "-r"]
 
     def requirements(self):
         """Pip will use its ``--requirements`` feature."""
