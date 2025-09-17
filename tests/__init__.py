@@ -507,9 +507,9 @@ class ScaffoldingCase(unittest.TestCase):
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
-        # TODO: Remove 18.0 from the matrix skip when 'base_search_fuzzy'
+        # TODO: Remove 19.0 from the matrix skip when 'base_search_fuzzy'
         # is available for that version
-        for sub_env in matrix(odoo_skip={"18.0", "19.0"}):
+        for sub_env in matrix(odoo_skip={"19.0"}):
             self.compose_test(
                 dependencies_dir,
                 sub_env,
