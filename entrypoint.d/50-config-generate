@@ -1,5 +1,5 @@
 #!/bin/bash
 
-log INFO Generating $OPENERP_SERVER file. Overriding any existing...
+log INFO "Generating ${OPENERP_SERVER:-$ODOO_RC} file. Overriding any existing..."
 
 config-generate
