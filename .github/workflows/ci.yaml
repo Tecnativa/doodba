@@ -168,6 +168,10 @@ jobs:
         ${{ matrix.odoo_version }}-pr-${{ github.event.pull_request.number }}-test
       PG_VERSIONS: ${{ matrix.pg_version }}
       ODOO_MINOR: ${{ matrix.odoo_version }}
+      # signal to tests that they can use the prebuilt images from registries and do not need to build the image in setupClass
+      USE_PREBUILT_IMAGES:
+        ${{ github.repository == 'tecnativa/doodba' &&
+        github.event.pull_request.head.repo.full_name == github.repository }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
