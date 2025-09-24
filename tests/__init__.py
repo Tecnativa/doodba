@@ -56,24 +56,46 @@ def matrix(
 class ScaffoldingCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # We build the “onbuild” images with the latest changes for
-        # testing instead of relying on the latest published ones.
-        for ODOO_VER in ODOO_VERSIONS:
-            print(f"Building ${ODOO_VER}-onbuild image...")
+        use_prebuilt_images = (
+            os.environ.get("USE_PREBUILT_IMAGES", "false").lower() == "true"
+        )
+        if "DOCKER_TAG" in os.environ and not use_prebuilt_images:
+            print(f"Building ${os.environ['DOCKER_TAG']}-onbuild image...")
             Popen(
                 (
                     "docker",
                     "build",
                     "-t",
-                    f"tecnativa/doodba:{ODOO_VER}-onbuild",
+                    f"tecnativa/doodba:{os.environ['DOCKER_TAG']}-onbuild",
                     "-f",
-                    f"{ODOO_VER}.Dockerfile",
+                    f"{os.environ['ODOO_MINOR']}.Dockerfile",
                     "--target",
                     "onbuild",
                     ".",
                 ),
                 cwd=os.getcwd(),
             ).wait()
+        elif not use_prebuilt_images:
+            # We build the “onbuild” images with the latest changes for
+            # testing instead of relying on the latest published ones.
+            for ODOO_VER in ODOO_VERSIONS:
+                print(f"Building ${ODOO_VER}-onbuild image...")
+                Popen(
+                    (
+                        "docker",
+                        "build",
+                        "-t",
+                        f"tecnativa/doodba:{ODOO_VER}-onbuild",
+                        "-f",
+                        f"{ODOO_VER}.Dockerfile",
+                        "--target",
+                        "onbuild",
+                        ".",
+                    ),
+                    cwd=os.getcwd(),
+                ).wait()
+        else:
+            logging.info("using prebuilt images")
 
     def setUp(self):
         super().setUp()
@@ -507,9 +529,9 @@ class ScaffoldingCase(unittest.TestCase):
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
-        # TODO: Remove 18.0 from the matrix skip when 'base_search_fuzzy'
+        # TODO: Remove 19.0 from the matrix skip when 'base_search_fuzzy'
         # is available for that version
-        for sub_env in matrix(odoo_skip={"18.0", "19.0"}):
+        for sub_env in matrix(odoo_skip={"19.0"}):
             self.compose_test(
                 dependencies_dir,
                 sub_env,
