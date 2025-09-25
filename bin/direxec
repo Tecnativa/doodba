@@ -67,6 +67,8 @@ if extra_command:
                 + os.environ["DEBUGPY_ARGS"].split()
                 + extra_command
             )
+        elif os.environ["PYDEVD_ENABLE"] == "1" or os.environ["PYCHARM_ENABLE"] == "1":
+            extra_command[0] = "/usr/local/bin/odoo_pydevd"
     logger.log(
         DEBUG if extra_command[0] == "/qa/insider" else INFO,
         "Executing %s",
