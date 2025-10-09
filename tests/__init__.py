@@ -55,45 +55,45 @@ def matrix(
 
 class ScaffoldingCase(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
-        use_prebuilt_images = (
-            os.environ.get("USE_PREBUILT_IMAGES", "false").lower() == "true"
-        )
-        if "DOCKER_TAG" in os.environ and not use_prebuilt_images:
-            print(f"Building ${os.environ['DOCKER_TAG']}-onbuild image...")
+    def build_base_image(cls, tag, file):
+        assert (
             Popen(
                 (
                     "docker",
                     "build",
                     "-t",
-                    f"tecnativa/doodba:{os.environ['DOCKER_TAG']}-onbuild",
+                    tag,
                     "-f",
-                    f"{os.environ['ODOO_MINOR']}.Dockerfile",
+                    file,
                     "--target",
                     "onbuild",
                     ".",
                 ),
                 cwd=os.getcwd(),
             ).wait()
+            == 0
+        ), "Building image for tests failed"
+
+    @classmethod
+    def setUpClass(cls):
+        use_prebuilt_images = (
+            os.environ.get("USE_PREBUILT_IMAGES", "false").lower() == "true"
+        )
+        if "DOCKER_TAG" in os.environ and not use_prebuilt_images:
+            print(f"Building {os.environ['DOCKER_TAG']}-onbuild image...")
+            cls.build_base_image(
+                f"tecnativa/doodba:{os.environ['DOCKER_TAG']}-onbuild",
+                f"{os.environ['ODOO_MINOR']}.Dockerfile",
+            )
         elif not use_prebuilt_images:
             # We build the “onbuild” images with the latest changes for
             # testing instead of relying on the latest published ones.
             for ODOO_VER in ODOO_VERSIONS:
-                print(f"Building ${ODOO_VER}-onbuild image...")
-                Popen(
-                    (
-                        "docker",
-                        "build",
-                        "-t",
-                        f"tecnativa/doodba:{ODOO_VER}-onbuild",
-                        "-f",
-                        f"{ODOO_VER}.Dockerfile",
-                        "--target",
-                        "onbuild",
-                        ".",
-                    ),
-                    cwd=os.getcwd(),
-                ).wait()
+                print(f"Building {ODOO_VER}-onbuild image...")
+                cls.build_base_image(
+                    f"tecnativa/doodba:{ODOO_VER}-onbuild",
+                    f"{ODOO_VER}.Dockerfile",
+                )
         else:
             logging.info("using prebuilt images")
 
