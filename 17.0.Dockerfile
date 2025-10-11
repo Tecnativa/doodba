@@ -64,7 +64,7 @@ RUN echo "LAST_SYSTEM_UID=$LAST_SYSTEM_UID\nLAST_SYSTEM_GID=$LAST_SYSTEM_GID\nFI
         ./wkhtmltox.deb \
         chromium \
         ffmpeg \
-        fonts-liberation2 \
+        fonts-noto-core \
         gettext \
         git \
         gnupg2 \
@@ -208,9 +208,9 @@ ONBUILD ARG DEPTH_DEFAULT=1
 ONBUILD ARG DEPTH_MERGE=100
 ONBUILD ARG CLEAN=true
 ONBUILD ARG COMPILE=true
-ONBUILD ARG FONT_MONO="Liberation Mono"
-ONBUILD ARG FONT_SANS="Liberation Sans"
-ONBUILD ARG FONT_SERIF="Liberation Serif"
+ONBUILD ARG FONT_MONO="Noto Mono"
+ONBUILD ARG FONT_SANS="Noto Sans"
+ONBUILD ARG FONT_SERIF="Noto Serif"
 ONBUILD ARG PIP_INSTALL_ODOO=true
 ONBUILD ARG ADMIN_PASSWORD=admin
 ONBUILD ARG SMTP_SERVER=smtp
