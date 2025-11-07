@@ -137,6 +137,8 @@ RUN build_deps=" \
         tcl-dev \
         tk-dev \
         zlib1g-dev \
+        gcc \
+        libcairo2-dev \
     " \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $build_deps \
@@ -162,6 +164,8 @@ RUN build_deps=" \
         python-magic \
         watchdog \
         wdb \
+        rlPyCairo \
+        pycairo \
     && (python3 -m compileall -q /usr/local/lib/python3.12/ || true) \
     # generate flanker cached tables during install when /usr/local/lib/ is still intended to be written to
     # https://github.com/Tecnativa/doodba/issues/486
