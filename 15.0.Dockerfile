@@ -81,6 +81,11 @@ RUN apt-get -qq update \
     && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpq-dev \
+    && ln -s "$(which pg_config)" /usr/local/bin/pg_config \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /opt/odoo
 COPY bin/* /usr/local/bin/
 COPY lib/doodbalib /usr/local/lib/python3.8/site-packages/doodbalib
@@ -125,7 +130,6 @@ RUN build_deps=" \
         liblcms2-dev \
         libldap2-dev \
         libopenjp2-7-dev \
-        libpq-dev \
         libsasl2-dev \
         libtiff5-dev \
         libwebp-dev \
