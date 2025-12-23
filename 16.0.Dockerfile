@@ -33,12 +33,16 @@ ENV DB_FILTER=.* \
     PUDB_RDB_PORT=6899 \
     PYTHONOPTIMIZE="" \
     UNACCENT=true \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_NO_MANAGED_PYTHON=1 \
     WAIT_DB=true \
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost
 
+COPY --from=ghcr.io/astral-sh/uv /uv /uvx /bin/
 
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
@@ -106,9 +110,10 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
 
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
-RUN python -m venv --system-site-packages /qa/venv \
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
-    && pip install \
+    && uv pip install \
         click \
         coverage \
     && deactivate \
@@ -119,7 +124,8 @@ ARG ODOO_VERSION=16.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 
 # Install Odoo hard & soft dependencies, and Doodba utilities
-RUN build_deps=" \
+RUN --mount=type=cache,target=/root/.cache/uv \
+    build_deps=" \
         build-essential \
         libfreetype6-dev \
         libfribidi-dev \
@@ -145,8 +151,8 @@ RUN build_deps=" \
     # disable gevent version recommendation from odoo and use 22.10.2 used in debian bookworm as python3-gevent
     && sed -i -E "s/(gevent==)21\.8\.0( ; sys_platform != 'win32' and python_version > '3.9' and python_version <= '3.10')/\122.10.2\2/;s/(greenlet==)1.1.2( ; sys_platform != 'win32' and python_version  > '3.9' and python_version <= '3.10')/\12.0.2\2/" requirements.txt \
     # need to upgrade setuptools, since the fixes for CVE-2024-6345 rolled out in base images we get errors "error: invalid command 'bdist_wheel'"
-    && pip install --upgrade setuptools \
-    && pip install -r requirements.txt \
+    && uv pip install --system --upgrade setuptools \
+    && uv pip install --system -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
         click-odoo-contrib \
@@ -257,6 +263,7 @@ ONBUILD RUN [ -d ~root/.ssh ] && rm -r ~root/.ssh; \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
 ONBUILD ARG DB_VERSION=latest
-ONBUILD RUN /opt/odoo/common/build && sync
+ONBUILD RUN --mount=type=cache,target=/root/.cache/uv \
+            /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo
