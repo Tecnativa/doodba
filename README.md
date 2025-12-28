@@ -499,7 +499,7 @@ scripts:
 
 Little shell shortcut for exporting a translation template from any addon(s). Usage:
 
-    pot my_addon,my_other_addon
+    pot my_addon,my_other_addon lang
 
 ### [`psql`](https://www.postgresql.org/docs/current/app-psql.html)
 
