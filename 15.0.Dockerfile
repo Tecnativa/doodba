@@ -27,11 +27,16 @@ ENV DB_FILTER=.* \
     PUDB_RDB_PORT=6899 \
     PYTHONOPTIMIZE="" \
     UNACCENT=true \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_NO_MANAGED_PYTHON=1 \
     WAIT_DB=true \
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost
+
+COPY --from=ghcr.io/astral-sh/uv /uv /uvx /bin/
 
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
@@ -102,9 +107,10 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
 
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
-RUN python -m venv --system-site-packages /qa/venv \
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
-    && pip install \
+    && uv pip install \
         click \
         coverage \
     && deactivate \
@@ -115,7 +121,8 @@ ARG ODOO_VERSION=15.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 
 # Install Odoo hard & soft dependencies, and Doodba utilities
-RUN build_deps=" \
+RUN --mount=type=cache,target=/root/.cache/uv \
+    build_deps=" \
         build-essential \
         libfreetype6-dev \
         libfribidi-dev \
@@ -142,7 +149,7 @@ RUN build_deps=" \
     && sed -i -E "s/(gevent==)[0-9\.]+/\121.12.0/; \
              s/(greenlet==)[0-9\.]+/\11.1.0/; \
              s/(reportlab==)[0-9\.]+/reportlab==3.6.13/" requirements.txt \
-    && pip install -r requirements.txt \
+    && uv pip install --system -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
         click-odoo-contrib \
@@ -166,8 +173,7 @@ RUN build_deps=" \
     # https://github.com/Tecnativa/doodba/issues/486
     && python3 -c 'from flanker.addresslib import address' >/dev/null 2>&1 \
     && apt-get purge -yqq $build_deps \
-    && apt-get autopurge -yqq \
-    && rm -Rf /var/lib/apt/lists/* /tmp/*
+    && apt-get autopurge -yqq
 
 # Metadata
 ARG VCS_REF
@@ -252,6 +258,7 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
 ONBUILD ARG DB_VERSION=latest
-ONBUILD RUN /opt/odoo/common/build && sync
+ONBUILD RUN --mount=type=cache,target=/root/.cache/uv \
+            /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo

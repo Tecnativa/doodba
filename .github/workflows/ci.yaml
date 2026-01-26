@@ -190,11 +190,12 @@ jobs:
       - uses: docker/setup-compose-action@v1
         with:
           version: latest
-      - run: pip install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Patch $PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - run: poetry install
-      - run: poetry run python -m unittest -v tests
+      - run: uv install
+      - run: uv run python -m unittest -v tests
 
   test:
     if: github.event_name != 'pull_request'
@@ -248,11 +249,12 @@ jobs:
       - uses: docker/setup-compose-action@v1
         with:
           version: latest
-      - run: pip install poetry
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
       - name: Patch $PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - run: poetry install
-      - run: poetry run python -m unittest -v tests
+      - run: uv install
+      - run: uv run python -m unittest -v tests
 
   build-push-official:
     # Only publish final images from master after tests pass
