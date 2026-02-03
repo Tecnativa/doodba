@@ -151,7 +151,7 @@ RUN build_deps=" \
         click-odoo-contrib \
         debugpy \
         pydevd-odoo \
-        git+https://github.com/mailgun/flanker.git@v0.9.15#egg=flanker[validator] \
+        "flanker[validator] @ git+https://github.com/mailgun/flanker.git@v0.9.15" \
         geoip2 \
         "git-aggregator==4.0" \
         inotify \
