@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+
+# set server timezone in UTC before time module imported
+import os
+os.environ["TZ"] = "UTC"
+
+# import regular pydevd or pycharm's version depending on flags
+if os.environ["PYCHARM_ENABLE"] == "1":
+    import pydevd_pycharm as pydevd
+else:
+    import pydevd
+import odoo
+
+# If we don't get host, we guess it from within the container
+if os.environ.get("PYDEVD_HOST", False):
+    pydevd_host = os.environ["PYDEVD_HOST"]
+else:
+    import socket
+    local_ip = socket.gethostbyname(socket.gethostname())
+    pydevd_host = ".".join(local_ip.split(".")[0:3] + ["1"])
+# Port needs casting to int if obtained from env variable
+port=int(os.environ.get("PYDEVD_PORT", 6988))
+pydevd.settrace(
+    pydevd_host, port=port, suspend=False, stdoutToServer=True, stderrToServer=True
+)
+if __name__ == "__main__":
+    odoo.cli.main()
