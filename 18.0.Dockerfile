@@ -146,6 +146,8 @@ RUN build_deps=" \
     # cbor2==5.4.2 no longer builds as pkg_resources is removed, and 5.4.6 is already pre-built
     && sed -i -E "s/(cbor2==)5\.4\.2( ; python_version < '3.12')/\15.4.6\2/" requirements.txt \
     # need to upgrade setuptools, since the fixes for CVE-2024-6345 rolled out in base images we get errors "error: invalid command 'bdist_wheel'"
+    # We need setuptools lower than 82 as odoo uses pkg_resources and it was removed in 82.0.0
+    && pip install --upgrade "setuptools<82" \
     && pip install --upgrade setuptools \
     && pip install -r requirements.txt \
         'websocket-client~=0.56' \
