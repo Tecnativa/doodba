@@ -141,6 +141,9 @@ subsequently run.
 Files here will be environment-variable-expanded and concatenated in
 `/opt/odoo/auto/odoo.conf` in the entrypoint.
 
+You can use a different custom directory to concatenate the configuration by using the
+`CUSTOM_CONF_DIR` environment variable in the odoo service of the compose specific file.
+
 #### `/opt/odoo/custom/ssh`
 
 It must follow the same structure as a standard `~/.ssh` directory, including `config`
