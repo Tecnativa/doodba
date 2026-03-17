@@ -11,6 +11,7 @@ services:
       PGPASSWORD: anotherodoopassword
       PGHOST: postgresql
       PGDATABASE: ${DBNAME:-prod}
+      CUSTOM_CONF_DIR: "/opt/odoo/custom/conf-test.d"
     depends_on:
       - postgresql
     volumes:
