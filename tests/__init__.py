@@ -3,6 +3,7 @@
 
 Each test must be a valid docker-compose.yaml file with a ``odoo`` service.
 """
+
 import logging
 import os
 import unittest
