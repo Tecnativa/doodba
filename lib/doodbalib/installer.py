@@ -60,7 +60,7 @@ class Installer(object):
 
 
 class AptInstaller(Installer):
-    _cleanup_commands = [["apt-get", "-y", "autoremove"], "rm -Rf /var/lib/apt/lists/*"]
+    _cleanup_commands = [["apt-get", "-y", "autoremove"]]
     _install_command = [
         "apt-get",
         "-o",
