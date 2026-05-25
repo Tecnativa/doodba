@@ -3,7 +3,7 @@
   defaults:
     depth: $DEPTH_MERGE
   remotes:
-    local: /opt/fake-odoo
+    local: /tmp/fake-odoo
   merges:
     - local branch1
     - local branch2
