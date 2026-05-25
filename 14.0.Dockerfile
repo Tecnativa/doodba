@@ -37,10 +37,7 @@ ENV DB_FILTER=.* \
 RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://security.debian.org,http://archive.debian.org,g' /etc/apt/sources.list
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
-RUN --mount=target=/var/lib/apt,type=cache,sharing=locked \
-    --mount=target=/var/cache/apt,type=cache,sharing=locked \
-    --mount=target=/tmp,type=tmpfs \
-    apt-get -qq update \
+RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
         curl; \
     if [ "$TARGETARCH" = "arm64" ]; then \
@@ -57,13 +54,13 @@ RUN --mount=target=/var/lib/apt,type=cache,sharing=locked \
         echo "Unsupported architecture: $TARGETARCH" >&2; \
         exit 1; \
     fi \
-    && curl -SLo /tmp/wkhtmltox.deb ${WKHTMLTOPDF_URL} \
+    && curl -SLo wkhtmltox.deb ${WKHTMLTOPDF_URL} \
     && echo "Downloading wkhtmltopdf from: ${WKHTMLTOPDF_URL}" \
     && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
-    && echo "Computed wkhtmltox checksum: $(sha256sum /tmp/wkhtmltox.deb | awk '{ print $1 }')" \
-    && echo "${WKHTMLTOPDF_CHECKSUM} /tmp/wkhtmltox.deb" | sha256sum -c - \
+    && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
+    && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
     && apt-get install -yqq --no-install-recommends \
-        /tmp/wkhtmltox.deb \
+        ./wkhtmltox.deb \
         chromium \
         ffmpeg \
         fonts-liberation2 \
@@ -80,9 +77,11 @@ RUN --mount=target=/var/lib/apt,type=cache,sharing=locked \
     && echo 'deb https://apt-archive.postgresql.org/pub/repos/apt buster-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
-    && curl --silent -L --output /tmp/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
-    && dpkg -i /tmp/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
+    && curl --silent -L --output geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
+    && dpkg -i geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
+    && rm geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
     && apt-get autopurge -yqq \
+    && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
 
 WORKDIR /opt/odoo
@@ -106,8 +105,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
 
 # Doodba-QA dependencies in a separate virtualenv
 COPY qa /qa
-RUN --mount=target=/root/.cache/pip,type=cache,sharing=locked \
-    python -m venv --system-site-packages /qa/venv \
+RUN python -m venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
     && pip install \
         click \
@@ -121,11 +119,7 @@ ARG ODOO_VERSION=14.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 
 # Install Odoo hard & soft dependencies, and Doodba utilities
-RUN --mount=target=/var/lib/apt,type=cache,sharing=locked \
-    --mount=target=/var/cache/apt,type=cache,sharing=locked \
-    --mount=target=/root/.cache/pip,type=cache,sharing=locked \
-    --mount=target=/tmp,type=tmpfs \
-    build_deps=" \
+RUN build_deps=" \
         build-essential \
         libfreetype6-dev \
         libfribidi-dev \
@@ -171,7 +165,8 @@ RUN --mount=target=/var/lib/apt,type=cache,sharing=locked \
         wdb \
     && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \
     && apt-get purge -yqq $build_deps \
-    && apt-get autopurge -yqq
+    && apt-get autopurge -yqq \
+    && rm -Rf /var/lib/apt/lists/* /tmp/*
 
 # Metadata
 ARG VCS_REF
@@ -256,11 +251,6 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
 ONBUILD ARG DB_VERSION=latest
-ONBUILD RUN --mount=target=/var/lib/apt,type=cache,sharing=locked \
-            --mount=target=/var/cache/apt,type=cache,sharing=locked \
-            --mount=target=/root/.cache/pip,type=cache,sharing=locked \
-            --mount=target=/root/.cache/pip,type=cache,sharing=locked \
-            --mount=target=/tmp,type=tmpfs \
-            /opt/odoo/common/build && sync
+ONBUILD RUN /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo
