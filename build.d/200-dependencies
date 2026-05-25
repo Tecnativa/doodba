@@ -5,7 +5,7 @@
 from glob import glob
 from os.path import basename, join, splitext
 
-from doodbalib import CUSTOM_DIR, FILE_APT_BUILD, SRC_DIR
+from doodbalib import CUSTOM_DIR, FILE_APT_BUILD
 from doodbalib.installer import INSTALLERS, install, logger
 
 # Build dependencies installed before any others

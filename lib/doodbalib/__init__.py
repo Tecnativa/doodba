@@ -129,7 +129,7 @@ def addons_config(filtered=True, strict=False):
                 if not any(os.path.isfile(m) for m in manifests):
                     missing_manifest.add(addon)
                     logger.debug(
-                        "Skipping '%s' as it is not a valid Odoo " "module", addon
+                        "Skipping '%s' as it is not a valid Odoo module", addon
                     )
                     continue
                 logger.debug("Registering addon %s", addon)

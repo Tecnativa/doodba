@@ -1,4 +1,5 @@
 # Compiled locally, which would fail if `apt_build.txt` fails
-pycrypto==2.6.1 --no-binary :all:
+pycrypto==2.6.1
+--no-binary :all:
 # External dependency files can be included too; example: numpy
 -r https://raw.githubusercontent.com/Tecnativa/doodba/6cec8ea6eefa9d8de8cff103cfca6e373f8fe910/tests/scaffoldings/dotd/custom/src/dummy_repo/requirements.txt
