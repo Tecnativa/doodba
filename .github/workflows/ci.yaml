@@ -110,6 +110,8 @@ jobs:
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ env.BUILD_DATE }}
             ODOO_VERSION=${{ matrix.odoo_version }}
+          cache-from: type=gha
+          cache-to: type=gha
       - name: Build onbuild image
         uses: docker/build-push-action@v6
         with:
@@ -127,6 +129,8 @@ jobs:
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ env.BUILD_DATE }}
             ODOO_VERSION=${{ matrix.odoo_version }}
+          cache-from: type=gha
+          cache-to: type=gha
       - name: Clean Docker system after build
         run: |
           docker system prune -af --volumes || true
@@ -334,6 +338,8 @@ jobs:
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ env.BUILD_DATE }}
             ODOO_VERSION=${{ matrix.odoo_version }}
+          cache-from: type=gha
+          cache-to: type=gha
       - name: Build onbuild image
         uses: docker/build-push-action@v6
         with:
@@ -353,6 +359,8 @@ jobs:
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ env.BUILD_DATE }}
             ODOO_VERSION=${{ matrix.odoo_version }}
+          cache-from: type=gha
+          cache-to: type=gha
       - name: Clean Docker system after build
         run: |
           docker system prune -af --volumes || true

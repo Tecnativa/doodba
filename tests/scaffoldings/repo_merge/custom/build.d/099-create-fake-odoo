@@ -1,10 +1,10 @@
 #!/bin/bash
-rm -rf /tmp/fake-odoo
-mkdir /tmp/fake-odoo
-cd /tmp/fake-odoo
+rm -rf /opt/fake-odoo
+mkdir /opt/fake-odoo
+cd /opt/fake-odoo
 
 git init
-git config --system --add safe.directory /tmp/fake-odoo/.git
+git config --system --add safe.directory /opt/fake-odoo/.git
 touch odoo-bin
 git add odoo-bin
 git commit -m odoo-bin
