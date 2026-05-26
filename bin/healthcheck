@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if (( ${ODOO_VERSION/%.0} > 13));then
+    curl -sf http://localhost:8069/web/health || exit 1
+else
+    curl -sf http://localhost:8069/web/database/selector || exit 1
+fi

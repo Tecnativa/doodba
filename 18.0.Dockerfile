@@ -182,6 +182,8 @@ LABEL org.label-schema.schema-version="$VERSION" \
       org.label-schema.vcs-ref="$VCS_REF" \
       org.label-schema.vcs-url="https://github.com/Tecnativa/doodba"
 
+HEALTHCHECK --interval=1m --timeout=1s --start-period=30s --start-interval=1s --retries=3 CMD [ "/usr/local/bin/healthcheck" ]
+
 # Onbuild version, with all the magic
 FROM base AS onbuild
 
