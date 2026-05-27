@@ -197,6 +197,7 @@ ONBUILD RUN groupadd -g $GID odoo -o \
 # Subimage triggers
 ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint"]
 ONBUILD CMD ["/usr/local/bin/odoo"]
+ONBUILD HEALTHCHECK CMD ["/usr/local/bin/healthcheck"]
 ONBUILD ARG AGGREGATE=true
 ONBUILD ARG DEFAULT_REPO_PATTERN="https://github.com/OCA/{}.git"
 ONBUILD ARG DEFAULT_REPO_PATTERN_ODOO="https://github.com/OCA/OCB.git"

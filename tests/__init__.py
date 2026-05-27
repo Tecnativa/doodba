@@ -880,6 +880,122 @@ class ScaffoldingCase(unittest.TestCase):
                 ),
             )
 
+    def test_healthcheck(self):
+        healthcheck_dir = join(SCAFFOLDINGS_DIR, "healthcheck")
+        for sub_env in matrix():
+            self.compose_test(
+                healthcheck_dir,
+                sub_env,
+                # verify that healthcheck fails if odoo is not running
+                (
+                    "bash",
+                    "-c",
+                    "if healthcheck; then echo 'healthcheck is healthy without odoo started' 1>&2; exit 1; fi",
+                ),
+                # verify that healthcheck is working and becomes healthy when odoo is starting
+                (
+                    "timeout",
+                    "120s",
+                    "bash",
+                    "-c",
+                    "odoo & until healthcheck; do sleep 3; done;",
+                ),
+                # verify that healthcheck is working with DB_FILTER .*
+                (
+                    "timeout",
+                    "30s",
+                    "bash",
+                    "-c",
+                    "DB_FILTER='.*' odoo & until healthcheck; do sleep 3; done;",
+                ),
+                # verify that healthcheck is working with workers
+                (
+                    "timeout",
+                    "30s",
+                    "bash",
+                    "-c",
+                    "odoo --workers 2 & until healthcheck; do sleep 3; done",
+                ),
+                # verify that healthcheck is working with workers and DB_FILTER .*
+                (
+                    "timeout",
+                    "30s",
+                    "bash",
+                    "-c",
+                    "DB_FILTER='.*' odoo --workers 2 & until healthcheck; do sleep 3; done",
+                ),
+                # verify that healthcheck is working if odoo shell is launched
+                (
+                    "timeout",
+                    "30s",
+                    "bash",
+                    "-c",
+                    "odoo --workers 2 & odoo shell & until healthcheck; do sleep 3; done",
+                ),
+                # verify that healthcheck works when disabling http (and http checks are skipped)
+                (
+                    "timeout",
+                    "30s",
+                    "bash",
+                    "-c",
+                    "odoo --no-http & until healthcheck; do sleep 3; done && "
+                    "healthcheck | grep 'odoo_installed SKIPPED' && "
+                    "healthcheck | grep 'odoo_listening_ports SKIPPED' && "
+                    "healthcheck | grep 'odoo_connectivity SKIPPED'",
+                ),
+                # verify that http checks are done when running odoo normally with http
+                (
+                    "timeout",
+                    "30s",
+                    "bash",
+                    "-c",
+                    "odoo & until healthcheck; do sleep 3; done && "
+                    "healthcheck | grep 'odoo_installed OK' && "
+                    "healthcheck | grep 'odoo_listening_ports OK' && "
+                    "healthcheck | grep 'odoo_connectivity OK' && "
+                    "healthcheck | grep 'odoo_processes OK'",
+                ),
+                # verify that healthcheck works with click-odoo scripts, and odoo process check is skipped
+                (
+                    "timeout",
+                    "30s",
+                    "bash",
+                    "-c",
+                    "click-odoo-update & until healthcheck; do sleep 3; done && "
+                    "healthcheck | grep 'odoo_processes SKIPPED'",
+                ),
+                # verify that healthcheck uses cookie jar file
+                ("test", "-e", "/var/lib/odoo/prod-healthcheck-cookies.txt"),
+                # and stored a session_id cookie
+                (
+                    "grep",
+                    "-R",
+                    "session_id",
+                    "/var/lib/odoo/prod-healthcheck-cookies.txt",
+                ),
+                # and after another healthcheck cookies should not change
+                # but timestamps (column 5 in awk) do
+                (
+                    "cp",
+                    "/var/lib/odoo/prod-healthcheck-cookies.txt",
+                    "/var/lib/odoo/prod-healthcheck-cookies.txt.1",
+                ),
+                (
+                    "timeout",
+                    "30s",
+                    "bash",
+                    "-c",
+                    "odoo & until healthcheck; do sleep 3; done",
+                ),
+                (
+                    "bash",
+                    "-c",
+                    "diff"
+                    " <(awk '{$5=\"\"; print $0}' < /var/lib/odoo/prod-healthcheck-cookies.txt)"
+                    " <(awk '{$5=\"\"; print $0}' </var/lib/odoo/prod-healthcheck-cookies.txt.1)",
+                ),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
