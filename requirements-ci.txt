@@ -1,3 +1,0 @@
-docker-compose
-plumbum
-pre-commit
