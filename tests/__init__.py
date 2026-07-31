@@ -363,8 +363,35 @@ class ScaffoldingCase(unittest.TestCase):
         )
         smallest_dir = join(SCAFFOLDINGS_DIR, "smallest")
         for sub_env in matrix():
+            if float(sub_env["ODOO_MINOR"]) >= 19.0:
+                # Replicas disabled with None
+                replica_command = (
+                    "grep",
+                    "-x",
+                    "db_replica_host = None",
+                    "/opt/odoo/auto/odoo.conf",
+                )
+            elif float(sub_env["ODOO_MINOR"]) >= 18.0:
+                # Replicas disabled with false
+                replica_command = (
+                    "grep",
+                    "-x",
+                    "db_replica_host = false",
+                    "/opt/odoo/auto/odoo.conf",
+                )
+            else:
+                # Replicas unsupported, settings must not be shipped
+                replica_command = (
+                    "bash",
+                    "-xc",
+                    "! grep -q db_replica /opt/odoo/auto/odoo.conf",
+                )
             self.compose_test(
-                smallest_dir, sub_env, *commands, ("python", "-c", "import watchdog")
+                smallest_dir,
+                sub_env,
+                *commands,
+                replica_command,
+                ("python", "-c", "import watchdog"),
             )
 
     def test_addons_env(self):
