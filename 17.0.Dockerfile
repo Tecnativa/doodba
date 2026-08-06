@@ -1,13 +1,34 @@
-FROM python:3.10-slim-bookworm AS base
-ARG ODOO_VERSION=17.0
-ENV ODOO_VERSION="$ODOO_VERSION"
-EXPOSE 8069 8072
+FROM scratch AS ctx
+COPY system_files /
+FROM curlimages/curl:8.21.0 AS downloader
 ARG TARGETARCH
-ARG GEOIP_UPDATER_VERSION=6.0.0
 ARG WKHTMLTOPDF_VERSION=0.12.6.1
 ARG WKHTMLTOPDF_AMD64_CHECKSUM='98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d'
 ARG WKHTMLTOPDF_ARM64_CHECKSUM="b6606157b27c13e044d0abbe670301f88de4e1782afca4f9c06a5817f3e03a9c"
 ARG WKHTMLTOPDF_URL="https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}-3/wkhtmltox_${WKHTMLTOPDF_VERSION}-3.bookworm_${TARGETARCH}.deb"
+ARG GEOIP_UPDATER_VERSION=6.0.0
+ARG GEOIP_URL="https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb"
+WORKDIR /downloads
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+        WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_ARM64_CHECKSUM; \
+    elif [ "$TARGETARCH" = "amd64" ]; then \
+        WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_AMD64_CHECKSUM; \
+    else \
+        echo "Unsupported architecture: $TARGETARCH" >&2; \
+        exit 1; \
+    fi \
+    && curl -SLo wkhtmltox.deb ${WKHTMLTOPDF_URL} \
+    && echo "Downloading wkhtmltopdf from: ${WKHTMLTOPDF_URL}" \
+    && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
+    && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
+    && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
+    && curl -L --output geoipupdate.deb ${GEOIP_URL}
+FROM python:3.10-slim-bookworm AS foundation
+ARG ODOO_VERSION=17.0
+ENV ODOO_VERSION="$ODOO_VERSION"
+EXPOSE 8069 8072
+ARG TARGETARCH
+ARG ODOO_SOURCE=OCA/OCB
 ARG LAST_SYSTEM_UID=499
 ARG LAST_SYSTEM_GID=499
 ARG FIRST_UID=500
@@ -24,7 +45,8 @@ ENV DB_FILTER=.* \
     LIST_DB=false \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
-    PATH="/home/odoo/.local/bin:$PATH" \
+    PATH="/opt/odoo-venv/bin:$PATH" \
+    PYTHONPATH="/var/lib/doodba:$PYTHONPATH" \
     DEBUGPY_ARGS="--listen 0.0.0.0:6899 --wait-for-client" \
     DEBUGPY_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
@@ -42,6 +64,7 @@ ENV DB_FILTER=.* \
 RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/tmp,type=tmpfs \
+    --mount=type=bind,from=downloader,source=/downloads,target=/downloads \
     rm -f /etc/apt/apt.conf.d/docker-clean \
     && echo "LAST_SYSTEM_UID=$LAST_SYSTEM_UID\nLAST_SYSTEM_GID=$LAST_SYSTEM_GID\nFIRST_UID=$FIRST_UID\nFIRST_GID=$FIRST_GID" >> /etc/adduser.conf \
     && echo "SYS_UID_MAX   $LAST_SYSTEM_UID\nSYS_GID_MAX   $LAST_SYSTEM_GID" >> /etc/login.defs \
@@ -50,80 +73,45 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
     && apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
         curl \
-    && if [ "$TARGETARCH" = "arm64" ]; then \
-        WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_ARM64_CHECKSUM; \
-    elif [ "$TARGETARCH" = "amd64" ]; then \
-        WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_AMD64_CHECKSUM; \
-    else \
-        echo "Unsupported architecture: $TARGETARCH" >&2; \
-        exit 1; \
-    fi \
-    && curl -SLo /tmp/wkhtmltox.deb ${WKHTMLTOPDF_URL} \
-    && echo "Downloading wkhtmltopdf from: ${WKHTMLTOPDF_URL}" \
-    && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
-    && echo "Computed wkhtmltox checksum: $(sha256sum /tmp/wkhtmltox.deb | awk '{ print $1 }')" \
-    && echo "${WKHTMLTOPDF_CHECKSUM} /tmp/wkhtmltox.deb" | sha256sum -c - \
+        gnupg2 \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+        | gpg --dearmor -o /etc/apt/keyrings/postgresql.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/postgresql.gpg] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" \
+        > /etc/apt/sources.list.d/postgresql.list \
+    && apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
-        /tmp/wkhtmltox.deb \
+        /downloads/wkhtmltox.deb \
+        /downloads/geoipupdate.deb \
         chromium \
         ffmpeg \
         fonts-liberation2 \
         gettext \
         git \
-        gnupg2 \
         locales-all \
         nano \
         npm \
         openssh-client \
         telnet \
         vim \
-    && echo 'deb https://apt.postgresql.org/pub/repos/apt/ bookworm-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
-    && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt-get update \
-    && curl --silent -L --output /tmp/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
-    && dpkg -i /tmp/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb \
     && apt-get autopurge -yqq \
     && sync
 
-WORKDIR /opt/odoo
-COPY bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.10/site-packages/doodbalib
-COPY build.d common/build.d
-COPY conf.d common/conf.d
-COPY entrypoint.d common/entrypoint.d
-RUN rm -f /opt/odoo/common/conf.d/60-geoip-lt17.conf \
-    && mv /opt/odoo/common/conf.d/60-geoip-ge17.conf /opt/odoo/common/conf.d/60-geoip.conf \
-    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf
-RUN mkdir -p auto/addons auto/geoip custom/src/private \
-    && ln /usr/local/bin/direxec common/entrypoint \
-    && ln /usr/local/bin/direxec common/build \
-    && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.10/site-packages/doodbalib \
-    && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
-    && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
-    && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
-    && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
-    && sync
-
-# Doodba-QA dependencies in a separate virtualenv
-COPY qa /qa
+FROM foundation AS qa-builder
+COPY --from=ctx /qa /qa
 RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     python -m venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
     && pip install \
         click \
         coverage \
-    && deactivate \
     && mkdir -p /qa/artifacts
-
-ARG ODOO_SOURCE=OCA/OCB
-
-# Install Odoo hard & soft dependencies, and Doodba utilities
+FROM foundation AS venv-builder
 RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
-    --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     --mount=target=/tmp,type=tmpfs \
-    build_deps=" \
+    apt-get update \
+    && apt-get install -yqq --no-install-recommends \
         build-essential \
         libfreetype6-dev \
         libfribidi-dev \
@@ -141,10 +129,12 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         libxslt-dev \
         tcl-dev \
         tk-dev \
-        zlib1g-dev \
-    " \
-    && apt-get update \
-    && apt-get install -yqq --no-install-recommends $build_deps \
+        zlib1g-dev
+# Install Odoo hard & soft dependencies, and Doodba utilities
+RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
+    --mount=target=/tmp,type=tmpfs \
+    python -m venv --system-site-packages /opt/odoo-venv \
+    && . /opt/odoo-venv/bin/activate \
     && curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     # disable gevent version recommendation from odoo and use 22.10.2 used in debian bookworm as python3-gevent
     && sed -i -E "s/(gevent==)21\.8\.0( ; sys_platform != 'win32' and python_version == '3.10')/\122.10.2\2/;s/(greenlet==)1.1.2( ; sys_platform != 'win32' and python_version == '3.10')/\12.0.2\2/" requirements.txt \
@@ -169,19 +159,25 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         python-magic \
         watchdog \
         wdb \
-    && (python3 -m compileall -q /usr/local/lib/python3.10/ || true) \
-    && apt-get purge -yqq $build_deps \
-    && apt-get autopurge -yqq
-# Metadata
-ARG VCS_REF
-ARG BUILD_DATE
-ARG VERSION
-LABEL org.label-schema.schema-version="$VERSION" \
-      org.label-schema.vendor=Tecnativa \
-      org.label-schema.license=Apache-2.0 \
-      org.label-schema.build-date="$BUILD_DATE" \
-      org.label-schema.vcs-ref="$VCS_REF" \
-      org.label-schema.vcs-url="https://github.com/Tecnativa/doodba"
+    && (python3 -m compileall /opt/odoo-venv || true)
+FROM foundation AS base
+COPY --from=ctx / /
+COPY --from=qa-builder /qa /qa
+COPY --from=venv-builder /opt/odoo-venv /opt/odoo-venv
+WORKDIR /opt/odoo
+RUN rm -f /opt/odoo/common/conf.d/60-geoip-lt17.conf \
+    && mv /opt/odoo/common/conf.d/60-geoip-ge17.conf /opt/odoo/common/conf.d/60-geoip.conf \
+    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf \
+    &&  mkdir -p auto/addons auto/geoip custom/src/private \
+    && ln /usr/local/bin/direxec common/entrypoint \
+    && ln /usr/local/bin/direxec common/build \
+    && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
+    && chmod -R a+rX /var/lib/doodba \
+    && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
+    && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
+    && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
+    && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
+    && sync
 
 # Onbuild version, with all the magic
 FROM base AS onbuild

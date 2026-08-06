@@ -480,7 +480,7 @@ class ScaffoldingCase(unittest.TestCase):
                 # ``requirements.txt`` from addon repos were processed
                 ("python", "-c", "import numpy"),
                 # Local executable binaries found in $PATH
-                ("sh", "-xc", "pip install --user -q flake8 && which flake8"),
+                ("sh", "-xc", "pip install -q flake8 && which flake8"),
                 # Addon cleanup works correctly
                 ("test", "!", "-e", "custom/src/private/dummy_addon"),
                 ("test", "!", "-e", "custom/src/dummy_repo/dummy_link"),
