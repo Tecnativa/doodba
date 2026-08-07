@@ -41,6 +41,15 @@ for dir_ in CONFIG_DIRS:
     except OSError:  # TODO Use FileNotFoundError when we drop python 2
         continue
 
+
+for section in parser.sections():
+    for key, value in parser.items(section):
+        if not value.startswith("$"):
+            continue
+        varname = value.removeprefix("$")
+        if varname in os.environ:
+            continue
+        parser.remove_option(section, key)
 # Write it to a memory string object
 with closing(StringIO()) as resultfp:
     parser.write(resultfp)
