@@ -1,2 +1,3 @@
 # Compiled locally, which would fail if `apt_build.txt` fails
-pycrypto==2.6.1 --no-binary :all:
+pycrypto==2.6.1
+--no-binary :all:
