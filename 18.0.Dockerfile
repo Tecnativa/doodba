@@ -37,8 +37,9 @@ ENV DB_FILTER=.* \
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
-    WDB_WEB_SERVER=localhost
-
+    WDB_WEB_SERVER=localhost \
+    GIT_AUTOSHARE_CACHE_DIR=/var/cache/git-autoshare \
+    GIT_AUTOSHARE_CONFIG_DIR=/opt/odoo/auto/git-autoshare-config
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
@@ -162,7 +163,8 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         debugpy \
         pydevd-odoo \
         geoip2 \
-        "git-aggregator==4.0" \
+                git-aggregator \
+        git-autoshare \
         inotify \
         pdfminer.six \
         pg_activity \
@@ -263,10 +265,11 @@ ONBUILD RUN [ -d ~root/.ssh ] && rm -r ~root/.ssh; \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
 ONBUILD ARG DB_VERSION=latest
-ONBUILD RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
-            --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
-            --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
-            --mount=target=/tmp,type=tmpfs \
+ONBUILD RUN --mount=type=cache,target=/var/lib/apt/lists,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+            --mount=type=cache,target=/var/cache/apt,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+            --mount=type=cache,target=/root/.cache/pip,id=pip-cache \
+            --mount=target=/var/cache/git-autoshare,type=cache,id=git-autoshare \
+            --mount=,type=tmpfs,target=/tmp \
             /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo

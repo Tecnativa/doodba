@@ -1,0 +1,8 @@
+odoo:
+  defaults:
+    depth: $DEPTH_DEFAULT
+  remotes:
+    origin: https://github.com/oca/oca-addons-repo-template.git
+  target: origin master
+  merges:
+    - origin master
