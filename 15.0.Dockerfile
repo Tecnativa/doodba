@@ -6,6 +6,8 @@ ARG GEOIP_UPDATER_VERSION=6.0.0
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_AMD64_CHECKSUM='dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd'
 ARG WKHTMLTOPDF_ARM64_CHECKSUM="3344e3a72f4cb4c1218cf48ac5fa9e88bef62aa7fa6f2295be7d5bc1fef100b1"
+# Milestone 126
+ARG CHROME_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F1300309%2Fchrome-linux.zip?alt=media"
 ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
@@ -61,7 +63,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS
     && echo "${WKHTMLTOPDF_CHECKSUM} /tmp/wkhtmltox.deb" | sha256sum -c - \
     && (dpkg -i /tmp/wkhtmltox.deb || apt-get -y install -f) \
     && apt-get install -yqq --no-install-recommends \
-        chromium \
+        unzip \
         ffmpeg \
         fonts-liberation2 \
         gettext \
@@ -73,6 +75,9 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS
         openssh-client \
         telnet \
         vim \
+    && curl -fsSL "${CHROME_URL}" -o /tmp/chrome.zip \
+    && unzip -o /tmp/chrome.zip -d /opt \
+    && ln -snf /opt/chrome-linux64/chrome /usr/bin/chromium \
     && echo 'deb https://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \

@@ -8,6 +8,8 @@ ARG WKHTMLTOPDF_VERSION=0.12.6.1
 ARG WKHTMLTOPDF_AMD64_CHECKSUM='98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d'
 ARG WKHTMLTOPDF_ARM64_CHECKSUM="b6606157b27c13e044d0abbe670301f88de4e1782afca4f9c06a5817f3e03a9c"
 ARG WKHTMLTOPDF_URL="https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}-3/wkhtmltox_${WKHTMLTOPDF_VERSION}-3.bookworm_${TARGETARCH}.deb"
+# Milestone 139
+ARG CHROME_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F1477650%2Fchrome-linux.zip?alt=media"
 ARG LAST_SYSTEM_UID=499
 ARG LAST_SYSTEM_GID=499
 ARG FIRST_UID=500
@@ -67,7 +69,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS
     && echo "${WKHTMLTOPDF_CHECKSUM} /tmp/wkhtmltox.deb" | sha256sum -c - \
     && apt-get install -yqq --no-install-recommends \
         /tmp/wkhtmltox.deb \
-        chromium \
+        unzip \
         ffmpeg \
         fonts-liberation2 \
         gettext \
@@ -79,6 +81,9 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS
         openssh-client \
         telnet \
         vim \
+    && curl -fsSL "${CHROME_URL}" -o /tmp/chrome.zip \
+    && unzip -o /tmp/chrome.zip -d /opt \
+    && ln -snf /opt/chrome-linux64/chrome /usr/bin/chromium \
     && echo 'deb https://apt.postgresql.org/pub/repos/apt/ bookworm-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
