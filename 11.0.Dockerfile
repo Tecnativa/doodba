@@ -6,6 +6,8 @@ ARG GEOIP_UPDATER_VERSION=4.1.5
 ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
+# Milestone 126
+ARG CHROME_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F1300309%2Fchrome-linux.zip?alt=media"
 ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
@@ -42,7 +44,7 @@ RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://securit
 RUN apt-get -qq update \
     && apt-get -yqq upgrade \
     && apt-get install -yqq --no-install-recommends \
-        chromium \
+        unzip \
         fonts-liberation2 \
         gettext \
         gnupg2 \
@@ -55,6 +57,9 @@ RUN apt-get -qq update \
         zlibc \
         apt-transport-https \
         ca-certificates \
+    && curl -fsSL "${CHROME_URL}" -o /tmp/chrome.zip \
+    && unzip -o /tmp/chrome.zip -d /opt \
+    && ln -snf /opt/chrome-linux64/chrome /usr/bin/chromium \
     && echo 'deb https://apt-archive.postgresql.org/pub/repos/apt stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && curl https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3 /dev/stdin \
