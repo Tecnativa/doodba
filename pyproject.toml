@@ -9,6 +9,7 @@ requires-python = ">=3.9,<4"
 dev = [
     "plumbum>=1.6.9",
     "pre-commit>=2.9.3",
+    "unittest-xml-reporting>=3.2.0",
 ]
 [tool.poetry]
 package-mode = false

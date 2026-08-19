@@ -13,5 +13,8 @@
     "editor.formatOnSave": false
   },
   "python.analysis.extraPaths": ["./lib", "./tests"],
-  "python.languageServer": "None"
+  "python.languageServer": "None",
+  "python.testing.unittestArgs": ["-v", "-s", "./tests", "-p", "*test*.py"],
+  "python.testing.pytestEnabled": false,
+  "python.testing.unittestEnabled": true
 }

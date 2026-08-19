@@ -44,16 +44,17 @@ jobs:
       - *checkout
       - &setup-buildx
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - &build
-        name: Build image
-        uses: docker/build-push-action@v6
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+      - name: Build image
+        uses: &build-push-action docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           file: ./${{ matrix.odoo_version }}.Dockerfile
           platforms: linux/${{ matrix.platform }}
           push: false
           load: false
+          # Weekly rebuilds ignore cache to pick up fresh base images/packages
+          no-cache: ${{ github.event_name == 'schedule' }}
           cache-from:
             &cache-from type=gha,scope=doodba-${{ matrix.odoo_version }}-${{
             matrix.platform }}
@@ -113,13 +114,12 @@ jobs:
       - uses: *setup-python
         with:
           python-version: ${{ matrix.python_version }}
-      - &setup-compose
-        uses: docker/setup-compose-action@16feee727cbdc83b6a014e6cc26fec4a79bcf30c # v2.2.0
+      - uses: docker/setup-compose-action@16feee727cbdc83b6a014e6cc26fec4a79bcf30c # v2.2.0
         with:
           version: latest
       - *setup-buildx
       - name: Build image
-        uses: docker/build-push-action@v6
+        uses: *build-push-action
         with:
           context: .
           file: ./${{ matrix.odoo_version }}.Dockerfile
@@ -133,17 +133,21 @@ jobs:
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ env.BUILD_DATE }}
             ODOO_VERSION=${{ matrix.odoo_version }}
-      - &install-uv
-        name: Install uv
+      - name: Install uv
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           enable-cache: true
-      - &python-deps
-        name: Install the project
+      - name: Install the project
         run: uv sync --locked --all-extras --dev
-      - &run-tests
-        name: Run tests
-        run: uv run python -m unittest -v tests
+      - name: Run tests
+        run: uv run python -m xmlrunner -v tests --output test_results
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
+        with:
+          name: Python unit tests
+          path: test_results/*.xml
+          reporter: python-xunit
   push:
     # Push by digest as they only get merged into the final image after tests pass
     if: >-
@@ -170,20 +174,20 @@ jobs:
       - *setup-buildx
       - &dockerhub-login
         name: Login to Docker Hub
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        uses: &docker-login-action docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           username: ${{ secrets.DOCKERHUB_LOGIN }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - &ghcr-login
         name: Login to GitHub Container Registry
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        uses: *docker-login-action
         with:
           registry: ghcr.io
           username: ${{ secrets.BOT_LOGIN }}
           password: ${{ secrets.BOT_TOKEN }}
       - name: Build and push base image (ghcr.io)
         id: push-base-ghcr
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        uses: *build-push-action
         with:
           context: .
           file: ./${{ matrix.odoo_version }}.Dockerfile
@@ -199,7 +203,7 @@ jobs:
             type=image,name=ghcr.io/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true
       - name: Build and push base image (docker.io)
         id: push-base-dockerhub
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        uses: *build-push-action
         with:
           context: .
           file: ./${{ matrix.odoo_version }}.Dockerfile
@@ -215,7 +219,7 @@ jobs:
             type=image,name=docker.io/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true
       - name: Build and push onbuild image (ghcr.io)
         id: push-onbuild-ghcr
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        uses: *build-push-action
         with:
           context: .
           file: ./${{ matrix.odoo_version }}.Dockerfile
@@ -231,7 +235,7 @@ jobs:
             type=image,name=ghcr.io/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true
       - name: Build and push onbuild image (docker.io)
         id: push-onbuild-dockerhub
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        uses: *build-push-action
         with:
           context: .
           file: ./${{ matrix.odoo_version }}.Dockerfile
@@ -288,7 +292,7 @@ jobs:
       - &ghcr-meta
         name: Docker meta ghcr.io
         id: docker_meta_ghcr
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
+        uses: &docker-meta-action docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: |
             ghcr.io/${{ env.IMAGE_NAME }}
@@ -315,7 +319,7 @@ jobs:
       - &dockerhub-meta
         name: Docker meta dockerhub
         id: docker_meta_dockerhub
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
+        uses: *docker-meta-action
         with:
           images: |
             docker.io/${{ env.IMAGE_NAME }}
@@ -361,14 +365,24 @@ jobs:
       - *dockerhub-login
       - *dockerhub-meta
       - *dockerhub-merge-manifests
-      - name: Comment PR with execution number
+      - name: Find Comment
         if: matrix.odoo_version == env.LATEST_RELEASE
-        uses: thollander/actions-comment-pull-request@v3
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
+        id: fc
         with:
-          message: |
-            Test this PR by using these tags:
-              ```
-              FROM ghcr.io/tecnativa/doodba:${ODOO_VERSION}-pr-${{ github.event.pull_request.number }}-onbuild
-              FROM ghcr.io/tecnativa/doodba:${ODOO_VERSION}-pr-${{ github.event.pull_request.number }}
-              ```
-          comment-tag: execution
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "Test this PR by using this tag:"
+
+      - name: Create or update comment
+        if: matrix.odoo_version == env.LATEST_RELEASE
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Test this PR by using this tag:
+            ```
+            FROM ghcr.io/tecnativa/doodba:${ODOO_VERSION}-pr-${{ github.event.pull_request.number }}-onbuild
+            ```
+          edit-mode: replace
