@@ -4,7 +4,9 @@ variable "IMAGE_NAME" {
 variable "VERSIONS" {
   default = ["11.0", "12.0", "13.0","14.0","15.0","16.0","17.0","18.0","19.0"]
 }
-
+variable "SUFFIX" {
+ default = ""
+}
 variable "VARIANTS" {
   default = ["base", "onbuild"]
 }
@@ -13,9 +15,15 @@ variable "CI_SKIP_VERSIONS" {
 }
 group "default" {
   targets = [
-    "onbuild-${replace(VERSIONS[length(VERSIONS) - 1], ".0", "")}",
-    "base-${replace(VERSIONS[length(VERSIONS) - 1], ".0", "")}"
+    "onbuild-${ODOO_VERSION}",
+    "base-${ODOO_VERSION}"
   ]
+}
+variable "ODOO_VERSION" {
+    default = replace(VERSIONS[length(VERSIONS) - 1], ".0", "")
+}
+variable "PLATFORMS" {
+    default = ""
 }
 group "all" {
   targets = flatten([
@@ -41,8 +49,9 @@ target "doodba" {
   }
   name = "${variant}-${replace(version, ".0", "")}"
   tags = [
-    "${IMAGE_NAME}:${version}-${variant}"
+    "${IMAGE_NAME}:${version}-${variant}${SUFFIX}"
   ]
   context = "."
   dockerfile = "${version}.Dockerfile"
+  platforms = split(",", PLATFORMS)
 }
