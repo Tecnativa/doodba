@@ -1,7 +1,7 @@
 FROM python:3.12-slim-bookworm AS base
-
+ARG ODOO_VERSION=19.0
+ENV ODOO_VERSION="$ODOO_VERSION"
 EXPOSE 8069 8072
-ARG OS_VERSION="bookworm"
 ARG TARGETARCH
 ARG GEOIP_UPDATER_VERSION=6.0.0
 ARG WKHTMLTOPDF_VERSION=0.12.6.1
@@ -41,8 +41,8 @@ ENV DB_FILTER=.* \
 
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
-RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS_VERSION} \
-    --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${OS_VERSION} \
+RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/tmp,type=tmpfs \
     rm -f /etc/apt/apt.conf.d/docker-clean \
     && echo "LAST_SYSTEM_UID=$LAST_SYSTEM_UID\nLAST_SYSTEM_GID=$LAST_SYSTEM_GID\nFIRST_UID=$FIRST_UID\nFIRST_GID=$FIRST_GID" >> /etc/adduser.conf \
@@ -119,12 +119,10 @@ RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     && mkdir -p /qa/artifacts
 
 ARG ODOO_SOURCE=OCA/OCB
-ARG ODOO_VERSION=19.0
-ENV ODOO_VERSION="$ODOO_VERSION"
 
 # Install Odoo hard & soft dependencies, and Doodba utilities
-RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS_VERSION} \
-    --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${OS_VERSION} \
+RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     --mount=target=/tmp,type=tmpfs \
     build_deps=" \
@@ -264,9 +262,9 @@ ONBUILD RUN [ -d ~root/.ssh ] && rm -r ~root/.ssh; \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
 ONBUILD ARG DB_VERSION=latest
-ONBUILD RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS_VERSION} \
-            --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${OS_VERSION} \
-            --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
+ONBUILD RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+            --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+            --mount=target=/root/.cache/pip,type=cache,id=pip-cache\
             --mount=target=/tmp,type=tmpfs \
             /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
