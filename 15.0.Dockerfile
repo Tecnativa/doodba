@@ -1,6 +1,7 @@
 FROM python:3.8-slim-bullseye AS base
+ARG ODOO_VERSION=15.0
+ENV ODOO_VERSION="$ODOO_VERSION"
 EXPOSE 8069 8072
-ARG OS_VERSION="bullseye"
 ARG TARGETARCH
 ARG GEOIP_UPDATER_VERSION=6.0.0
 ARG WKHTMLTOPDF_VERSION=0.12.5
@@ -33,8 +34,8 @@ ENV DB_FILTER=.* \
 
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
-RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS_VERSION} \
-    --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${OS_VERSION} \
+RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/tmp,type=tmpfs \
     rm -f /etc/apt/apt.conf.d/docker-clean \
     && apt-get -qq update \
@@ -113,12 +114,10 @@ RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     && mkdir -p /qa/artifacts
 
 ARG ODOO_SOURCE=OCA/OCB
-ARG ODOO_VERSION=15.0
-ENV ODOO_VERSION="$ODOO_VERSION"
 
 # Install Odoo hard & soft dependencies, and Doodba utilities
-RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS_VERSION} \
-    --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${OS_VERSION} \
+RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     --mount=target=/tmp,type=tmpfs \
     build_deps=" \
@@ -255,8 +254,8 @@ ONBUILD RUN mkdir -p /opt/odoo/custom/ssh \
             && chmod -R u=rwX,go= /opt/odoo/custom/ssh \
             && sync
 ONBUILD ARG DB_VERSION=latest
-ONBUILD RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OS_VERSION} \
-            --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${OS_VERSION} \
+ONBUILD RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+            --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
             --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
             --mount=target=/tmp,type=tmpfs \
             /opt/odoo/common/build && sync
