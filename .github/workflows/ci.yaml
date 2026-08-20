@@ -35,54 +35,12 @@ jobs:
           python-version: "3.11"
       - uses: tox-dev/action-pre-commit-uv@e09b8958484dfe71f4ac3bc7afb230ba506402ec # v1.0.5
 
-  build:
-    # Build & push PR images so tests and local dev can pull them
+  test:
     runs-on: ${{ matrix.platform == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
     needs: pre-commit
     strategy:
       fail-fast: false
-      matrix: &build-matrix
-        odoo_version:
-          &odoo-versions ["13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
-        platform: ["amd64", "arm64"]
-        exclude:
-          - odoo_version: "13.0"
-            platform: "arm64"
-    steps:
-      # Set build date as env variable to be used later
-      - &set-build-date
-        name: Set build date
-        run: echo "BUILD_DATE=$(date '+%Y-%m-%dT%H:%M:%S.%N%:z')" >> $GITHUB_ENV
-      - *checkout
-      - &setup-buildx
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
-      - name: Build image
-        uses: &build-push-action docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
-        with:
-          context: .
-          file: ./${{ matrix.odoo_version }}.Dockerfile
-          platforms: linux/${{ matrix.platform }}
-          push: false
-          load: false
-          # Weekly rebuilds ignore cache to pick up fresh base images/packages
-          no-cache: ${{ github.event_name == 'schedule' || inputs.no_cache == true }}
-          cache-from: |
-            type=gha,scope=doodba-${{ matrix.odoo_version }}-${{ matrix.platform }}-${{ github.ref_name }}
-          cache-to: |
-            type=gha,mode=max,scope=doodba-${{ matrix.odoo_version }}-${{ matrix.platform }}-${{ github.ref_name }}
-          target: onbuild
-          build-args: |
-            VCS_REF=${{ github.sha }}
-            BUILD_DATE=${{ env.BUILD_DATE }}
-            ODOO_VERSION=${{ matrix.odoo_version }}
-
-  test:
-    runs-on: ${{ matrix.platform == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix: &test-matrix
+      matrix:
         odoo_version: ["19.0"]
         pg_version: ["17"]
         python_version: ["3.12"]
@@ -120,30 +78,37 @@ jobs:
       USE_PREBUILT_IMAGES: true
     steps:
       - *checkout
-      - *set-build-date
+      - &set-build-date
+        name: Set build date
+        run: echo "BUILD_DATE=$(date '+%Y-%m-%dT%H:%M:%S.%N%:z')" >> $GITHUB_ENV
       - uses: *setup-python
         with:
           python-version: ${{ matrix.python_version }}
       - uses: docker/setup-compose-action@16feee727cbdc83b6a014e6cc26fec4a79bcf30c # v2.2.0
         with:
           version: latest
-      - *setup-buildx
+      - &setup-buildx
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
       - name: Build image
-        uses: *build-push-action
+        uses: &build-push-action docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
           file: ./${{ matrix.odoo_version }}.Dockerfile
           platforms: linux/${{ matrix.platform }}
           push: false
           load: true
-          tags: tecnativa/doodba:${{ matrix.odoo_version }}-onbuild
-          cache-from: |
+          tags: tecnativa/doodba:${{ matrix.odoo_version }}-onbuild-testonly
+          cache-from: &cache-from |
             type=gha,scope=doodba-${{ matrix.odoo_version }}-${{ matrix.platform }}-${{ github.ref_name }}
+            type=gha,scope=doodba-${{ matrix.odoo_version }}-${{ matrix.platform }}-${{ github.event.repository.default_branch}}
           target: onbuild
           build-args: |
             VCS_REF=${{ github.sha }}
             BUILD_DATE=${{ env.BUILD_DATE }}
             ODOO_VERSION=${{ matrix.odoo_version }}
+      - name: Use default builder for tests
+        run: docker buildx use default
       - name: Install uv
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
@@ -159,17 +124,23 @@ jobs:
           name: Python unit tests
           path: test_results/*.xml
           reporter: python-xunit
-  push:
+  build-push:
     # Push by digest as they only get merged into the final image after tests pass
     if: >-
       github.ref == format('refs/heads/{0}', github.event.repository.default_branch) ||
       (github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ${{ matrix.platform == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
-    needs: build
+    needs: pre-commit
     strategy:
       fail-fast: false
-      matrix: *build-matrix
+      matrix:
+        odoo_version:
+          &odoo-versions ["13.0", "14.0", "15.0", "16.0", "17.0", "18.0", "19.0"]
+        platform: ["amd64", "arm64"]
+        exclude:
+          - odoo_version: "13.0"
+            platform: "arm64"
     permissions:
       contents: read
       packages: write
@@ -204,8 +175,7 @@ jobs:
           file: ./${{ matrix.odoo_version }}.Dockerfile
           platforms: linux/${{ matrix.platform }}
           push: true
-          cache-from: |
-            type=gha,scope=doodba-${{ matrix.odoo_version }}-${{ matrix.platform }}-${{ github.ref_name }}
+          cache-from: *cache-from
           target: base
           build-args: |
             VCS_REF=${{ github.sha }}
@@ -221,8 +191,7 @@ jobs:
           file: ./${{ matrix.odoo_version }}.Dockerfile
           platforms: linux/${{ matrix.platform }}
           push: true
-          cache-from: |
-            type=gha,scope=doodba-${{ matrix.odoo_version }}-${{ matrix.platform }}-${{ github.ref_name }}
+          cache-from: *cache-from
           target: base
           build-args: |
             VCS_REF=${{ github.sha }}
@@ -238,8 +207,7 @@ jobs:
           file: ./${{ matrix.odoo_version }}.Dockerfile
           platforms: linux/${{ matrix.platform }}
           push: true
-          cache-from: |
-            type=gha,scope=doodba-${{ matrix.odoo_version }}-${{ matrix.platform }}-${{ github.ref_name }}
+          cache-from: *cache-from
           target: onbuild
           build-args: |
             VCS_REF=${{ github.sha }}
@@ -255,8 +223,9 @@ jobs:
           file: ./${{ matrix.odoo_version }}.Dockerfile
           platforms: linux/${{ matrix.platform }}
           push: true
-          cache-from: |
-            type=gha,scope=doodba-${{ matrix.odoo_version }}-${{ matrix.platform }}-${{ github.ref_name }}
+          cache-from: *cache-from
+          cache-to: |
+            type=gha,mode=max,scope=doodba-${{ matrix.odoo_version }}-${{ matrix.platform }}-${{ github.ref_name }}
           target: onbuild
           build-args: |
             VCS_REF=${{ github.sha }}
@@ -284,7 +253,7 @@ jobs:
           retention-days: 1
   merge-manifests-release:
     runs-on: ubuntu-24.04
-    needs: ["test", "push"]
+    needs: ["test", "build-push"]
     if: >-
       github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     strategy:
@@ -362,7 +331,7 @@ jobs:
     if: >-
       (github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository)
-    needs: push
+    needs: build-push
     strategy:
       matrix:
         odoo_version: *odoo-versions
