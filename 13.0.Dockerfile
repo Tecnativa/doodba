@@ -1,12 +1,26 @@
-FROM python:3.6-slim-buster AS base
+FROM scratch AS ctx
+COPY system_files /
+FROM curlimages/curl:8.21.0 AS downloader
+ARG TARGETARCH
+ARG GEOIP_UPDATER_VERSION=4.1.5
+ARG GEOIP_URL="https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb"
+ARG WKHTMLTOPDF_VERSION=0.12.5
+ARG WKHTMLTOPDF_CHECKSUM='dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd'
+ARG WKHTMLTOPDF_URL="https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb"
+
+WORKDIR /downloads
+RUN curl -SLo wkhtmltox.deb ${WKHTMLTOPDF_URL} \
+    && echo "Downloading wkhtmltopdf from: ${WKHTMLTOPDF_URL}" \
+    && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
+    && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
+    && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
+    && curl -L --output geoipupdate.deb ${GEOIP_URL}
+FROM python:3.6-slim-buster AS foundation
 ARG ODOO_VERSION=13.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 EXPOSE 8069 8072
 ARG TARGETARCH
-ARG GEOIP_UPDATER_VERSION=4.1.5
-ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
-ARG WKHTMLTOPDF_VERSION=0.12.5
-ARG WKHTMLTOPDF_CHECKSUM='dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd'
+ARG ODOO_SOURCE=OCA/OCB
 ENV DB_FILTER=.* \
     DEPTH_DEFAULT=1 \
     DEPTH_MERGE=100 \
@@ -19,7 +33,8 @@ ENV DB_FILTER=.* \
     LIST_DB=false \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
-    PATH="/home/odoo/.local/bin:$PATH" \
+    PATH="/opt/odoo-venv/bin:$PATH" \
+    PYTHONPATH="/var/lib/doodba:$PYTHONPATH" \
     PTVSD_ARGS="--host 0.0.0.0 --port 6899 --wait --multiprocess" \
     PTVSD_ENABLE=0 \
     DEBUGPY_ARGS="--listen 0.0.0.0:6899 --wait-for-client" \
@@ -41,20 +56,26 @@ RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://securit
 RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/tmp,type=tmpfs \
+    --mount=type=bind,from=downloader,source=/downloads,target=/downloads \
     rm -f /etc/apt/apt.conf.d/docker-clean \
     && apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
         curl \
-    && curl -SLo /tmp/wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb \
-    && echo "${WKHTMLTOPDF_CHECKSUM} /tmp/wkhtmltox.deb" | sha256sum -c - \
+        gnupg2 \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+        | gpg --dearmor -o /etc/apt/keyrings/postgresql.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/postgresql.gpg] https://apt-archive.postgresql.org/pub/repos/apt buster-pgdg main" \
+        > /etc/apt/sources.list.d/postgresql.list \
+    && apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
-        /tmp/wkhtmltox.deb \
+        /downloads/wkhtmltox.deb \
+        /downloads/geoipupdate.deb \
         chromium \
         ffmpeg \
         fonts-liberation2 \
         gettext \
         git \
-        gnupg2 \
         locales-all \
         nano \
         npm \
@@ -62,37 +83,12 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         telnet \
         vim \
         zlibc \
-    && echo 'deb https://apt-archive.postgresql.org/pub/repos/apt buster-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
-    && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt-get update \
-    && apt-get install -yqq --no-install-recommends \
-    && curl --silent -L --output /tmp/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
-    && dpkg -i /tmp/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_amd64.deb \
     && apt-get autopurge -yqq \
     && sync
 
-WORKDIR /opt/odoo
-COPY bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.6/site-packages/doodbalib
-COPY build.d common/build.d
-COPY conf.d common/conf.d
-COPY entrypoint.d common/entrypoint.d
-RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
-    && mv /opt/odoo/common/conf.d/60-geoip-lt17.conf /opt/odoo/common/conf.d/60-geoip.conf \
-    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf
-RUN mkdir -p auto/addons auto/geoip custom/src/private \
-    && ln /usr/local/bin/direxec common/entrypoint \
-    && ln /usr/local/bin/direxec common/build \
-    && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.6/site-packages/doodbalib \
-    && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
-    && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
-    && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
-    && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
-    && sync
-
-# Doodba-QA dependencies in a separate virtualenv
-COPY qa /qa
+FROM foundation AS qa-builder
+ARG MQT=https://github.com/OCA/maintainer-quality-tools.git
+COPY --from=ctx /qa /qa
 RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     python -m venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
@@ -100,18 +96,15 @@ RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
         click \
         coverage \
         six \
-    && deactivate \
     && mkdir -p /qa/artifacts \
     && git clone --depth 1 $MQT /qa/mqt
+FROM foundation AS venv-builder
 
-ARG ODOO_SOURCE=OCA/OCB
-
-# Install Odoo hard & soft dependencies, and Doodba utilities
 RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
-    --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     --mount=target=/tmp,type=tmpfs \
-    build_deps=" \
+    apt-get update \
+    && apt-get install -yqq --no-install-recommends \
         build-essential \
         libfreetype6-dev \
         libfribidi-dev \
@@ -129,12 +122,15 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         libxslt-dev \
         tcl-dev \
         tk-dev \
-        zlib1g-dev \
-    " \
-    && apt-get update \
-    && apt-get install -yqq --no-install-recommends $build_deps \
-    && pip install \
-        -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+        zlib1g-dev
+# Install Odoo hard & soft dependencies, and Doodba utilities
+RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
+    --mount=target=/tmp,type=tmpfs \
+    python -m venv --system-site-packages /opt/odoo-venv \
+    && . /opt/odoo-venv/bin/activate \
+    && curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+    && pip install --upgrade "pip<22" \
+    && pip install -r requirements.txt \
         'websocket-client~=0.56' \
         astor \
         "git-aggregator<3.0.0" \
@@ -152,20 +148,25 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         wdb \
         geoip2 \
         inotify \
-    && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
-    && apt-get purge -yqq $build_deps \
-    && apt-get autopurge -yqq
-
-# Metadata
-ARG VCS_REF
-ARG BUILD_DATE
-ARG VERSION
-LABEL org.label-schema.schema-version="$VERSION" \
-      org.label-schema.vendor=Tecnativa \
-      org.label-schema.license=Apache-2.0 \
-      org.label-schema.build-date="$BUILD_DATE" \
-      org.label-schema.vcs-ref="$VCS_REF" \
-      org.label-schema.vcs-url="https://github.com/Tecnativa/doodba"
+    && (python3 -m compileall -q /opt/odoo-venv || true)
+FROM foundation AS base
+COPY --from=ctx / /
+COPY --from=qa-builder /qa /qa
+COPY --from=venv-builder /opt/odoo-venv /opt/odoo-venv
+WORKDIR /opt/odoo
+RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
+    && mv /opt/odoo/common/conf.d/60-geoip-lt17.conf /opt/odoo/common/conf.d/60-geoip.conf \
+    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf \
+    &&  mkdir -p auto/addons auto/geoip custom/src/private \
+    && ln /usr/local/bin/direxec common/entrypoint \
+    && ln /usr/local/bin/direxec common/build \
+    && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
+    && chmod -R a+rX /var/lib/doodba \
+    && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
+    && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
+    && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
+    && sed -i 's/.*DatabaseDirectory .*$/DatabaseDirectory \/opt\/odoo\/auto\/geoip\//g' /opt/odoo/auto/geoip/GeoIP.conf \
+    && sync
 
 # Onbuild version, with all the magic
 FROM base AS onbuild

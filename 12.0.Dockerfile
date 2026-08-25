@@ -95,18 +95,16 @@ RUN pip install \
         geoip2 \
         inotify \
     && sync
-COPY bin-deprecated/* bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib
-COPY build.d common/build.d
-COPY conf.d common/conf.d
-COPY entrypoint.d common/entrypoint.d
+COPY system_files/ /
+COPY extra_files/bin-deprecated/* /usr/local/bin/
 RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
     && mv /opt/odoo/common/conf.d/60-geoip-lt17.conf /opt/odoo/common/conf.d/60-geoip.conf \
-    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf
-RUN mkdir -p auto/addons auto/geoip custom/src/private \
+    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf \
+    && mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
+    && mv /var/lib/doodba/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib \
     && chmod -R a+rX /usr/local/lib/python3.5/site-packages/doodbalib \
     && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
@@ -115,7 +113,6 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && sync
 
 # Doodba-QA dependencies in a separate virtualenv
-COPY qa /qa
 RUN python -m venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
     # HACK: Upgrade pip: higher version needed to install pyproject.toml based packages
