@@ -6,10 +6,13 @@ ARG WKHTMLTOPDF_VERSION=0.12.6.1
 ARG WKHTMLTOPDF_AMD64_CHECKSUM='98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d'
 ARG WKHTMLTOPDF_ARM64_CHECKSUM="b6606157b27c13e044d0abbe670301f88de4e1782afca4f9c06a5817f3e03a9c"
 ARG WKHTMLTOPDF_URL="https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}-3/wkhtmltox_${WKHTMLTOPDF_VERSION}-3.bookworm_${TARGETARCH}.deb"
+ARG CHROME_MILESTONE="139"
+ARG CHROMIUM_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F1477650%2Fchrome-linux.zip?alt=media"
 ARG GEOIP_UPDATER_VERSION=6.0.0
 ARG GEOIP_URL="https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb"
 WORKDIR /downloads
-RUN if [ "$TARGETARCH" = "arm64" ]; then \
+RUN --mount=target=/tmp,type=tmpfs \
+    if [ "$TARGETARCH" = "arm64" ]; then \
         WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_ARM64_CHECKSUM; \
     elif [ "$TARGETARCH" = "amd64" ]; then \
         WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_AMD64_CHECKSUM; \
@@ -22,7 +25,9 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
     && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
-    && curl -L --output geoipupdate.deb ${GEOIP_URL}
+    && curl -L --output geoipupdate.deb ${GEOIP_URL} \
+    && curl -fsSL "${CHROMIUM_URL}" -o chromium.zip
+
 FROM python:3.12-slim-bookworm AS foundation
 ARG ODOO_VERSION=19.0
 ENV ODOO_VERSION="$ODOO_VERSION"
@@ -85,7 +90,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
     && apt-get install -yqq --no-install-recommends \
         /downloads/wkhtmltox.deb \
         /downloads/geoipupdate.deb \
-        chromium \
+        unzip \
         ffmpeg \
         fonts-liberation2 \
         gettext \
@@ -96,6 +101,11 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         openssh-client \
         telnet \
         vim \
+        # Chrome deps
+        '?and(?name(libatk-bridge.*) | ?name(libatk1.*) | ?name(libdrm2.*) | ?name(libxcomposite1.*) | ?name(libXdamage.*) | ?name(libxfixes3.*) | ?name(libXrandr.*) | ?name(libgbm.*) | ?name(libxkbcommon0.*) | ?name(libpango1.*) | ?name(libcairo2.*) | ?name(libasound2), ?not(?name(.*-dev)))' \
+    && unzip -o /downloads/chromium.zip -d /opt \
+    && mv /opt/chrome-linux /opt/chromium \
+    && ln -snf /opt/chromium/chrome /usr/bin/chromium \
     && apt-get autopurge -yqq \
     && sync
 

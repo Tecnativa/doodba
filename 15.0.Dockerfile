@@ -7,6 +7,8 @@ ARG GEOIP_URL="https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_AMD64_CHECKSUM='dfab5506104447eef2530d1adb9840ee3a67f30caaad5e9bcb8743ef2f9421bd'
 ARG WKHTMLTOPDF_ARM64_CHECKSUM="3344e3a72f4cb4c1218cf48ac5fa9e88bef62aa7fa6f2295be7d5bc1fef100b1"
+# Milestone 126
+ARG CHROMIUM_URL="https://www.googleapis.com/download/storage/v1/b/chromium-browser-snapshots/o/Linux_x64%2F1300309%2Fchrome-linux.zip?alt=media"
 WORKDIR /downloads
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
         if [ "$WKHTMLTOPDF_VERSION" != "0.12.6.1" ]; then \
@@ -27,7 +29,8 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     && echo "Expected wkhtmltox checksum: ${WKHTMLTOPDF_CHECKSUM}" \
     && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
-    && curl -L --output geoipupdate.deb ${GEOIP_URL}
+    && curl -L --output geoipupdate.deb ${GEOIP_URL} \
+    && curl -fsSL "${CHROMIUM_URL}" -o chromium.zip
 FROM python:3.8-slim-bullseye AS foundation
 ARG ODOO_VERSION=15.0
 ENV ODOO_VERSION="$ODOO_VERSION"
@@ -84,7 +87,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
     && apt-get install -yqq --no-install-recommends \
         /downloads/wkhtmltox.deb \
         /downloads/geoipupdate.deb \
-        chromium \
+        unzip \
         ffmpeg \
         fonts-liberation2 \
         gettext \
@@ -95,6 +98,11 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         openssh-client \
         telnet \
         vim \
+        # Chrome deps
+        '?and(?name(libatk-bridge.*) | ?name(libatk1.*) | ?name(libdrm2.*) | ?name(libxcomposite1.*) | ?name(libXdamage.*) | ?name(libxfixes3.*) | ?name(libXrandr.*) | ?name(libgbm.*) | ?name(libxkbcommon0.*) | ?name(libpango1.*) | ?name(libcairo2.*) | ?name(libasound2), ?not(?name(.*-dev)))' \
+    && unzip -o /downloads/chromium.zip -d /opt \
+    && mv /opt/chrome-linux /opt/chromium \
+    && ln -snf /opt/chromium/chrome /usr/bin/chromium \
     && apt-get autopurge -yqq \
     && sync
 
