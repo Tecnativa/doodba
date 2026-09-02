@@ -1,3 +1,67 @@
+FROM debian:buster AS builder
+RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://security.debian.org,http://archive.debian.org,g' /etc/apt/sources.list
+
+ARG TARGETARCH
+ARG ODOO_VERSION=13.0
+ARG OPENSSL_VERSION=3.5.1
+ARG CURL_VERSION=8.14.1
+ARG GIT_VERSION=2.47.3
+
+RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
+    --mount=target=/tmp,type=tmpfs \
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        autoconf automake libtool pkg-config \
+        libssl-dev zlib1g-dev libpsl-dev \
+        libcurl4-openssl-dev libexpat1-dev \
+        gettext libz-dev \
+        wget ca-certificates
+
+WORKDIR /usr/src
+
+# --- Download all sources (cached independently, survives layer-cache misses) ---
+RUN --mount=type=cache,target=/root/.cache/dl,id=src-downloads-${TARGETARCH},sharing=locked \
+    set -eux; \
+    OPENSSL_TARBALL="openssl-${OPENSSL_VERSION}.tar.gz"; \
+    CURL_TARBALL="curl-${CURL_VERSION}.tar.gz"; \
+    GIT_TARBALL="v${GIT_VERSION}.tar.gz"; \
+    [ -f "/root/.cache/dl/${OPENSSL_TARBALL}" ] || wget -q -O "/root/.cache/dl/${OPENSSL_TARBALL}" \
+        "https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/${OPENSSL_TARBALL}"; \
+    [ -f "/root/.cache/dl/${CURL_TARBALL}" ] || wget -q -O "/root/.cache/dl/${CURL_TARBALL}" \
+        "https://curl.se/download/${CURL_TARBALL}"; \
+    [ -f "/root/.cache/dl/${GIT_TARBALL}" ] || wget -q -O "/root/.cache/dl/${GIT_TARBALL}" \
+        "https://github.com/git/git/archive/refs/tags/${GIT_TARBALL}"; \
+    cp "/root/.cache/dl/${OPENSSL_TARBALL}" /usr/src/; \
+    cp "/root/.cache/dl/${CURL_TARBALL}" /usr/src/; \
+    cp "/root/.cache/dl/${GIT_TARBALL}" /usr/src/; \
+    tar xzf "${OPENSSL_TARBALL}"; \
+    tar xzf "${CURL_TARBALL}"; \
+    tar xzf "${GIT_TARBALL}"
+
+# --- Build OpenSSL 3.x (own layer, static, isolated prefix) ---
+RUN cd openssl-${OPENSSL_VERSION} \
+    && ./Configure --prefix=/opt/openssl --openssldir=/opt/openssl/ssl \
+        no-shared no-tests \
+        linux-$([ "$TARGETARCH" = "arm64" ] && echo aarch64 || echo x86_64) \
+    && make -j"$(nproc)" \
+    && make install_sw install_ssldirs
+
+# --- Build curl against the freshly built OpenSSL (own layer) ---
+RUN cd curl-${CURL_VERSION} \
+    && ./configure --prefix=/usr/local \
+        --with-openssl=/opt/openssl \
+        --enable-ipv6 \
+    && make -j"$(nproc)" \
+    && make install \
+    && make install DESTDIR=/build/curl
+
+# --- Build git (own layer) ---
+RUN cd git-${GIT_VERSION} \
+    && make configure \
+    && ./configure --prefix=/usr/local \
+    && make -j"$(nproc)" all \
+    && make install DESTDIR=/build/git
 FROM python:3.6-slim-buster AS base
 ARG ODOO_VERSION=13.0
 ENV ODOO_VERSION="$ODOO_VERSION"
@@ -33,6 +97,8 @@ ENV DB_FILTER=.* \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost
+COPY --from=builder /build/curl/usr/local /usr/local
+COPY --from=builder /build/git/usr/local /usr/local
 
 # Debian buster was moved to archive
 RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://security.debian.org,http://archive.debian.org,g' /etc/apt/sources.list
@@ -42,9 +108,10 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
     --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
     --mount=target=/tmp,type=tmpfs \
     rm -f /etc/apt/apt.conf.d/docker-clean \
+    && ldconfig \
     && apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
-        curl \
+        zlib1g libpsl5 libexpat1 ca-certificates \
     && curl -SLo /tmp/wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM} /tmp/wkhtmltox.deb" | sha256sum -c - \
     && apt-get install -yqq --no-install-recommends \
@@ -53,7 +120,6 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         ffmpeg \
         fonts-liberation2 \
         gettext \
-        git \
         gnupg2 \
         locales-all \
         nano \
@@ -79,7 +145,9 @@ COPY conf.d common/conf.d
 COPY entrypoint.d common/entrypoint.d
 RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
     && mv /opt/odoo/common/conf.d/60-geoip-lt17.conf /opt/odoo/common/conf.d/60-geoip.conf \
-    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf
+    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf \
+    && git config --system pull.rebase false \
+    && git config --system init.defaultBranch main
 RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
