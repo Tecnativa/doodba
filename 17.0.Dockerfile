@@ -47,8 +47,9 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
     && echo "SYS_UID_MAX   $LAST_SYSTEM_UID\nSYS_GID_MAX   $LAST_SYSTEM_GID" >> /etc/login.defs \
     && sed -i -E "s/^UID_MIN\s+[0-9]+.*/UID_MIN   $FIRST_UID/;s/^GID_MIN\s+[0-9]+.*/GID_MIN   $FIRST_GID/" /etc/login.defs \
     && useradd --system -u $LAST_SYSTEM_UID -s /usr/sbin/nologin -d / systemd-network \
+    && echo "deb http://deb.debian.org/debian bookworm-backports main" |  tee /etc/apt/sources.list.d/bookworm-backports.list \
     && apt-get -qq update \
-    && apt-get install -yqq --no-install-recommends \
+    && apt-get install -t bookworm-backports -yqq --no-install-recommends \
         curl \
     && if [ "$TARGETARCH" = "arm64" ]; then \
         WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_ARM64_CHECKSUM; \
