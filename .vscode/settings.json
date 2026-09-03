@@ -14,7 +14,7 @@
   },
   "python.analysis.extraPaths": ["./lib", "./tests"],
   "python.languageServer": "None",
-  "python.testing.unittestArgs": ["-v", "-s", "./tests", "-p", "*test*.py"],
+  "python.testing.unittestArgs": ["-v", "-s", "./tests", "-p", "*.py"],
   "python.testing.pytestEnabled": false,
   "python.testing.unittestEnabled": true
 }

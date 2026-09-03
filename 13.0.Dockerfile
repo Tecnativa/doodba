@@ -32,7 +32,9 @@ ENV DB_FILTER=.* \
     WDB_NO_BROWSER_AUTO_OPEN=True \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
-    WDB_WEB_SERVER=localhost
+    WDB_WEB_SERVER=localhost \
+    GIT_AUTOSHARE_CACHE_DIR=/var/cache/git-autoshare \
+    GIT_AUTOSHARE_CONFIG_DIR=/opt/odoo/auto/git-autoshare-config
 
 # Debian buster was moved to archive
 RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://security.debian.org,http://archive.debian.org,g' /etc/apt/sources.list
@@ -137,7 +139,8 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         'websocket-client~=0.56' \
         astor \
-        "git-aggregator<3.0.0" \
+        git-aggregator \
+        git-autoshare \
         # Install fix from https://github.com/acsone/click-odoo-contrib/pull/93
         git+https://github.com/Tecnativa/click-odoo-contrib.git@fix-active-modules-hashing \
         "pg_activity<2.0.0" \
@@ -246,7 +249,8 @@ ONBUILD ARG DB_VERSION=latest
 ONBUILD RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
             --mount=target=/var/cache/apt,type=cache,id=apt-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
             --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
-            --mount=target=/tmp,type=tmpfs \
+            --mount=target=/var/cache/git-autoshare,type=cache,id=git-autoshare \
+            --mount=,type=tmpfs,target=/tmp \
             /opt/odoo/common/build && sync
 ONBUILD VOLUME ["/var/lib/odoo"]
 ONBUILD USER odoo
