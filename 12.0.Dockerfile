@@ -35,8 +35,7 @@ ENV DB_FILTER=.* \
     WDB_WEB_SERVER=localhost
 
 # Debian stretch was moved to archive (and stretch-updates does not exist in archive)
-RUN sed -i 's,http://deb.debian.org,http://archive.debian.org,g;s,http://security.debian.org,http://archive.debian.org,g;s,\(.*stretch-updates\),#\1,' /etc/apt/sources.list
-
+COPY legacy/apt/stretch.list /etc/apt/sources.list
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 RUN apt-get -qq update \
@@ -95,11 +94,11 @@ RUN pip install \
         geoip2 \
         inotify \
     && sync
-COPY bin-deprecated/* bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib
-COPY build.d common/build.d
-COPY conf.d common/conf.d
-COPY entrypoint.d common/entrypoint.d
+COPY legacy/bin/* bin/* /usr/local/bin/
+COPY system_files/var/lib/doodba/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib
+COPY system_files/opt/odoo/common/build.d common/build.d
+COPY system_files/opt/odoo/common/conf.d common/conf.d
+COPY system_files/opt/odoo/common/entrypoint.d common/entrypoint.d
 RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
     && mv /opt/odoo/common/conf.d/60-geoip-lt17.conf /opt/odoo/common/conf.d/60-geoip.conf \
     && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf
@@ -115,7 +114,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && sync
 
 # Doodba-QA dependencies in a separate virtualenv
-COPY qa /qa
+COPY system_files/qa /qa
 RUN python -m venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
     # HACK: Upgrade pip: higher version needed to install pyproject.toml based packages

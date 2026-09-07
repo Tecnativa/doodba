@@ -92,7 +92,7 @@ class GemInstaller(Installer):
 
 
 class NpmInstaller(Installer):
-    _cleanup_commands = ["rm -Rf ~/.npm /tmp/*"]
+    _cleanup_commands = ["rm -Rf ~/.npm "]
     _install_command = ["npm", "install", "-g"]
 
 
