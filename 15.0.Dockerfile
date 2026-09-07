@@ -1,3 +1,5 @@
+FROM scratch AS ctx
+COPY system_files /
 FROM python:3.8-slim-bullseye AS base
 ARG ODOO_VERSION=15.0
 ENV ODOO_VERSION="$ODOO_VERSION"
@@ -20,6 +22,7 @@ ENV DB_FILTER=.* \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
+    PYTHONPATH="/var/lib/doodba:$PYTHONPATH" \
     DEBUGPY_ARGS="--listen 0.0.0.0:6899 --wait-for-client" \
     DEBUGPY_ENABLE=0 \
     PUDB_RDB_HOST=0.0.0.0 \
@@ -33,7 +36,7 @@ ENV DB_FILTER=.* \
     WDB_WEB_SERVER=localhost
 
 # Debian bullseye is now EOL
-COPY apt_sources/bullseye.txt /etc/apt/sources.list
+COPY legacy/apt/bullseye.list /etc/apt/sources.list
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
@@ -75,6 +78,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         npm \
         openssh-client \
         telnet \
+        tk-dev \
         vim \
     && echo 'deb https://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
@@ -85,11 +89,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
     && sync
 
 WORKDIR /opt/odoo
-COPY bin/* /usr/local/bin/
-COPY lib/doodbalib /usr/local/lib/python3.8/site-packages/doodbalib
-COPY build.d common/build.d
-COPY conf.d common/conf.d
-COPY entrypoint.d common/entrypoint.d
+COPY --from=ctx / /
 RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
     && mv /opt/odoo/common/conf.d/60-geoip-lt17.conf /opt/odoo/common/conf.d/60-geoip.conf \
     && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf
@@ -97,7 +97,7 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.8/site-packages/doodbalib \
+    && chmod -R a+rX /var/lib/doodba \
     && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
@@ -105,7 +105,6 @@ RUN mkdir -p auto/addons auto/geoip custom/src/private \
     && sync
 
 # Doodba-QA dependencies in a separate virtualenv
-COPY qa /qa
 RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     python -m venv --system-site-packages /qa/venv \
     && . /qa/venv/bin/activate \
