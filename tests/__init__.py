@@ -919,6 +919,54 @@ class ScaffoldingCase(unittest.TestCase):
                 ),
             )
 
+    def test_aggregate_autoshare(self):
+        symlink_dir = join(SCAFFOLDINGS_DIR, "aggregate_autoshare")
+        for sub_env in matrix(
+            odoo_skip={
+                "11.0",
+                "12.0",
+            }
+        ):
+            self.compose_test(
+                symlink_dir,
+                dict(
+                    sub_env,
+                    UID=str(os.getuid()),
+                    GID=str(os.getgid()),
+                ),
+                # Ensure no cache exists prior to 1st aggregation
+                ("rm", "-rf", "/opt/odoo/custom/src/odoo"),
+                ("mkdir", "-p", "/var/cache/git-autoshare"),
+                ("rm", "-rf", "/var/cache/git-autoshare/github.com"),
+                (
+                    "test",
+                    "!",
+                    "-d",
+                    "/var/cache/git-autoshare/github.com/oca-addons-repo-template",
+                ),
+                # The git-autoshare config file should have been correctly generated
+                ("test", "-f", "/opt/odoo/auto/git-autoshare-config/repos.yml"),
+                ("autoaggregate",),
+                # Cache should have been generated
+                (
+                    "test",
+                    "-d",
+                    "/var/cache/git-autoshare/github.com/oca-addons-repo-template",
+                ),
+                # Cloned repo should reference to cache
+                (
+                    "test",
+                    "-f",
+                    "/opt/odoo/custom/src/odoo/.git/objects/info/alternates",
+                ),
+                (
+                    "grep",
+                    "-Fxq",
+                    "/var/cache/git-autoshare/github.com/oca-addons-repo-template/objects",
+                    "/opt/odoo/custom/src/odoo/.git/objects/info/alternates",
+                ),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""Generates the appropiate configuration file for git-autoshare according to
+user-defined settings through environment variables
+"""
+
+import os
+import yaml
+import shutil
+from pathlib import Path
+
+
+def setup_autoshare():
+    GIT_AUTOSHARE_CONFIG_DIR = os.environ.get(
+        "GIT_AUTOSHARE_CONFIG_DIR", "/opt/odoo/auto/git-autoshare-config"
+    )
+    GIT_AUTOSHARE_CACHE_DIR = os.environ.get(
+        "GIT_AUTOSHARE_CACHE_DIR", "/var/cache/git-autoshare"
+    )
+    UID = int(os.environ["UID"])
+    GID = int(os.environ["GID"])
+
+    custom_autoshare = Path("/opt/odoo/custom/src/git-autoshare.yaml")
+    config_dir = Path(GIT_AUTOSHARE_CONFIG_DIR)
+    config_dir.mkdir(parents=True, exist_ok=True)
+    config_file = config_dir / "repos.yml"
+    if custom_autoshare.exists():
+        shutil.copy(custom_autoshare, config_file)
+    else:
+        content = yaml.dump({"github.com": {"*": {"orgs": ["odoo", "oca"]}}})
+        config_file.write_text(content)
+    os.chown(str(config_dir), UID, GID)
+    # Ensure cache dir exists and has correct permissions
+    cache_dir = Path(GIT_AUTOSHARE_CACHE_DIR)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    os.chown(str(cache_dir), UID, GID)
+
+
+if __name__ == "__main__":
+    if shutil.which("git-autoshare-clone"):
+        setup_autoshare()
