@@ -1,0 +1,6 @@
+# deb http://snapshot.debian.org/archive/debian/20200908T070000Z stretch main
+deb http://archive.debian.org/debian stretch main
+# deb http://snapshot.debian.org/archive/debian-security/20200908T070000Z stretch/updates main
+deb http://archive.debian.org/debian-security stretch/updates main
+## deb http://snapshot.debian.org/archive/debian/20200908T070000Z stretch-updates main
+# deb http://archive.debian.org/debian stretch-updates main
