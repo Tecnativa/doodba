@@ -22,7 +22,6 @@ ENV DB_FILTER=.* \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     OPENERP_SERVER=/opt/odoo/auto/odoo.conf \
     PATH="/home/odoo/.local/bin:$PATH" \
-    PYTHONPATH="/var/lib/doodba:$PYTHONPATH" \
     PTVSD_ARGS="--host 0.0.0.0 --port 6899 --wait --multiprocess" \
     PTVSD_ENABLE=0 \
     DEBUGPY_ARGS="--listen 0.0.0.0:6899 --wait-for-client" \
@@ -78,12 +77,13 @@ WORKDIR /opt/odoo
 COPY --from=ctx / /
 RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
     && mv /opt/odoo/common/conf.d/60-geoip-lt17.conf /opt/odoo/common/conf.d/60-geoip.conf \
-    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf
-RUN mkdir -p auto/addons auto/geoip custom/src/private \
+    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf \
+    && mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /var/lib/doodba \
+    && mv /var/lib/doodba/doodbalib /usr/local/lib/python${PYTHON_VERSION%.*}/site-packages/doodbalib \
+    && chmod -R a+rX /usr/local/lib/python${PYTHON_VERSION%.*}/site-packages/doodbalib \
     && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
@@ -150,7 +150,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         wdb \
         geoip2 \
         inotify \
-    && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
+    && (python3 -m compileall -q /usr/local/lib/python${PYTHON_VERSION%.*}/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq
 

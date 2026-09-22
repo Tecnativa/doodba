@@ -95,18 +95,18 @@ RUN pip install \
         inotify \
     && sync
 COPY legacy/bin/* bin/* /usr/local/bin/
-COPY system_files/var/lib/doodba/doodbalib /usr/local/lib/python3.5/site-packages/doodbalib
+COPY system_files/var/lib/doodba/doodbalib /usr/local/lib/python${PYTHON_VERSION%.*}/site-packages/doodbalib
 COPY system_files/opt/odoo/common/build.d common/build.d
 COPY system_files/opt/odoo/common/conf.d common/conf.d
 COPY system_files/opt/odoo/common/entrypoint.d common/entrypoint.d
 RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
     && mv /opt/odoo/common/conf.d/60-geoip-lt17.conf /opt/odoo/common/conf.d/60-geoip.conf \
-    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf
-RUN mkdir -p auto/addons auto/geoip custom/src/private \
+    && rm -f /opt/odoo/common/conf.d/70-database-replica-ge18.conf \
+    && mkdir -p auto/addons auto/geoip custom/src/private \
     && ln /usr/local/bin/direxec common/entrypoint \
     && ln /usr/local/bin/direxec common/build \
     && chmod -R a+rx common/entrypoint* common/build* /usr/local/bin \
-    && chmod -R a+rX /usr/local/lib/python3.5/site-packages/doodbalib \
+    && chmod -R a+rX /usr/local/lib/python${PYTHON_VERSION%.*}/site-packages/doodbalib \
     && cp -a /etc/GeoIP.conf /etc/GeoIP.conf.orig \
     && mv /etc/GeoIP.conf /opt/odoo/auto/geoip/GeoIP.conf \
     && ln -s /opt/odoo/auto/geoip/GeoIP.conf /etc/GeoIP.conf \
@@ -143,7 +143,7 @@ RUN debs="libldap2-dev libsasl2-dev" \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         phonenumbers \
         'websocket-client~=0.53' \
-    && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
+    && (python3 -m compileall -q /usr/local/lib/python${PYTHON_VERSION%.*}/ || true) \
     && apt-get purge -yqq $debs \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
