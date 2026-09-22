@@ -10,10 +10,13 @@ import click_odoo
 @click_odoo.env_options(default_log_level="info", database_must_exist=True)
 def main(env):
     """Set report.url in the database to be pointing at localhost."""
-    env["ir.config_parameter"].set_param("report.url", "http://localhost:8069")
-    env["ir.config_parameter"].set_param(
-        "database.expiration_date", "3000-01-30 00:00:00"
-    )
+    config_parameter = env["ir.config_parameter"]
+    if "set_param" in dir(config_parameter):
+        set_method = config_parameter.set_param
+    else:
+        set_method = config_parameter.set_str
+    set_method("report.url", "http://localhost:8069")
+    set_method("database.expiration_date", "3000-01-30 00:00:00")
     env.cr.commit()
 
 

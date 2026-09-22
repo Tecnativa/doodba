@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
-ODOO_VERSIONS = frozenset(environ.get("ODOO_MINOR", "19.0").split())
+ODOO_VERSIONS = frozenset(environ.get("ODOO_MINOR", "20.0").split())
 PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "17").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
@@ -31,7 +31,7 @@ GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ
 #     ODOO_VERSIONS & {"16.0"}, "Tests not supported in pre-release"
 # )
 prerelease_skip = unittest.skipIf(
-    False, "Tests not supported in pre-release"
+    ODOO_VERSIONS & {"20.0"}, "Tests not supported in pre-release"
 )  # No pre-releases to test
 
 
@@ -126,7 +126,7 @@ class ScaffoldingCase(unittest.TestCase):
         full_env = dict(environ, **sub_env)
         with self.subTest(PWD=workdir, **sub_env):
             try:
-                build_arg = f"ODOO_VERSION={full_env.get('DOCKER_TAG', full_env.get('ODOO_MINOR', '19.0'))}"
+                build_arg = f"ODOO_VERSION={full_env.get('DOCKER_TAG', full_env.get('ODOO_MINOR', '20.0'))}"
                 self.popen(
                     ("docker", "compose", "build", "--build-arg", build_arg),
                     cwd=workdir,
@@ -249,7 +249,7 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_addons_filtered_lt_16(self):
         """Test addons filtering with ``ONLY`` keyword in ``addons.yaml`` for versions < 16"""
-        self._check_addons("dotd", {"16.0", "17.0", "18.0", "19.0"})
+        self._check_addons("dotd", {"16.0", "17.0", "18.0", "19.0", "20.0"})
 
     def test_addons_filtered_ge_16(self):
         """Test addons filtering with ``ONLY`` keyword in ``addons.yaml`` for versions >= 16"""
@@ -411,8 +411,8 @@ class ScaffoldingCase(unittest.TestCase):
                 ("test", "-e", "auto/addons/crm"),
                 ("test", "-d", "auto/addons/crm/migrations"),
             )
-        # TODO: Review error on 19.0
-        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0", "19.0"}):
+        # TODO: Review error on 20.0
+        for sub_env in matrix(odoo_skip={"11.0", "12.0", "13.0", "20.0"}):
             self.compose_test(
                 join(SCAFFOLDINGS_DIR, "addons_env_ou"),
                 sub_env,
@@ -495,7 +495,7 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_dotd_lt_16(self):
         """Test environment with common ``*.d`` directories for versions < 16."""
-        self._check_dotd("dotd", {"16.0", "17.0", "18.0", "19.0"})
+        self._check_dotd("dotd", {"16.0", "17.0", "18.0", "19.0", "20.0"})
 
     def test_dotd_ge_16(self):
         """Test environment with common ``*.d`` directories for versions >= 16."""
@@ -547,7 +547,9 @@ class ScaffoldingCase(unittest.TestCase):
 
     def test_dependencies_lt_16(self):
         """Test dependencies installation for versions < 16"""
-        self._check_dependencies("dependencies", {"16.0", "17.0", "18.0", "19.0"})
+        self._check_dependencies(
+            "dependencies", {"16.0", "17.0", "18.0", "19.0", "20.0"}
+        )
 
     def test_dependencies_ge_16(self):
         """Test dependencies installation for versions >= 16"""
@@ -558,9 +560,9 @@ class ScaffoldingCase(unittest.TestCase):
     def test_dependencies_base_search_fuzzy(self):
         """Test dependencies installation."""
         dependencies_dir = join(SCAFFOLDINGS_DIR, "dependencies_base_search_fuzzy")
-        # TODO: Remove 19.0 from the matrix skip when 'base_search_fuzzy'
+        # TODO: Remove 20.0 from the matrix skip when 'base_search_fuzzy'
         # is available for that version
-        for sub_env in matrix(odoo_skip={"19.0"}):
+        for sub_env in matrix(odoo_skip={"20.0"}):
             self.compose_test(
                 dependencies_dir,
                 sub_env,
@@ -698,7 +700,8 @@ class ScaffoldingCase(unittest.TestCase):
                         "bash",
                         "-c",
                         "timeout 60s bash -c 'while (ls -l /proc/*/exe 2>&1 | grep geoipupdate); do sleep 1; done' &&"
-                        " geoipupdate",
+                        # ignore errors because of HTTP status code: 429: Daily GeoIP database download limit reached
+                        " geoipupdate 2> >(tee /tmp/geoipupdate_errors.log 1>&2) || grep 'HTTP status code: 429' /tmp/geoipupdate_errors.log >/dev/null",
                     ),
                     # verify that geoip database exists after entrypoint finished its update
                     # using ls and /proc because ps is missing in image for 13.0
@@ -896,11 +899,11 @@ class ScaffoldingCase(unittest.TestCase):
                     "--v=1",
                     "about:blank",
                 ),
-                # install odoo base module
+                # install odoo base/test_tests module
                 (
                     "odoo",
                     "-i",
-                    "base",
+                    "base" if float(sub_env["ODOO_MINOR"]) < 20.0 else "test_tests",
                     "--stop-after-init",
                 ),
                 # run odoo test for screencast
