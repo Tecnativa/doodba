@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.DEBUG)
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
 ODOO_VERSIONS = frozenset(environ.get("ODOO_MINOR", "20.0").split())
-PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "17").split())
+PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "18").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
 GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
     "GEOIP_ACCOUNT_ID", False

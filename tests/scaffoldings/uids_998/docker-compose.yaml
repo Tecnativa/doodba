@@ -25,7 +25,7 @@ services:
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: odoopassword
     volumes:
-      - db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql
 
 volumes:
   db:
