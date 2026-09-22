@@ -9,7 +9,12 @@ import click_odoo
 @click_odoo.env_options(default_log_level="error")
 def main(env):
     """Set report.url in the database to be pointing at localhost."""
-    assert env["ir.config_parameter"].get_param("report.url") == "http://localhost:8069"
+    config_parameter = env["ir.config_parameter"]
+    if "set_param" in dir(config_parameter):
+        get_method = config_parameter.get_param
+    else:
+        get_method = config_parameter.get_str
+    assert get_method("report.url") == "http://localhost:8069"
 
 
 if __name__ == "__main__":
