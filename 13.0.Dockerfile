@@ -59,8 +59,10 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         gnupg2 \
         locales-all \
         nano \
+        net-tools \
         npm \
         openssh-client \
+        procps \
         telnet \
         vim \
         zlibc \
@@ -183,6 +185,7 @@ ONBUILD RUN groupadd -g $GID odoo -o \
 # Subimage triggers
 ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint"]
 ONBUILD CMD ["/usr/local/bin/odoo"]
+ONBUILD HEALTHCHECK CMD ["/usr/local/bin/healthcheck"]
 ONBUILD ARG TARGETARCH
 ONBUILD ARG AGGREGATE=true
 ONBUILD ARG DEFAULT_REPO_PATTERN="https://github.com/OCA/{}.git"
