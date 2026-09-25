@@ -8,11 +8,15 @@ ARG WKHTMLTOPDF_ARM64_CHECKSUM="b6606157b27c13e044d0abbe670301f88de4e1782afca4f9
 ARG WKHTMLTOPDF_URL="https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}-3/wkhtmltox_${WKHTMLTOPDF_VERSION}-3.bookworm_${TARGETARCH}.deb"
 ARG GEOIP_UPDATER_VERSION=6.0.0
 ARG GEOIP_URL="https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb"
+ARG PAPER_MUCHER_VERSION="v0.7.1"
+ARG PAPER_MUCHER_URL="https://github.com/odoo/paper-muncher/releases/download/${PAPER_MUCHER_VERSION}/paper-muncher_${PAPER_MUCHER_VERSION}_bookworm_${TARGETARCH}.deb"
 WORKDIR /downloads
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
         WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_ARM64_CHECKSUM; \
+        echo "Paper mucher not supported on ARM64 yet"; \
     elif [ "$TARGETARCH" = "amd64" ]; then \
         WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_AMD64_CHECKSUM; \
+        curl -SLo papermuncher.deb ${PAPER_MUCHER_URL}; \
     else \
         echo "Unsupported architecture: $TARGETARCH" >&2; \
         exit 1; \
@@ -95,6 +99,10 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         openssh-client \
         telnet \
         vim \
+    && if [ "$TARGETARCH" = "amd64" ]; then \
+        apt-get install -yqq --no-install-recommends \
+            /downloads/papermuncher.deb; \
+    fi \
     && apt-get autopurge -yqq \
     && sync
 
@@ -160,8 +168,8 @@ RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
         watchdog \
         wdb \
         rlPyCairo \
-        pycairo
-
+        pycairo \
+        markdown2
 FROM foundation AS base
 COPY --from=ctx / /
 COPY --from=qa-builder /qa /qa
