@@ -87,6 +87,11 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
     && apt-get autopurge -yqq \
     && sync
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpq-dev \
+    && ln -s "$(which pg_config)" /usr/local/bin/pg_config \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /opt/odoo
 COPY --from=ctx / /
 RUN rm -f /opt/odoo/common/conf.d/60-geoip-ge17.conf \
@@ -131,7 +136,6 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
         liblcms2-dev \
         libldap2-dev \
         libopenjp2-7-dev \
-        libpq-dev \
         libsasl2-dev \
         libtiff5-dev \
         libwebp-dev \
