@@ -605,7 +605,7 @@ placing it somewhere.
 ### `autoaggregate`
 
 This little script wraps `git-aggregator` to make it work fine and automatically with
-this image. Used in the [template][]'s `setup-devel.yaml` step.
+this image. Used in the [template][]'s `setup-devel` step.
 
 #### Example `repos.yaml` file
 

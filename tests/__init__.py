@@ -574,7 +574,7 @@ class ScaffoldingCase(unittest.TestCase):
         """tests if we can build an image with a custom uid and gid of odoo"""
         for expected_uid, expected_gid, uids_dir in [
             (1001, 1002, join(SCAFFOLDINGS_DIR, "uids_1001")),
-            (998, 998, join(SCAFFOLDINGS_DIR, "uids_998")),
+            (997, 997, join(SCAFFOLDINGS_DIR, "uids_997")),
         ]:
             for sub_env in matrix():
                 self.compose_test(
@@ -814,7 +814,6 @@ class ScaffoldingCase(unittest.TestCase):
                 symlink_dir,
                 dict(
                     sub_env,
-                    COMPOSE_FILE="setup-devel.yaml",
                     UID=str(os.getuid()),
                     GID=str(os.getgid()),
                 ),

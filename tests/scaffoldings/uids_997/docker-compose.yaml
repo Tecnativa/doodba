@@ -7,8 +7,8 @@ services:
         ODOO_VERSION: $ODOO_MINOR
         PIP_INSTALL_ODOO: "false"
         WITHOUT_DEMO: "false"
-        UID: 998
-        GID: 998
+        UID: 997
+        GID: 997
 
     tty: true
     depends_on:

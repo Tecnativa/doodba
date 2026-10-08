@@ -9,7 +9,7 @@ ARG WKHTMLTOPDF_URL="https://github.com/wkhtmltopdf/packaging/releases/download/
 ARG GEOIP_UPDATER_VERSION=6.0.0
 ARG GEOIP_URL="https://github.com/maxmind/geoipupdate/releases/download/v${GEOIP_UPDATER_VERSION}/geoipupdate_${GEOIP_UPDATER_VERSION}_linux_${TARGETARCH}.deb"
 ARG PAPER_MUCHER_VERSION="v0.7.1"
-ARG PAPER_MUCHER_URL="https://github.com/odoo/paper-muncher/releases/download/${PAPER_MUCHER_VERSION}/paper-muncher_${PAPER_MUCHER_VERSION}_bookworm_${TARGETARCH}.deb"
+ARG PAPER_MUCHER_URL="https://github.com/odoo/paper-muncher/releases/download/${PAPER_MUCHER_VERSION}/paper-muncher_${PAPER_MUCHER_VERSION}_trixie_${TARGETARCH}.deb"
 WORKDIR /downloads
 RUN if [ "$TARGETARCH" = "arm64" ]; then \
         WKHTMLTOPDF_CHECKSUM=$WKHTMLTOPDF_ARM64_CHECKSUM; \
@@ -27,7 +27,7 @@ RUN if [ "$TARGETARCH" = "arm64" ]; then \
     && echo "Computed wkhtmltox checksum: $(sha256sum wkhtmltox.deb | awk '{ print $1 }')" \
     && echo "${WKHTMLTOPDF_CHECKSUM} wkhtmltox.deb" | sha256sum -c - \
     && curl -L --output geoipupdate.deb ${GEOIP_URL}
-FROM python:3.12-slim-bookworm AS foundation
+FROM python:3.14-slim-trixie AS foundation
 ARG ODOO_VERSION=20.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 EXPOSE 8069 8072
@@ -63,7 +63,7 @@ ENV DB_FILTER=.* \
     WDB_SOCKET_SERVER=wdb \
     WDB_WEB_PORT=1984 \
     WDB_WEB_SERVER=localhost
-
+RUN rm -rf /var/lib/apt/lists
 # Other requirements and recommendations
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${ODOO_VERSION},sharing=locked \
@@ -82,7 +82,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
     && mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
         | gpg --dearmor -o /etc/apt/keyrings/postgresql.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/postgresql.gpg] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" \
+    && echo "deb [signed-by=/etc/apt/keyrings/postgresql.gpg] https://apt.postgresql.org/pub/repos/apt trixie-pgdg main" \
         > /etc/apt/sources.list.d/postgresql.list \
     && apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
@@ -147,7 +147,8 @@ RUN --mount=target=/root/.cache/pip,type=cache,id=pip-cache \
     --mount=target=/tmp,type=tmpfs \
     curl -o requirements.txt https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     # need to upgrade setuptools, since the fixes for CVE-2024-6345 rolled out in base images we get errors "error: invalid command 'bdist_wheel'"
-    && pip install --upgrade "setuptools<82" \
+    && sed -i -E "s/libsass==0.22.0/libsass==0.23.0/" requirements.txt \
+    && pip install --upgrade setuptools \
     && pip install --prefix=/python-install \
         -r requirements.txt \
         'websocket-client~=0.56' \
