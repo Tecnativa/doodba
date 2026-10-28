@@ -30,9 +30,9 @@ jobs:
     steps:
       - &checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: &setup-python actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+      - uses: &setup-uv astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - uses: tox-dev/action-pre-commit-uv@e09b8958484dfe71f4ac3bc7afb230ba506402ec # v1.0.5
 
   test:
@@ -85,8 +85,10 @@ jobs:
       - &set-build-date
         name: Set build date
         run: echo "BUILD_DATE=$(date '+%Y-%m-%dT%H:%M:%S.%N%:z')" >> $GITHUB_ENV
-      - uses: *setup-python
+      - name: Install uv
+        uses: *setup-uv
         with:
+          enable-cache: true
           python-version: ${{ matrix.python_version }}
       - uses: docker/setup-compose-action@16feee727cbdc83b6a014e6cc26fec4a79bcf30c # v2.2.0
         with:
@@ -113,10 +115,9 @@ jobs:
             ODOO_VERSION=${{ matrix.odoo_version }}
       - name: Use default builder for tests
         run: docker buildx use default
-      - name: Install uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-        with:
-          enable-cache: true
+      - run: git config --global user.name CI
+      - run: git config --global user.email CI@GITHUB
+      - run: git config --global init.defaultBranch main
       - name: Install the project
         run: uv sync --locked --all-extras --dev
       - name: Run tests
