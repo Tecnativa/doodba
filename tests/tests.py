@@ -3,24 +3,28 @@
 
 Each test must be a valid docker-compose.yaml file with a ``odoo`` service.
 """
+
 import logging
 import os
 import unittest
 from itertools import product
-from os import environ
 from os.path import dirname, join
 from subprocess import Popen
 
+from python_on_whales import docker
+
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("doodba.test")
+
 
 DIR = dirname(__file__)
 ODOO_PREFIX = ("odoo", "--stop-after-init", "--workers=0")
-ODOO_VERSIONS = frozenset(environ.get("ODOO_MINOR", "20.0").split())
-PG_VERSIONS = frozenset(environ.get("PG_VERSIONS", "18").split())
+ODOO_VERSIONS = frozenset(os.environ.get("ODOO_MINOR", "20.0").split())
+PG_VERSIONS = frozenset(os.environ.get("PG_VERSIONS", "18").split())
 SCAFFOLDINGS_DIR = join(DIR, "scaffoldings")
-GEIOP_CREDENTIALS_PROVIDED = environ.get("GEOIP_LICENSE_KEY", False) and environ.get(
-    "GEOIP_ACCOUNT_ID", False
-)
+GEIOP_CREDENTIALS_PROVIDED = os.environ.get(
+    "GEOIP_LICENSE_KEY", False
+) and os.environ.get("GEOIP_ACCOUNT_ID", False)
 
 
 # This decorator skips tests that will fail until some branches and/or addons
@@ -55,47 +59,21 @@ def matrix(
 
 class ScaffoldingCase(unittest.TestCase):
     @classmethod
-    def build_base_image(cls, tag, file):
-        assert (
-            Popen(
-                (
-                    "docker",
-                    "build",
-                    "-t",
-                    tag,
-                    "-f",
-                    file,
-                    "--target",
-                    "onbuild",
-                    ".",
-                ),
-                cwd=os.getcwd(),
-            ).wait()
-            == 0
-        ), "Building image for tests failed"
-
-    @classmethod
     def setUpClass(cls):
         use_prebuilt_images = (
             os.environ.get("USE_PREBUILT_IMAGES", "false").lower() == "true"
         )
-        if "DOCKER_TAG" in os.environ and not use_prebuilt_images:
-            print(f"Building {os.environ['DOCKER_TAG']}-onbuild image...")
-            cls.build_base_image(
-                f"tecnativa/doodba:{os.environ['DOCKER_TAG']}-onbuild-testonly",
-                f"{os.environ['ODOO_MINOR']}.Dockerfile",
+        if not use_prebuilt_images:
+            docker.buildx.bake(
+                load=True,
+                targets="all",
+                variables={
+                    "VERSIONS": ",".join(ODOO_VERSIONS),
+                    "TAG_SUFFIX": "-testonly",
+                },
             )
-        elif not use_prebuilt_images:
-            # We build the “onbuild” images with the latest changes for
-            # testing instead of relying on the latest published ones.
-            for ODOO_VER in ODOO_VERSIONS:
-                print(f"Building {ODOO_VER}-onbuild-testonly image...")
-                cls.build_base_image(
-                    f"tecnativa/doodba:{ODOO_VER}-onbuild-testonly",
-                    f"{ODOO_VER}.Dockerfile",
-                )
         else:
-            logging.info("using prebuilt images")
+            logger.info("using prebuilt images")
 
     def setUp(self):
         super().setUp()
@@ -103,7 +81,7 @@ class ScaffoldingCase(unittest.TestCase):
 
     def popen(self, *args, **kwargs):
         """Shortcut to open a subprocess and ensure it works."""
-        logging.info("Subtest execution: %s", self._subtest)
+        logger.info("Subtest execution: %s", self._subtest)
         self.assertFalse(Popen(*args, **kwargs).wait())
 
     def compose_test(self, workdir, sub_env, *commands):
@@ -123,7 +101,7 @@ class ScaffoldingCase(unittest.TestCase):
         :param tuple()... commands:
             List of commands to be tested in the odoo container.
         """
-        full_env = dict(environ, **sub_env)
+        full_env = dict(os.environ, **sub_env)
         with self.subTest(PWD=workdir, **sub_env):
             try:
                 build_arg = f"ODOO_VERSION={full_env.get('DOCKER_TAG', full_env.get('ODOO_MINOR', '20.0'))}"
