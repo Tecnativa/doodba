@@ -364,6 +364,9 @@ Advanced features:
 
 - You can use any wildcards supported by [Python's glob module][glob].
 
+- A single glob can be written directly, without a list: `web: "*"` means the
+  same as `web: ["*"]`. Use a list when you declare more than one addon.
+
 The following example shows these advanced features:
 
 ```yaml

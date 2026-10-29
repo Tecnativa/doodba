@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
-from glob import glob
+from glob import glob, has_magic
 from pprint import pformat
 from subprocess import check_output
 
@@ -101,6 +101,9 @@ def addons_config(filtered=True, strict=False):
                 for repo, partial_globs in doc.items():
                     if repo == "ENV":
                         continue
+                    if isinstance(partial_globs, str):
+                        # A bare string is one glob, not a list of characters
+                        partial_globs = [partial_globs]
                     logger.debug("Processing %s repo", repo)
                     all_globs.setdefault(repo, set())
                     all_globs[repo].update(partial_globs)
@@ -127,7 +130,12 @@ def addons_config(filtered=True, strict=False):
                     continue
                 manifests = (os.path.join(addon, m) for m in MANIFESTS)
                 if not any(os.path.isfile(m) for m in manifests):
-                    missing_manifest.add(addon)
+                    # Only an explicitly declared addon can be missing. A
+                    # wildcard also matches non-addon directories (OCA repos
+                    # ship a tracked ``setup/``), so recording those would make
+                    # --explicit fail on a correct configuration.
+                    if not has_magic(partial_glob):
+                        missing_manifest.add(addon)
                     logger.debug(
                         "Skipping '%s' as it is not a valid Odoo " "module", addon
                     )
