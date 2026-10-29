@@ -91,6 +91,12 @@ parser.add_argument(
 parser.add_argument(
     "-W", "--without", action="append", default=[], help="Addons to exclude always."
 )
+parser.add_argument(
+    "--skip-auto-install",
+    action="store_true",
+    dest="skip_auto_install",
+    help="Skip auto install addons. Supported on odoo 17.0+",
+)
 
 # Generate the matching addons set
 args = parser.parse_args()
@@ -145,6 +151,8 @@ if args.action == "list":
     print(addons)
 else:
     command = ["odoo", "--stop-after-init", "--{}".format(args.action), addons]
+    if args.skip_auto_install and float(os.environ["ODOO_VERSION"]) > 17.0:
+        command += ["--skip-auto-install"]
     if args.test:
         command += ["--test-enable", "--workers", "0"]
         if os.environ.get("PGDATABASE"):
