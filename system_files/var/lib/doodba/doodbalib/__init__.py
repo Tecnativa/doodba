@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
-from glob import glob
+from glob import glob, has_magic
 from pprint import pformat
 from subprocess import check_output
 
@@ -127,7 +127,9 @@ def addons_config(filtered=True, strict=False):
                     continue
                 manifests = (os.path.join(addon, m) for m in MANIFESTS)
                 if not any(os.path.isfile(m) for m in manifests):
-                    missing_manifest.add(addon)
+                    # A wildcard can also match directories that are not addons
+                    if not has_magic(partial_glob):
+                        missing_manifest.add(addon)
                     logger.debug(
                         "Skipping '%s' as it is not a valid Odoo " "module", addon
                     )
