@@ -573,8 +573,10 @@ class ScaffoldingCase(unittest.TestCase):
     def test_modified_uids(self):
         """tests if we can build an image with a custom uid and gid of odoo"""
         for expected_uid, expected_gid, uids_dir in [
+            # user ids as given when adding a second user to ubuntu desktop (because the initial one (1000) had the "wrong" name)
             (1001, 1002, join(SCAFFOLDINGS_DIR, "uids_1001")),
-            (997, 997, join(SCAFFOLDINGS_DIR, "uids_997")),
+            # user ids as given when installing gitlab-runner on ubuntu server
+            (998, 998, join(SCAFFOLDINGS_DIR, "uids_998")),
         ]:
             for sub_env in matrix():
                 self.compose_test(

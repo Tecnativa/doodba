@@ -75,6 +75,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,id=apt-lists-${TARGETARCH}-${OD
     && echo "SYS_UID_MAX   $LAST_SYSTEM_UID\nSYS_GID_MAX   $LAST_SYSTEM_GID" >> /etc/login.defs \
     && sed -i -E "s/^UID_MIN\s+[0-9]+.*/UID_MIN   $FIRST_UID/;s/^GID_MIN\s+[0-9]+.*/GID_MIN   $FIRST_GID/" /etc/login.defs \
     && useradd --system -u $LAST_SYSTEM_UID -s /usr/sbin/nologin -d / systemd-network \
+    && useradd --system -u $((LAST_SYSTEM_UID - 1)) -s /usr/sbin/nologin -d /nonexistent messagebus \
     && apt-get -qq update \
     && apt-get install -yqq --no-install-recommends \
         curl \
