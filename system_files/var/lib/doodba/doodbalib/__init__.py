@@ -101,6 +101,8 @@ def addons_config(filtered=True, strict=False):
                 for repo, partial_globs in doc.items():
                     if repo == "ENV":
                         continue
+                    if isinstance(partial_globs, str):
+                        partial_globs = [partial_globs]
                     logger.debug("Processing %s repo", repo)
                     all_globs.setdefault(repo, set())
                     all_globs[repo].update(partial_globs)
