@@ -41,6 +41,8 @@ COPY legacy/apt/stretch.list /etc/apt/sources.list
 RUN apt-get -qq update \
     && apt-get -yqq upgrade \
     && apt-get install -yqq --no-install-recommends \
+        apt-transport-https \
+        ca-certificates \
         chromium \
         ffmpeg \
         fonts-liberation2 \
@@ -48,12 +50,12 @@ RUN apt-get -qq update \
         gnupg2 \
         locales-all \
         nano \
+        net-tools \
+        procps \
         ruby \
         telnet \
         vim \
         zlibc \
-        apt-transport-https \
-        ca-certificates \
     && echo 'deb https://apt-archive.postgresql.org/pub/repos/apt stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && curl https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3 /dev/stdin \
@@ -176,6 +178,7 @@ ONBUILD RUN groupadd -g $GID odoo -o \
 # Subimage triggers
 ONBUILD ENTRYPOINT ["/opt/odoo/common/entrypoint"]
 ONBUILD CMD ["/usr/local/bin/odoo"]
+ONBUILD HEALTHCHECK CMD ["/usr/local/bin/healthcheck"]
 ONBUILD ARG AGGREGATE=true
 ONBUILD ARG DEFAULT_REPO_PATTERN="https://github.com/OCA/{}.git"
 ONBUILD ARG DEFAULT_REPO_PATTERN_ODOO="https://github.com/OCA/OCB.git"

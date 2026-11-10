@@ -1,0 +1,216 @@
+#!/usr/bin/env bash
+# check that odoo
+# * bin can be found
+# * if not just an odoo-click- script is running
+#   and not just tests are running
+#   * has process(es) running
+#   *  if http_enabled
+#     * has http ports open
+#     * if multithreaded
+#       * check that longpolling port is open
+#       * check that cron threads are running
+#       * check that http workers are available
+#       * check that not all threads are occupied
+# * db connection is working
+
+if [[ $1 == '-v' ]]; then
+    OUTPUT=""
+    set -x
+else
+    OUTPUT=" >/dev/null"
+fi
+
+errors=0
+skipped=()
+ODOO_CMD=$(which odoo)
+# store cookies in a file that is persisted through restarts
+CURL_COOKIE_JAR="/var/lib/odoo/${PGDATABASE}-healthcheck-cookies.txt"
+if [[ ! -e "$CURL_COOKIE_JAR" ]]; then
+    touch "$CURL_COOKIE_JAR"
+fi
+ONLY_CLICK_ODOO_RUNNING="false"
+ONLY_TEST_RUNNING="false"
+
+function is_skipped() {
+    local skipped_item
+    for skipped_item in "${skipped[@]}"; do
+        if [[ $skipped_item == "$*" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+function check() {
+    local status errors_at_start new_errors
+    errors_at_start=$errors
+    "$@"
+    status=$?
+    errors=$((errors + status))
+    new_errors=$((errors - errors_at_start))
+    if [[ $status == 0 && $new_errors != 0 ]]; then
+        # errors triggered in subchecks also should affect our status
+        status=$new_errors
+    fi
+    if [[ $# == 1 ]]; then
+        if [[ $status != 0 ]]; then
+            echo "$* FAILED"
+        elif is_skipped "$*" ; then
+            echo "$* SKIPPED"
+        else
+            echo "$* OK"
+        fi
+    fi
+
+    return $status
+}
+
+function get_odoo_value() {
+    local argument config argument_value config_value value default_value
+
+    argument=$1
+    config=${2:-$argument}
+    default_value=${3:-}
+
+    argument_value=$(ps fax 2>/dev/null | grep -v grep | grep "$ODOO_CMD" | grep -- '--'"$argument"'\([= ][0-9]\|$\| --\)' | sed 's/.*--'"$argument"'[= ]\([0-9]\+\).*/\1/' | sed 's/.*\(--'"$argument"'\)\($\| --.*\)/\1/' | sort | uniq)
+    config_value=$(grep -R '^'"$config"' = \([0-9]\|true\|false\)' /opt/odoo/auto/odoo.conf | sed 's/'"$config"' = \([0-9]\+\|true\|false\).*/\1/')
+    value=${argument_value:-$config_value}
+
+    echo "${value:-$default_value}"
+}
+
+function get_odoo_workers() {
+    get_odoo_value workers
+}
+
+function get_odoo_cron_threads() {
+    get_odoo_value max-cron-threads max_cron_threads 2
+}
+
+function get_odoo_http_enabled() {
+    local no_xmlrpc no_http
+    no_xmlrpc=$(get_odoo_value no-xmlrpc)
+    no_http=$(get_odoo_value no-http)
+    http_enabled=$(get_odoo_value - http_enabled true)
+    if [[ $no_xmlrpc || $no_http ]] ; then
+        echo "false"
+    else
+        echo "$http_enabled"
+    fi
+}
+
+function odoo_bin_exists() {
+    check test "$ODOO_CMD" != ""
+    check test -x "$ODOO_CMD"
+}
+
+function odoo_run_detection() {
+    # if click script is running
+    if ps fax 2>/dev/null | grep -v grep | grep "[ /]click-odoo-" >/dev/null; then
+        # and odoo is not running
+        if ! ps fax 2>/dev/null | grep -v grep | grep "$ODOO_CMD" | grep -v "odoo.* shell\( \|$\)" >/dev/null ; then
+            # we set the marker that only click odoo is running
+            ONLY_CLICK_ODOO_RUNNING="true"
+            echo "Only click-odoo-.* seems to be running"
+        fi
+    fi
+    # if test is running
+    if ps fax 2>/dev/null | grep -v grep | grep -E '[ /](run_tests|_jb_pytest_runner.py|pytest)' >/dev/null; then
+        # and odoo is not running
+        if ! ps fax 2>/dev/null | grep -v grep | grep "$ODOO_CMD" | grep -v "odoo.* --test-enable\( \|$\)" >/dev/null ; then
+            ONLY_TEST_RUNNING="true"
+            echo "Only test seems to be running"
+        fi
+    fi
+}
+
+function odoo_processes() {
+    if [[ $ONLY_CLICK_ODOO_RUNNING == "false" && $ONLY_TEST_RUNNING == "false" ]]; then
+        # checking for main odoo process
+        check bash -c 'ps fax 2>/dev/null | grep '"$ODOO_CMD"' | grep -v grep | grep -v "odoo.* shell\( \|$\)"'"$OUTPUT"
+        # detect if odoo is running with workers
+        if [[ $(get_odoo_workers) -gt 0 ]]; then
+            check odoo_workers
+        fi
+    else
+        skipped+=("odoo_processes")
+    fi
+}
+
+function odoo_listening_ports() {
+    if [[ $(get_odoo_http_enabled) == "true" && $ONLY_CLICK_ODOO_RUNNING == "false" && $ONLY_TEST_RUNNING == "false" ]] ; then
+        # checking that odoo port is listening
+        check bash -c 'netstat -lnp --tcp | grep :8069'"$OUTPUT"
+        if [[ $(get_odoo_workers) -gt 0 ]]; then
+            # check that odoo is listening on 8072 for longpolling
+            check bash -c 'netstat -lnp --tcp | grep :8072'"$OUTPUT"
+        fi
+    else
+        skipped+=("odoo_listening_ports")
+    fi
+}
+
+function odoo_workers() {
+    local workers
+    local cron_workers
+    local gevent_threads
+    local expected_processes
+
+    # verify that there is enough odoo/worker processes
+    gevent_threads=1
+    workers=$(get_odoo_workers)
+    cron_workers=$(get_odoo_cron_threads)
+    expected_processes=$((1 + workers + cron_workers + gevent_threads))
+    # shellcheck disable=SC2016
+    check bash -c '[[ $(ps fax 2>/dev/null | grep -v grep | grep -v "odoo.* shell\( \|$\)" | grep -c '"$ODOO_CMD"' 2>/dev/null) == '"$expected_processes"' ]]'
+}
+
+function odoo_connectivity() {
+    if [[ $(get_odoo_http_enabled) == "true" && $ONLY_CLICK_ODOO_RUNNING == "false" && $ONLY_TEST_RUNNING == "false" ]] ; then
+        check bash -c 'curl --cookie-jar "'"$CURL_COOKIE_JAR"'" --cookie "'"$CURL_COOKIE_JAR"'" --silent --show-error --fail 127.0.0.1:8069'"$OUTPUT"
+        # detect if odoo is running with workers
+        if [[ $(get_odoo_workers) -gt 0 ]]; then
+            check odoo_connectivity_longpolling
+        fi
+    else
+        skipped+=("odoo_connectivity")
+    fi
+}
+
+function odoo_connectivity_longpolling() {
+    if [[ ${ODOO_VERSION%.*} -ge 16 ]] ; then
+        # /websocket/health was introduced in Odoo version 16.0
+        check bash -c 'curl --silent --show-error --fail "http://127.0.0.1:8072/websocket/health"'"$OUTPUT"
+    else
+        check bash -c 'curl --cookie-jar "'"$CURL_COOKIE_JAR"'" --cookie "'"$CURL_COOKIE_JAR"'" --silent --show-error --fail 127.0.0.1:8072'"$OUTPUT"
+    fi
+}
+
+function postgres_connectivity() {
+    check bash -c 'timeout 1s psql -l'"$OUTPUT"
+}
+
+function odoo_installed() {
+    if [[ $(get_odoo_http_enabled) == "true" && $ONLY_CLICK_ODOO_RUNNING == "false" && $ONLY_TEST_RUNNING == "false" ]] ; then
+        # we add the db to the login url to make sure we do not get redirected upon successful installation of odoo
+        # (/web/login should display the login mask)
+        check bash -c 'curl --cookie-jar "'"$CURL_COOKIE_JAR"'" --cookie "'"$CURL_COOKIE_JAR"'" --silent --dump-header - --show-error --fail "http://127.0.0.1:8069/web/login" | grep "HTTP/1.[10] 200 OK"'"$OUTPUT"
+        check bash -c 'timeout 1s psql -l | grep " '"$PGDATABASE"' "'"$OUTPUT"
+    elif [[ $ONLY_TEST_RUNNING == "true" ]] ; then
+        # we check only the databse when tests are running
+        check bash -c 'timeout 1s psql -l | grep " '"$PGDATABASE"' "'"$OUTPUT"
+    else
+        skipped+=("odoo_installed")
+    fi
+}
+
+check odoo_bin_exists
+odoo_run_detection
+check odoo_processes
+check odoo_listening_ports
+check odoo_connectivity
+check postgres_connectivity
+check odoo_installed
+
+[[ $errors == 0 ]]
+exit $?
